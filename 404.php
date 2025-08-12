@@ -1,60 +1,47 @@
 <?php
 /**
- * The template for displaying 404 pages (not found)
+ * 404 Error Page Template
  *
- * @link https://codex.wordpress.org/Creating_an_Error_404_Page
- *
- * @package Swiftly
+ * @package DubaiDirect
  */
 
-get_header();
-?>
+get_header(); ?>
 
-	<main id="primary" class="site-main">
+<main class="error-404-page">
+    <div class="container">
+        <div class="error-content">
+            <!-- 404 Icon -->
+            <div class="error-icon">
+                <i class="fa-solid fa-exclamation-triangle"></i>
+            </div>
 
-		<section class="error-404 not-found">
-			<header class="page-header">
-				<h1 class="page-title"><?php esc_html_e( 'Oops! That page can&rsquo;t be found.', 'swiftly' ); ?></h1>
-			</header><!-- .page-header -->
+            <!-- Error Message -->
+            <div class="error-message">
+                <h1 class="error-title">404</h1>
+                <h2 class="error-subtitle">Page Not Found</h2>
+                <p class="error-description">
+                    Oops! The page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.
+                </p>
+            </div>
 
-			<div class="page-content">
-				<p><?php esc_html_e( 'It looks like nothing was found at this location. Maybe try one of the links below or a search?', 'swiftly' ); ?></p>
 
-					<?php
-					get_search_form();
+            <!-- Help Section -->
+            <div class="help-section">
+                <h3>Need Help?</h3>
+                <p>If you can't find what you're looking for, our customer support team is here to help.</p>
+                <div class="help-actions">
+                    <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="btn btn-primary">
+                        <i class="fa-solid fa-headset"></i>
+                        Contact Support
+                    </a>
+                    <a href="<?php echo esc_url(home_url('/')); ?>" class="btn btn-secondary">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 
-					the_widget( 'WP_Widget_Recent_Posts' );
-					?>
-
-					<div class="widget widget_categories">
-						<h2 class="widget-title"><?php esc_html_e( 'Most Used Categories', 'swiftly' ); ?></h2>
-						<ul>
-							<?php
-							wp_list_categories(
-								array(
-									'orderby'    => 'count',
-									'order'      => 'DESC',
-									'show_count' => 1,
-									'title_li'   => '',
-									'number'     => 10,
-								)
-							);
-							?>
-						</ul>
-					</div><!-- .widget -->
-
-					<?php
-					/* translators: %1$s: smiley */
-					$swiftly_archive_content = '<p>' . sprintf( esc_html__( 'Try looking in the monthly archives. %1$s', 'swiftly' ), convert_smilies( ':)' ) ) . '</p>';
-					the_widget( 'WP_Widget_Archives', 'dropdown=1', "after_title=</h2>$swiftly_archive_content" );
-
-					the_widget( 'WP_Widget_Tag_Cloud' );
-					?>
-
-			</div><!-- .page-content -->
-		</section><!-- .error-404 -->
-
-	</main><!-- #main -->
-
-<?php
-get_footer();
+<?php get_footer(); ?>

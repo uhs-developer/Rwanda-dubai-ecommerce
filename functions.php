@@ -141,6 +141,14 @@ function dubaidirect_scripts() {
     wp_enqueue_style('dubaidirect-style', get_stylesheet_uri(), array(), _S_VERSION);
     wp_style_add_data('dubaidirect-style', 'rtl', 'replace');
 
+    // Font Awesome for social icons
+    wp_enqueue_style(
+        'font-awesome',
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
+        array(),
+        '6.5.0'
+    );
+
     wp_enqueue_script('dubaidirect-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true);
 
     if (is_singular() && comments_open() && get_option('thread_comments')) {
@@ -177,8 +185,10 @@ if (defined('JETPACK__VERSION')) {
 function dubaidirect_default_menu() {
     echo '<ul class="nav-menu">';
     echo '<li><a href="' . esc_url(home_url('/')) . '">' . esc_html__('Home', 'dubaidirect-rwanda') . '</a></li>';
-    echo '<li><a href="' . esc_url(home_url('/shop/')) . '">' . esc_html__('Shop', 'dubaidirect-rwanda') . '</a></li>';
-    echo '<li><a href="' . esc_url(home_url('/about-us/')) . '">' . esc_html__('About Us', 'dubaidirect-rwanda') . '</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/product-page/')) . '">' . esc_html__('Shop', 'dubaidirect-rwanda') . '</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/promotion/')) . '">' . esc_html__('About Us', 'dubaidirect-rwanda') . '</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/privacy-policy/')) . '">' . esc_html__('Privacy', 'dubaidirect-rwanda') . '</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/blog/')) . '">' . esc_html__('Blog', 'dubaidirect-rwanda') . '</a></li>';
     echo '<li><a href="' . esc_url(home_url('/contact/')) . '">' . esc_html__('Contact', 'dubaidirect-rwanda') . '</a></li>';
     echo '</ul>';
 }
