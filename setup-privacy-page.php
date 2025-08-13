@@ -34,3 +34,4 @@ if (!$privacy_page) {
     echo "<br>Page URL: " . get_permalink($privacy_page->ID);
 }
 ?>
+

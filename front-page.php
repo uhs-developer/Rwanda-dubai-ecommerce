@@ -108,7 +108,7 @@ get_header(); ?>
             <div class="category-grid">
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="https://via.placeholder.com/300x200" alt="Electronics">
+                        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=400&fit=crop" alt="Electronics">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">Electronics</h3>
@@ -180,7 +180,7 @@ get_header(); ?>
 
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="" alt="Auto Parts">
+                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop" alt="Auto Parts">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">Auto Parts</h3>
@@ -252,7 +252,7 @@ get_header(); ?>
 
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="#" alt="Smartphones">
+                        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop" alt="Smartphones">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">Smartphones</h3>
@@ -324,7 +324,7 @@ get_header(); ?>
                 
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="" alt="Laptops">
+                        <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop" alt="Laptops">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">Laptops</h3>
@@ -396,7 +396,7 @@ get_header(); ?>
                 
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="" alt="Home Appliances">
+                        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop" alt="Home Appliances">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">Home Appliances</h3>
@@ -468,7 +468,7 @@ get_header(); ?>
                 
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="" alt="Performance Parts">
+                        <img src="https://images.unsplash.com/photo-1562141964-9d3c5a7124b0?w=400&h=400&fit=crop" alt="Performance Parts">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">Performance Parts</h3>
