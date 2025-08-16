@@ -13,8 +13,6 @@ get_header(); ?>
     <!-- Hero Section -->
     <section class="page-hero">
         <div class="hero-background">
-            <img src="<?php echo get_template_directory_uri(); ?>/assets/images/about-hero.jpg" alt="About DubaiDirect Rwanda" class="hero-image">
-            <div class="hero-overlay"></div>
         </div>
         
         <div class="hero-content">
@@ -38,7 +36,7 @@ get_header(); ?>
                     <p><?php echo esc_html__('Today, we serve thousands of satisfied customers across Rwanda, providing access to premium electronics and auto parts with the reliability and trust that the Rwandan market deserves.', 'dubaidirect-rwanda'); ?></p>
                 </div>
                 <div class="story-image">
-                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/our-story.jpg" alt="Our Story">
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2126&q=80" alt="Our Story">
                 </div>
             </div>
         </div>
@@ -163,7 +161,7 @@ get_header(); ?>
                     </div>
                 </div>
                 <div class="quality-image">
-                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/quality-assurance.jpg" alt="Quality Assurance">
+                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Quality Assurance">
                 </div>
             </div>
         </div>
@@ -176,7 +174,7 @@ get_header(); ?>
             <div class="team-grid">
                 <div class="team-member">
                     <div class="member-photo">
-                        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/team-ceo.jpg" alt="CEO">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="CEO">
                     </div>
                     <div class="member-info">
                         <h3><?php echo esc_html__('Jean Pierre Ndayisaba', 'dubaidirect-rwanda'); ?></h3>
@@ -187,7 +185,7 @@ get_header(); ?>
                 
                 <div class="team-member">
                     <div class="member-photo">
-                        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/team-cto.jpg" alt="CTO">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="CTO">
                     </div>
                     <div class="member-info">
                         <h3><?php echo esc_html__('Marie Uwimana', 'dubaidirect-rwanda'); ?></h3>
@@ -198,7 +196,7 @@ get_header(); ?>
                 
                 <div class="team-member">
                     <div class="member-photo">
-                        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/team-operations.jpg" alt="Operations">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Operations">
                     </div>
                     <div class="member-info">
                         <h3><?php echo esc_html__('David Mwambari', 'dubaidirect-rwanda'); ?></h3>

@@ -1,0 +1,669 @@
+/*
+ * About Us Page Specific Styles
+ * These styles are scoped to the About Us page only
+ * and will not affect other pages due to unique body classes
+ */
+
+/* ==========================================================================
+   CSS ROOT VARIABLES - DUBAIDIRECT RWANDA THEME
+   ========================================================================== */
+
+:root {
+    /* Apple Color Palette */
+    --apple-blue: #0066CC; /* Science Blue - buttons, links, accents */
+    --apple-dark: #1D1D1F; /* Shark - primary text, dark UI elements */
+    --apple-light: #F5F5F7; /* Athens Gray - sectional/background fill */
+    --apple-white: #FFFFFF; /* Pure white - default background */
+    --apple-black: #000000; /* Pure black */
+    --apple-gray-medium: #666666; /* Medium gray */
+    --apple-gray-light: #979797; /* Light-medium gray */
+    --apple-gray-very-light: #EEEEEE; /* Very light gray */
+    --apple-blue-accent: #0088CC; /* Blue accent */
+    
+    /* Rwandan Cultural Colors */
+    --rwanda-green: #2D5016; /* Deep forest green - "Land of a Thousand Hills" */
+    --rwanda-gold: #F4B942; /* Warm golden yellow - Rwandan sunshine */
+    --rwanda-terracotta: #C4622D; /* Terracotta red - traditional pottery */
+    
+    /* Status Colors */
+    --success: #34C759; /* Apple green */
+    --warning: #FF9500; /* Apple orange */
+    --error: #FF3B30; /* Apple red */
+    
+    /* Typography - Apple SF Pro System */
+    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    
+    /* Typography Scale */
+    --h1: 48px/52px;
+    --h2: 36px/40px;
+    --h3: 28px/32px;
+    --h4: 20px/24px;
+    --body-large: 18px/24px;
+    --body-regular: 16px/22px;
+    --body-small: 14px/20px;
+    --caption: 12px/16px;
+    
+    /* Spacing System - 8-point grid */
+    --micro: 4px;
+    --small: 8px;
+    --medium: 16px;
+    --large: 24px;
+    --xl: 32px;
+    --xxl: 48px;
+    --xxxl: 64px;
+    
+    /* Shadows - Apple style */
+    --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.16);
+    
+    /* Border Radius - Apple style */
+    --radius-small: 6px;
+    --radius-medium: 8px;
+    --radius-large: 12px;
+    --radius-xl: 16px;
+    
+    /* Transitions - Apple style */
+    --transition-fast: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-slow: 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ==========================================================================
+   ABOUT US PAGE SPECIFIC STYLES
+   ========================================================================== */
+
+/* Hero Section - About Us Specific */
+.page-about-us .page-hero {
+    position: relative;
+    height: 80vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.page-about-us .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: var(--apple-light);
+}
+
+.page-about-us .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.page-about-us .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(45, 80, 22, 0.8) 0%,
+        rgba(196, 98, 45, 0.6) 50%,
+        rgba(244, 185, 66, 0.4) 100%
+    );
+    z-index: 2;
+}
+
+.page-about-us .hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: var(--apple-white);
+    width: 100%;
+}
+
+.page-about-us .hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    margin-bottom: var(--medium);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
+}
+
+.page-about-us .hero-subtitle {
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0.95;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Container for consistent spacing */
+.page-about-us .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--medium);
+}
+
+/* Our Story Section */
+.page-about-us .our-story {
+    padding: var(--xxxl) 0;
+    background: var(--apple-white);
+}
+
+.page-about-us .story-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--xxl);
+    align-items: center;
+}
+
+.page-about-us .story-text h2 {
+    font-size: var(--h2);
+    color: var(--apple-black);
+    margin-bottom: var(--large);
+    font-weight: 700;
+}
+
+.page-about-us .story-text p {
+    font-size: var(--body-large);
+    line-height: 1.7;
+    color: var(--apple-dark);
+    margin-bottom: var(--large);
+}
+
+.page-about-us .story-image img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Mission & Vision Section */
+.page-about-us .mission-vision {
+    padding: var(--xxxl) 0;
+    background: var(--apple-light);
+}
+
+.page-about-us .mission-vision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--xxl);
+}
+
+.page-about-us .mission-card,
+.page-about-us .vision-card {
+    background: var(--apple-white);
+    padding: var(--xxl);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-small);
+    text-align: center;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.page-about-us .mission-card:hover,
+.page-about-us .vision-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+}
+
+.page-about-us .card-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--large);
+    background: var(--apple-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--apple-blue);
+}
+
+.page-about-us .card-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+.page-about-us .mission-card h3,
+.page-about-us .vision-card h3 {
+    font-size: var(--h3);
+    color: var(--apple-black);
+    margin-bottom: var(--medium);
+    font-weight: 600;
+}
+
+.page-about-us .mission-card p,
+.page-about-us .vision-card p {
+    font-size: var(--body-regular);
+    line-height: 1.6;
+    color: var(--apple-dark);
+}
+
+/* Values Section */
+.page-about-us .our-values {
+    padding: var(--xxxl) 0;
+    background: var(--apple-white);
+}
+
+.page-about-us .section-title {
+    text-align: center;
+    font-size: var(--h2);
+    color: var(--apple-black);
+    margin-bottom: var(--xxl);
+    font-weight: 700;
+}
+
+.page-about-us .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--large);
+}
+
+.page-about-us .value-item {
+    text-align: center;
+    padding: var(--large);
+    background: var(--apple-light);
+    border-radius: var(--radius-large);
+    transition: transform var(--transition-normal);
+}
+
+.page-about-us .value-item:hover {
+    transform: translateY(-2px);
+}
+
+.page-about-us .value-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto var(--medium);
+    background: var(--apple-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--apple-blue);
+}
+
+.page-about-us .value-icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+.page-about-us .value-item h3 {
+    font-size: var(--h4);
+    color: var(--apple-black);
+    margin-bottom: var(--small);
+    font-weight: 600;
+}
+
+.page-about-us .value-item p {
+    font-size: var(--body-regular);
+    line-height: 1.6;
+    color: var(--apple-dark);
+}
+
+/* Quality Assurance Section */
+.page-about-us .quality-assurance {
+    padding: var(--xxxl) 0;
+    background: var(--apple-light);
+}
+
+.page-about-us .quality-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--xxl);
+    align-items: center;
+}
+
+.page-about-us .quality-text h2 {
+    font-size: var(--h2);
+    color: var(--apple-black);
+    margin-bottom: var(--large);
+    font-weight: 700;
+}
+
+.page-about-us .quality-text p {
+    font-size: var(--body-large);
+    line-height: 1.7;
+    color: var(--apple-dark);
+    margin-bottom: var(--large);
+}
+
+.page-about-us .quality-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--large);
+}
+
+.page-about-us .quality-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--medium);
+}
+
+.page-about-us .step-number {
+    width: 40px;
+    height: 40px;
+    background: var(--apple-white);
+    color: var(--apple-black);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--body-regular);
+    flex-shrink: 0;
+}
+
+.page-about-us .step-content h4 {
+    font-size: var(--h4);
+    color: var(--apple-black);
+    margin-bottom: var(--small);
+    font-weight: 600;
+}
+
+.page-about-us .step-content p {
+    font-size: var(--body-regular);
+    line-height: 1.6;
+    color: var(--apple-dark);
+}
+
+.page-about-us .quality-image img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Team Section */
+.page-about-us .our-team {
+    padding: var(--xxxl) 0;
+    background: var(--apple-white);
+}
+
+.page-about-us .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--xxl);
+}
+
+.page-about-us .team-member {
+    background: var(--apple-light);
+    border-radius: var(--radius-large);
+    overflow: hidden;
+    box-shadow: var(--shadow-small);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.page-about-us .team-member:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+}
+
+.page-about-us .member-photo {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+}
+
+.page-about-us .member-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.page-about-us .team-member:hover .member-photo img {
+    transform: scale(1.05);
+}
+
+.page-about-us .member-info {
+    padding: var(--large);
+}
+
+.page-about-us .member-info h3 {
+    font-size: var(--h3);
+    color: var(--apple-black);
+    margin-bottom: var(--small);
+    font-weight: 600;
+}
+
+.page-about-us .member-title {
+    font-size: var(--body-regular);
+    color: var(--apple-black);
+    font-weight: 600;
+    margin-bottom: var(--medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.page-about-us .member-bio {
+    font-size: var(--body-regular);
+    line-height: 1.6;
+    color: var(--apple-dark);
+}
+
+/* Contact CTA Section */
+.page-about-us .contact-cta {
+    padding: var(--xxxl) 0;
+    background: var(--apple-light);
+    color: var(--apple-white);
+    text-align: center;
+}
+
+.page-about-us .cta-content h2 {
+    font-size: var(--h2);
+    margin-bottom: var(--large);
+    font-weight: 700;
+}
+
+.page-about-us .cta-content p {
+    font-size: var(--body-large);
+    margin-bottom: var(--xxl);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.95;
+}
+
+.page-about-us .cta-actions {
+    display: flex;
+    gap: var(--medium);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.page-about-us .btn {
+    display: inline-block;
+    padding: var(--medium) var(--large);
+    border-radius: var(--radius-medium);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--body-regular);
+    transition: all var(--transition-normal);
+    border: 2px solid transparent;
+}
+
+.page-about-us .btn-primary {
+    background: var(--apple-blue);
+    color: var(--apple-white);
+}
+
+.page-about-us .btn-primary:hover {
+    background: var(--apple-white);
+    color: var(--apple-black);
+    transform: translateY(-2px);
+}
+
+.page-about-us .btn-secondary {
+    background: transparent;
+    color: var(--apple-blue);
+    border-color: var(--apple-blue);
+}
+
+.page-about-us .btn-secondary:hover {
+    background: var(--apple-white);
+    color: var(--apple-black);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN - ABOUT US PAGE
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+    .page-about-us .story-content,
+    .page-about-us .quality-content {
+        grid-template-columns: 1fr;
+        gap: var(--large);
+    }
+    
+    .page-about-us .mission-vision-grid {
+        grid-template-columns: 1fr;
+        gap: var(--large);
+    }
+    
+    .page-about-us .values-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .page-about-us .team-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .page-about-us .page-hero {
+        height: 60vh;
+        min-height: 400px;
+    }
+    
+    .page-about-us .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .page-about-us .hero-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .page-about-us .our-story,
+    .page-about-us .mission-vision,
+    .page-about-us .our-values,
+    .page-about-us .quality-assurance,
+    .page-about-us .our-team,
+    .page-about-us .contact-cta {
+        padding: var(--xxl) 0;
+    }
+    
+    .page-about-us .container {
+        padding: 0 var(--medium);
+    }
+    
+    .page-about-us .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .page-about-us .btn {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-about-us .page-hero {
+        height: 50vh;
+        min-height: 300px;
+    }
+    
+    .page-about-us .hero-title {
+        font-size: 2rem;
+    }
+    
+    .page-about-us .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .page-about-us .container {
+        padding: 0 var(--small);
+    }
+    
+    .page-about-us .story-content,
+    .page-about-us .quality-content {
+        gap: var(--medium);
+    }
+    
+    .page-about-us .mission-card,
+    .page-about-us .vision-card {
+        padding: var(--large);
+    }
+    
+    .page-about-us .value-item {
+        padding: var(--medium);
+    }
+    
+    .page-about-us .team-member .member-info {
+        padding: var(--medium);
+    }
+}
+
+/* ==========================================================================
+   ANIMATIONS - ABOUT US PAGE
+   ========================================================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-about-us .story-content,
+.page-about-us .mission-vision-grid,
+.page-about-us .values-grid,
+.page-about-us .quality-content,
+.page-about-us .team-grid {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.page-about-us .value-item:nth-child(1) { animation-delay: 0.1s; }
+.page-about-us .value-item:nth-child(2) { animation-delay: 0.2s; }
+.page-about-us .value-item:nth-child(3) { animation-delay: 0.3s; }
+.page-about-us .value-item:nth-child(4) { animation-delay: 0.4s; }
+
+.page-about-us .team-member:nth-child(1) { animation-delay: 0.1s; }
+.page-about-us .team-member:nth-child(2) { animation-delay: 0.2s; }
+.page-about-us .team-member:nth-child(3) { animation-delay: 0.3s; }
+
+/* ==========================================================================
+   PRINT STYLES - ABOUT US PAGE
+   ========================================================================== */
+
+@media print {
+    .page-about-us .page-hero {
+        height: auto;
+        min-height: auto;
+    }
+    
+    .page-about-us .hero-overlay {
+        display: none;
+    }
+    
+    .page-about-us .hero-title,
+    .page-about-us .hero-subtitle {
+        color: var(--apple-dark);
+    }
+    
+    .page-about-us .btn {
+        display: none;
+    }
+}
+

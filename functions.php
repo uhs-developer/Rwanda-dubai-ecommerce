@@ -186,7 +186,7 @@ function dubaidirect_default_menu() {
     echo '<ul class="nav-menu">';
     echo '<li><a href="' . esc_url(home_url('/')) . '">' . esc_html__('Home', 'dubaidirect-rwanda') . '</a></li>';
     echo '<li><a href="' . esc_url(home_url('/product-page/')) . '">' . esc_html__('Shop', 'dubaidirect-rwanda') . '</a></li>';
-    echo '<li><a href="' . esc_url(home_url('/promotion/')) . '">' . esc_html__('About Us', 'dubaidirect-rwanda') . '</a></li>';
+    echo '<li><a href="' . esc_url(home_url('/about-us/')) . '">' . esc_html__('About Us', 'dubaidirect-rwanda') . '</a></li>';
     echo '<li><a href="' . esc_url(home_url('/privacy-policy/')) . '">' . esc_html__('Privacy', 'dubaidirect-rwanda') . '</a></li>';
     echo '<li><a href="' . esc_url(home_url('/blog/')) . '">' . esc_html__('Blog', 'dubaidirect-rwanda') . '</a></li>';
     echo '<li><a href="' . esc_url(home_url('/contact/')) . '">' . esc_html__('Contact', 'dubaidirect-rwanda') . '</a></li>';
@@ -264,6 +264,74 @@ function dubaidirect_woocommerce_active_body_class($classes) {
     return $classes;
 }
 add_filter('body_class', 'dubaidirect_woocommerce_active_body_class');
+
+/**
+ * Add page-specific body classes for independent styling
+ */
+function dubaidirect_page_specific_body_classes($classes) {
+    // Add unique class for About Us page
+    if (is_page('about-us') || is_page_template('page-about-us.php')) {
+        $classes[] = 'page-about-us';
+        $classes[] = 'about-us-template';
+    }
+    
+    // Add unique class for Checkout page
+    if (is_page('checkout') || is_page_template('page-checkout.php')) {
+        $classes[] = 'page-checkout';
+        $classes[] = 'checkout-template';
+    }
+    
+    // Add unique class for Shop page
+    if (is_page('shop') || is_page_template('page-shop.php')) {
+        $classes[] = 'page-shop';
+        $classes[] = 'shop-template';
+    }
+    
+    // Add unique class for homepage
+    if (is_front_page()) {
+        $classes[] = 'page-homepage';
+        $classes[] = 'homepage-template';
+    }
+    
+    return $classes;
+}
+add_filter('body_class', 'dubaidirect_page_specific_body_classes');
+
+/**
+ * Enqueue page-specific styles
+ */
+function dubaidirect_page_specific_styles() {
+    // Enqueue About Us page styles only when needed
+    if (is_page('about-us') || is_page_template('page-about-us.php')) {
+        wp_enqueue_style(
+            'dubaidirect-about-us',
+            get_template_directory_uri() . '/assets/css/about-us.css',
+            array('dubaidirect-style'),
+            _S_VERSION
+        );
+    }
+    
+    // Enqueue Checkout page styles only when needed
+    if (is_page('checkout') || is_page_template('page-checkout.php')) {
+        wp_enqueue_style(
+            'dubaidirect-checkout',
+            get_template_directory_uri() . '/assets/css/checkout.css',
+            array('dubaidirect-style'),
+            _S_VERSION
+        );
+    }
+    
+    // Enqueue Shop page styles only when needed
+    if (is_page('shop') || is_page_template('page-shop.php')) {
+        wp_enqueue_style(
+            'dubaidirect-shop',
+            get_template_directory_uri() . '/assets/css/shop.css',
+            array('dubaidirect-style'),
+            _S_VERSION
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'dubaidirect_page_specific_styles');
 
 /**
  * Products per page.

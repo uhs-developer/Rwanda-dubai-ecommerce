@@ -11,7 +11,7 @@
 get_header();
 ?>
 
-<main id="primary" class="site-main">
+	<main id="primary" class="site-main">
     <div class="error-404-wrapper">
         <div class="error-404-content">
             
@@ -69,7 +69,7 @@ get_header();
             <div class="error-404-categories">
                 <h3><?php esc_html_e('Popular Categories', 'dubaidirect-rwanda'); ?></h3>
                 <div class="error-404-categories-grid">
-                    <?php
+					<?php
                     $popular_categories = get_terms(array(
                         'taxonomy' => 'product_cat',
                         'number' => 6,
@@ -91,7 +91,7 @@ get_header();
                             </svg>
                             <span><?php echo esc_html($category->name); ?></span>
                         </a>
-                    <?php
+							<?php
                             endif;
                         endforeach;
                     else :

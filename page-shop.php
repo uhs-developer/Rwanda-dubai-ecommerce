@@ -61,6 +61,12 @@ get_header(); ?>
                         <span class="current-price">$899</span>
                         <span class="original-price">$919</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -78,6 +84,12 @@ get_header(); ?>
                     <div class="product-price">
                         <span class="current-price">$299</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -94,6 +106,12 @@ get_header(); ?>
                     <div class="product-price">
                         <span class="current-price">$129</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -112,6 +130,12 @@ get_header(); ?>
                         <span class="current-price">$89</span>
                         <span class="original-price">$119</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -128,6 +152,12 @@ get_header(); ?>
                     <div class="product-price">
                         <span class="current-price">$199</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -145,6 +175,12 @@ get_header(); ?>
                     <div class="product-price">
                         <span class="current-price">$1,199</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -163,6 +199,12 @@ get_header(); ?>
                         <span class="current-price">$1,999</span>
                         <span class="original-price">$2,149</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -179,6 +221,12 @@ get_header(); ?>
                     <div class="product-price">
                         <span class="current-price">$299</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -197,6 +245,12 @@ get_header(); ?>
                         <span class="current-price">$1,299</span>
                         <span class="original-price">$1,499</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -214,6 +268,12 @@ get_header(); ?>
                     <div class="product-price">
                         <span class="current-price">$899</span>
                     </div>
+                    <button class="add-to-cart-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
         </div>
@@ -262,6 +322,103 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Add to Cart functionality
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productCard = this.closest('.product-card');
+            const productTitle = productCard.querySelector('.product-title').textContent;
+            const productPrice = productCard.querySelector('.current-price').textContent;
+            
+            // Add loading state
+            const originalText = this.innerHTML;
+            this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 4v4M4.93 4.93l2.83 2.83M17.07 17.07l2.83-2.83"/></svg> Adding...';
+            this.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Increment cart count
+                cartCount++;
+                updateCartCount();
+                
+                // Show success state
+                this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Added!';
+                this.style.background = '#34C759';
+                
+                // Show notification
+                showNotification(`${productTitle} added to cart!`, 'success');
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.background = '';
+                    this.disabled = false;
+                }, 2000);
+            }, 1000);
+        });
+    });
+
+    // Notification function
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span>${message}</span>
+                <button class="notification-close">&times;</button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => notification.classList.add('show'), 100);
+        
+        // Auto hide after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+        
+        // Close button functionality
+        notification.querySelector('.notification-close').addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        });
+    }
+
+    // Cart functionality
+    let cartCount = 0;
+    
+    // Update cart count in header
+    function updateCartCount() {
+        const cartCountElement = document.querySelector('.cart-count');
+        if (cartCountElement) {
+            cartCountElement.textContent = cartCount;
+            
+            // Add animation class
+            cartCountElement.classList.add('cart-count-updated');
+            setTimeout(() => {
+                cartCountElement.classList.remove('cart-count-updated');
+            }, 300);
+        }
+        
+        // Store in localStorage for persistence
+        localStorage.setItem('dubaidirect_cart_count', cartCount);
+    }
+    
+    // Load cart count from localStorage on page load
+    function loadCartCount() {
+        const savedCount = localStorage.getItem('dubaidirect_cart_count');
+        if (savedCount !== null) {
+            cartCount = parseInt(savedCount);
+            updateCartCount();
+        }
+    }
+    
+    // Initialize cart count
+    loadCartCount();
 });
 </script>
 

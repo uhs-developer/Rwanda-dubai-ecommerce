@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us Page Styling Demo</title>
+    <style>
+        /* Demo CSS to show the scoping concept */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f7;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .demo-title {
+            color: #2D5016;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .benefit {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1 style="color: #2D5016; text-align: center; margin-bottom: 40px;">
+            About Us Page Independent Styling Demo
+        </h1>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">🎯 How It Works</h2>
+            <p>This system provides completely independent styling for the About Us page without affecting other pages like the homepage.</p>
+            
+            <div class="highlight">
+                <strong>Key Concept:</strong> All About Us styles are scoped with <code>.page-about-us</code> class, ensuring they only apply to that specific page.
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">🔧 Implementation</h2>
+            
+            <h3>1. Body Classes Added Automatically</h3>
+            <div class="code-block">
+// In functions.php
+function dubaidirect_page_specific_body_classes($classes) {
+    if (is_page('about-us') || is_page_template('page-about-us.php')) {
+        $classes[] = 'page-about-us';
+        $classes[] = 'about-us-template';
+    }
+    return $classes;
+}
+            </div>
+            
+            <h3>2. Conditional CSS Loading</h3>
+            <div class="code-block">
+// About Us styles only load when needed
+if (is_page('about-us') || is_page_template('page-about-us.php')) {
+    wp_enqueue_style(
+        'dubaidirect-about-us',
+        get_template_directory_uri() . '/assets/css/about-us.css',
+        array('dubaidirect-style'),
+        _S_VERSION
+    );
+}
+            </div>
+            
+            <h3>3. Scoped CSS Classes</h3>
+            <div class="code-block">
+/* about-us.css - All styles are scoped */
+.page-about-us .page-hero {
+    height: 80vh;
+    min-height: 600px;
+}
+
+.page-about-us .hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+}
+
+/* These styles will NEVER affect other pages */
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">✅ Benefits</h2>
+            
+            <div class="benefit">
+                <strong>Complete Isolation:</strong> About Us styles cannot affect other pages
+            </div>
+            
+            <div class="benefit">
+                <strong>Performance:</strong> CSS is only loaded when needed
+            </div>
+            
+            <div class="benefit">
+                <strong>Maintainability:</strong> Easy to modify without risk
+            </div>
+            
+            <div class="benefit">
+                <strong>Scalability:</strong> Simple pattern for other pages
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">📱 Responsive Design</h2>
+            <p>The About Us page includes comprehensive responsive design with:</p>
+            <ul>
+                <li>Mobile-first approach</li>
+                <li>CSS Grid layouts that adapt to screen size</li>
+                <li>Optimized typography scaling</li>
+                <li>Touch-friendly interactive elements</li>
+                <li>Performance-optimized animations</li>
+            </ul>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">🎨 Design System</h2>
+            <p>Uses the existing theme's design system:</p>
+            <ul>
+                <li>CSS custom properties (variables)</li>
+                <li>Apple-inspired design principles</li>
+                <li>8-point grid spacing system</li>
+                <li>Consistent color palette</li>
+                <li>Typography scale</li>
+            </ul>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">⚠️ Important Notes</h2>
+            
+            <div class="warning">
+                <strong>Remember:</strong> Always prefix About Us styles with <code>.page-about-us</code> to maintain isolation.
+            </div>
+            
+            <div class="warning">
+                <strong>Testing:</strong> Test on multiple pages to ensure styles don't leak to other pages.
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">🚀 Next Steps</h2>
+            <ol>
+                <li>Add placeholder images to <code>assets/images/</code></li>
+                <li>Test the About Us page in WordPress</li>
+                <li>Verify styles don't affect other pages</li>
+                <li>Customize colors and layouts as needed</li>
+                <li>Add more page-specific styles using the same pattern</li>
+            </ol>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">📁 File Structure Created</h2>
+            <div class="code-block">
+swiftly/
+├── functions.php (updated with new functions)
+├── page-about-us.php (existing template)
+├── assets/
+│   ├── css/
+│   │   ├── about-us.css (new independent styles)
+│   │   ├── README.md (documentation)
+│   │   └── demo.html (this file)
+│   └── images/ (for About Us page images)
+└── style.css (main theme styles - unchanged)
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
