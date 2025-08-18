@@ -1,0 +1,9 @@
+/* WooCommerce theme overrides (Apple-like)
+   Most styles live in style.css for a single source of truth. */
+
+/* Ensure product lists have consistent spacing */
+.woocommerce ul.products { margin: 0; padding: 0; }
+.woocommerce ul.products li.product { list-style: none; }
+
+
+

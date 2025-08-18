@@ -12,6 +12,11 @@
 <?php wp_body_open(); ?>
 
 <div id="page" class="site">
+    <!-- Promotional Banner -->
+    <div class="promo-banner">
+        <span><?php echo esc_html__('Enjoy fast delivery across Rwanda. Shop the latest electronics now.', 'dubaidirect-rwanda'); ?></span>
+        <a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>"><?php echo esc_html__('Shop now', 'dubaidirect-rwanda'); ?></a>
+    </div>
     <a class="skip-link screen-reader-text" href="#primary"><?php esc_html_e('Skip to content', 'dubaidirect-rwanda'); ?></a>
 
     <header id="masthead" class="site-header">

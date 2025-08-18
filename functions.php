@@ -203,9 +203,9 @@ function dubaidirect_woocommerce_setup() {
         'product_grid'          => array(
             'default_rows'    => 3,
             'min_rows'        => 1,
-            'default_columns' => 4,
+            'default_columns' => 2, // Exact 2-column grid
             'min_columns'     => 1,
-            'max_columns'     => 6,
+            'max_columns'     => 2,
         ),
     ));
     add_theme_support('wc-product-gallery-zoom');
@@ -383,11 +383,45 @@ add_filter('woocommerce_output_related_products_args', 'dubaidirect_woocommerce_
 function dubaidirect_woocommerce_loop_columns() {
     // Check if WooCommerce is active
     if (!class_exists('WooCommerce')) {
-        return 3;
+        return 2;
     }
-    return 4;
+    return 2;
 }
 add_filter('loop_shop_columns', 'dubaidirect_woocommerce_loop_columns');
 
 
+
+/**
+ * Show a "New" eyebrow badge on products published within the last 30 days
+ */
+function dubaidirect_show_new_badge() {
+    if (!class_exists('WooCommerce')) {
+        return;
+    }
+
+    global $product;
+    if (!$product) {
+        return;
+    }
+
+    $product_id = $product->get_id();
+    $published_timestamp = get_post_time('U', true, $product_id);
+    $days_threshold = 30 * DAY_IN_SECONDS;
+
+    if ($published_timestamp && (time() - $published_timestamp) <= $days_threshold) {
+        echo '<span class="new-badge eyebrow eyebrow--new">' . esc_html__('New', 'dubaidirect-rwanda') . '</span>';
+    }
+}
+add_action('woocommerce_before_shop_loop_item_title', 'dubaidirect_show_new_badge', 9);
+
+/**
+ * Add 'featured' class to featured products to allow 2-column spanning tiles
+ */
+function dubaidirect_featured_product_class($classes, $product) {
+    if (is_a($product, 'WC_Product') && $product->is_featured()) {
+        $classes[] = 'featured';
+    }
+    return $classes;
+}
+add_filter('woocommerce_post_class', 'dubaidirect_featured_product_class', 10, 2);
 
