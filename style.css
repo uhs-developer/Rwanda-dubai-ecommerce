@@ -12,40 +12,58 @@ Text Domain: dubaidirect-rwanda
 
 :root {
     /* Apple Color Palette */
-    --apple-blue: #0071e3; /* Apple's signature blue */
-    --apple-dark: #1D1D1F; /* Primary text, dark UI elements */
-    --apple-light: #F5F5F7; /* Sectional/background fill */
-    --apple-white: #FFFFFF; /* Pure white */
-    --apple-black: #000000; /* Pure black */
-    --apple-gray-medium: #86868b; /* Subtle gray text */
-    --apple-gray-light: #d2d2d7; /* Light gray borders */
-    --apple-gray-very-light: #e5e5ea; /* Very light gray */
-    --apple-blue-accent: #1489ff; /* Hover accent */
-    
+    --apple-blue: #0071e3;
+    /* Apple's signature blue */
+    --apple-dark: #1D1D1F;
+    /* Primary text, dark UI elements */
+    --apple-light: #F5F5F7;
+    /* Sectional/background fill */
+    --apple-white: #FFFFFF;
+    /* Pure white */
+    --apple-black: #000000;
+    /* Pure black */
+    --apple-gray-medium: #86868b;
+    /* Subtle gray text */
+    --apple-gray-light: #d2d2d7;
+    /* Light gray borders */
+    --apple-gray-very-light: #e5e5ea;
+    /* Very light gray */
+    --apple-blue-accent: #1489ff;
+    /* Hover accent */
+
     /* Rwandan Cultural Colors */
-    --rwanda-green: #2D5016; /* Deep forest green - "Land of a Thousand Hills" */
-    --rwanda-gold: #F4B942; /* Warm golden yellow - Rwandan sunshine */
-    --rwanda-terracotta: #C4622D; /* Terracotta red - traditional pottery */
-    
+    --rwanda-green: #2D5016;
+    /* Deep forest green - "Land of a Thousand Hills" */
+    --rwanda-gold: #F4B942;
+    /* Warm golden yellow - Rwandan sunshine */
+    --rwanda-terracotta: #C4622D;
+    /* Terracotta red - traditional pottery */
+
     /* Status Colors */
-    --success: #34C759; /* Apple green */
-    --warning: #FF9500; /* Apple orange */
-    --error: #FF3B30; /* Apple red */
-    
+    --success: #34C759;
+    /* Apple green */
+    --warning: #FF9500;
+    /* Apple orange */
+    --error: #FF3B30;
+    /* Apple red */
+
     /* Typography - Apple SF Pro System */
     --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-    
+
     /* Typography Scale (Apple-like) */
-    --h1: 56px/60px; /* Headlines */
+    --h1: 56px/60px;
+    /* Headlines */
     --h2: 36px/40px;
-    --h3: 28px/32px; /* Subheads */
+    --h3: 28px/32px;
+    /* Subheads */
     --h4: 20px/24px;
     --body-large: 18px/24px;
-    --body-regular: 17px/24px; /* Apple's 17px body */
+    --body-regular: 17px/24px;
+    /* Apple's 17px body */
     --body-small: 14px/20px;
     --caption: 12px/16px;
-    
+
     /* Spacing System - 8-point grid */
     --micro: 4px;
     --small: 8px;
@@ -54,18 +72,18 @@ Text Domain: dubaidirect-rwanda
     --xl: 32px;
     --xxl: 48px;
     --xxxl: 64px;
-    
+
     /* Shadows - Apple style */
     --shadow-small: 0 2px 6px rgba(0, 0, 0, 0.06);
     --shadow-medium: 0 8px 20px rgba(0, 0, 0, 0.10);
     --shadow-large: 0 12px 32px rgba(0, 0, 0, 0.12);
-    
+
     /* Border Radius - Apple style */
     --radius-small: 6px;
     --radius-medium: 8px;
     --radius-large: 12px;
     --radius-xl: 16px;
-    
+
     /* Transitions - Apple style */
     --transition-fast: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -77,7 +95,7 @@ Text Domain: dubaidirect-rwanda
 	 ========================================================================== */
 
 * {
-	margin: 0;
+    margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
@@ -104,7 +122,12 @@ body {
    TYPOGRAPHY - APPLE STYLE
 	 ========================================================================== */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--font-family);
     font-weight: 600;
     line-height: 1.2;
@@ -161,10 +184,29 @@ a:hover {
     color: var(--apple-gray-medium);
     font-weight: 600;
 }
-.eyebrow--new { color: #bf4800; }
-.headline-56 { font-size: 56px; line-height: 60px; letter-spacing: -0.02em; font-weight: 700; }
-.subhead-28 { font-size: 28px; line-height: 32px; letter-spacing: -0.01em; font-weight: 600; }
-.body-17 { font-size: 17px; line-height: 24px; }
+
+.eyebrow--new {
+    color: #bf4800;
+}
+
+.headline-56 {
+    font-size: 56px;
+    line-height: 60px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+}
+
+.subhead-28 {
+    font-size: 28px;
+    line-height: 32px;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+}
+
+.body-17 {
+    font-size: 17px;
+    line-height: 24px;
+}
 
 /* ==========================================================================
    LAYOUT & CONTAINERS
@@ -274,7 +316,8 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 48px; /* Apple-standard navbar height */
+    height: 48px;
+    /* Apple-standard navbar height */
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--medium);
@@ -287,7 +330,9 @@ a:hover {
 }
 
 @media (max-width: 768px) {
-    .header-content { height: 48px; }
+    .header-content {
+        height: 48px;
+    }
 }
 
 /* Logo */
@@ -464,7 +509,11 @@ a:hover {
     padding: 10px 16px;
     border-bottom: 1px solid var(--apple-gray-very-light);
 }
-.promo-banner a { color: var(--apple-blue); text-decoration: underline; }
+
+.promo-banner a {
+    color: var(--apple-blue);
+    text-decoration: underline;
+}
 
 /* Mobile Menu Toggle */
 .menu-toggle {
@@ -706,19 +755,19 @@ a:hover {
     .header-content {
         padding: 0 var(--medium);
     }
-    
+
     .main-navigation {
         display: none;
     }
-    
+
     .menu-toggle {
         display: flex;
     }
-    
+
     .header-actions {
         margin-left: var(--medium);
     }
-    
+
     .header-logo {
         margin-right: 0;
     }
@@ -728,11 +777,11 @@ a:hover {
     .header-content {
         padding: 0 var(--small);
     }
-    
+
     .header-actions {
         gap: var(--small);
     }
-    
+
     .header-action-btn {
         width: 36px;
         height: 36px;
@@ -888,6 +937,7 @@ a:hover {
 }
 
 @media (max-width: 768px) {
+
     .grid-2,
     .grid-3,
     .grid-4 {
@@ -1145,23 +1195,23 @@ a:hover {
     .category-content {
         padding: var(--medium);
     }
-    
+
     .category-image {
         height: 180px;
     }
-    
+
     .category-title {
         font-size: var(--h4);
     }
-    
+
     .category-description {
         font-size: var(--body-small);
     }
-    
+
     .category-features {
         gap: var(--micro);
     }
-    
+
     .feature-item {
         font-size: var(--caption);
     }
@@ -1171,11 +1221,11 @@ a:hover {
         gap: var(--micro);
         padding: var(--small);
     }
-    
+
     .subcategory-item {
         padding: var(--micro) var(--small);
     }
-    
+
     .subcategory-item span {
         font-size: var(--caption);
     }
@@ -1195,15 +1245,20 @@ a:hover {
     background: var(--apple-dark);
     color: #fff;
 }
+
 .section-dark .section-title,
 .section-dark .section-subtitle,
 .section-dark h1,
 .section-dark h2,
 .section-dark h3,
 .section-dark h4,
-.section-dark p { color: #fff; }
+.section-dark p {
+    color: #fff;
+}
 
-.text-secondary { color: var(--apple-gray-medium); }
+.text-secondary {
+    color: var(--apple-gray-medium);
+}
 
 /* ==========================================================================
    LATEST BLOGS
@@ -1286,7 +1341,7 @@ a:hover {
     display: flex;
     align-items: flex-end;
     justify-content: flex-start;
-    background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15) 40%, rgba(0,0,0,0));
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15) 40%, rgba(0, 0, 0, 0));
     padding: var(--xl);
     opacity: 0;
     transform: translateY(6px);
@@ -1354,31 +1409,70 @@ a:hover {
     font-size: var(--body-large);
 }
 
+/* Container (form wrapper) */
 .newsletter-inline-form {
     display: grid;
     grid-template-columns: min(30vw, 720px) auto;
     align-items: center;
-    background: var(--apple-white);
-    border-radius: var(--radius-medium);
     overflow: hidden;
-    border: 1px solid var(--apple-gray-very-light);
 }
 
-.newsletter-input {
+/* Email input (plugin uses .tnp-email) */
+.tnp-email {
     padding: var(--large);
     border: none;
     outline: none;
     font-size: var(--body-large);
     min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.newsletter-button {
+/* Submit button (plugin uses .tnp-submit) */
+.tnp-submit {
     padding: var(--large) var(--xxl);
-    background: var(--apple-blue);
+    background: var(--apple-blue) !important;
     color: #fff;
     font-weight: 700;
-    border: none;
+    border: 1px solid var(--apple-blue) !important;
+    border-radius: 0.5rem !important;
     cursor: pointer;
+    width: 100%;
+    height: 100%;
+    margin-top: 1.2rem !important;
+}
+
+/* Remove the plugin's default alignment */
+.tnp-field-button {
+    text-align: unset !important;
+}
+
+/* Newsletter confirmation page styling */
+.newsletter-confirmation {
+    text-align: center;
+    padding: var(--xxxl) 0;
+    background: var(--apple-light);
+}
+
+.newsletter-confirmation .container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.newsletter-confirmation h1 {
+    font-size: var(--h2);
+    color: var(--apple-dark);
+    margin-bottom: var(--large);
+}
+
+.newsletter-confirmation p {
+    font-size: var(--body-large);
+    color: var(--apple-gray-medium);
+    line-height: 1.6;
+}
+
+.newsletter-confirmation .btn {
+    margin-top: var(--large);
 }
 
 @media (max-width: 768px) {
@@ -1386,10 +1480,12 @@ a:hover {
         grid-template-columns: 1fr;
         gap: var(--large);
     }
+
     .newsletter-inline-form {
         grid-template-columns: 1fr auto;
     }
 }
+
 /* ==========================================================================
    TRUST INDICATORS - APPLE STYLE
    ========================================================================== */
@@ -1443,10 +1539,10 @@ a:hover {
 }
 
 .delivery-tier input[type="radio"] {
-	display: none;
+    display: none;
 }
 
-.delivery-tier input[type="radio"]:checked + .option-content {
+.delivery-tier input[type="radio"]:checked+.option-content {
     border-color: var(--apple-blue);
     background: rgba(0, 102, 204, 0.05);
 }
@@ -1488,7 +1584,7 @@ a:hover {
 }
 
 .form-label {
-	display: block;
+    display: block;
     margin-bottom: var(--small);
     font-weight: 500;
     color: var(--apple-dark);
@@ -1538,16 +1634,16 @@ a:hover {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .btn {
         width: 100%;
         max-width: 300px;
     }
-    
+
     .section {
         padding: var(--xxl) 0;
     }
-    
+
     .container {
         padding: 0 var(--medium);
     }
@@ -1557,11 +1653,11 @@ a:hover {
     .hero-title {
         font-size: 2rem;
     }
-    
+
     .hero-subtitle {
         font-size: var(--body-regular);
     }
-    
+
     .card {
         padding: var(--medium);
     }
@@ -1583,19 +1679,53 @@ a:hover {
     text-align: right;
 }
 
-.mb-0 { margin-bottom: 0; }
-.mb-small { margin-bottom: var(--small); }
-.mb-medium { margin-bottom: var(--medium); }
-.mb-large { margin-bottom: var(--large); }
-.mb-xl { margin-bottom: var(--xl); }
-.mb-xxl { margin-bottom: var(--xxl); }
+.mb-0 {
+    margin-bottom: 0;
+}
 
-.mt-0 { margin-top: 0; }
-.mt-small { margin-top: var(--small); }
-.mt-medium { margin-top: var(--medium); }
-.mt-large { margin-top: var(--large); }
-.mt-xl { margin-top: var(--xl); }
-.mt-xxl { margin-top: var(--xxl); }
+.mb-small {
+    margin-bottom: var(--small);
+}
+
+.mb-medium {
+    margin-bottom: var(--medium);
+}
+
+.mb-large {
+    margin-bottom: var(--large);
+}
+
+.mb-xl {
+    margin-bottom: var(--xl);
+}
+
+.mb-xxl {
+    margin-bottom: var(--xxl);
+}
+
+.mt-0 {
+    margin-top: 0;
+}
+
+.mt-small {
+    margin-top: var(--small);
+}
+
+.mt-medium {
+    margin-top: var(--medium);
+}
+
+.mt-large {
+    margin-top: var(--large);
+}
+
+.mt-xl {
+    margin-top: var(--xl);
+}
+
+.mt-xxl {
+    margin-top: var(--xxl);
+}
 
 .hidden {
     display: none;
@@ -1622,6 +1752,7 @@ a:hover {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1637,6 +1768,7 @@ a:hover {
         opacity: 0;
         transform: translateX(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -1652,6 +1784,7 @@ a:hover {
    ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -1681,18 +1814,19 @@ a:hover {
    ========================================================================== */
 
 @media print {
+
     .site-header,
     .site-footer,
     .btn,
     .hero-actions {
         display: none;
     }
-    
+
     body {
         font-size: 12pt;
         line-height: 1.4;
     }
-    
+
     .hero-section {
         min-height: auto;
         padding: 2rem 0;
@@ -1710,17 +1844,60 @@ a:hover {
 }
 
 /* Minimal footer to match screenshot */
-.footer-minimal { padding: 48px 0; border-top: 1px solid var(--apple-gray-very-light); }
-.footer-minimal-top { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:48px; }
-.footer-minimal-links { display:flex; gap:32px; }
-.footer-minimal-links a { color: var(--apple-dark); text-decoration:none; font-weight:500; }
-.footer-minimal-social { display:flex; gap:24px; color: var(--apple-gray-medium); }
-.footer-minimal-social a { color: var(--apple-gray-medium); text-decoration:none; font-size: 18px; }
-.footer-minimal-social a:hover { color: var(--apple-dark); }
-.footer-minimal-bottom { color: var(--apple-gray-medium); font-size: var(--body-small); }
-.footer-minimal-bottom .heart { color:#ff4d4f; }
-@media (max-width:768px){
-  .footer-minimal-top{ flex-direction:column; align-items:flex-start; }
+.footer-minimal {
+    padding: 48px 0;
+    border-top: 1px solid var(--apple-gray-very-light);
+}
+
+.footer-minimal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+.footer-minimal-links {
+    display: flex;
+    gap: 32px;
+}
+
+.footer-minimal-links a {
+    color: var(--apple-dark);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footer-minimal-social {
+    display: flex;
+    gap: 24px;
+    color: var(--apple-gray-medium);
+}
+
+.footer-minimal-social a {
+    color: var(--apple-gray-medium);
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.footer-minimal-social a:hover {
+    color: var(--apple-dark);
+}
+
+.footer-minimal-bottom {
+    color: var(--apple-gray-medium);
+    font-size: var(--body-small);
+}
+
+.footer-minimal-bottom .heart {
+    color: #ff4d4f;
+}
+
+@media (max-width:768px) {
+    .footer-minimal-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 /* ==========================================================================
@@ -1802,14 +1979,16 @@ a:hover {
 .products-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px; /* Exact 12px gaps */
+    gap: 12px;
+    /* Exact 12px gaps */
     max-width: 1600px;
     margin: 0 auto;
 }
 
 @media (max-width: 767px) {
     .products-grid {
-        grid-template-columns: 1fr; /* Single column on smaller screens */
+        grid-template-columns: 1fr;
+        /* Single column on smaller screens */
         gap: 12px;
         justify-items: center;
     }
@@ -1826,7 +2005,8 @@ a:hover {
 /* Product Cards */
 .product-card {
     background: var(--apple-white);
-    border-radius: 18px; /* Exact rounded corners */
+    border-radius: 18px;
+    /* Exact rounded corners */
     overflow: hidden;
     box-shadow: var(--shadow-small);
     transition: all var(--transition-normal);
@@ -1838,7 +2018,8 @@ a:hover {
 }
 
 .product-card:hover {
-    transform: scale(1.005); /* Subtle scaling */
+    transform: scale(1.005);
+    /* Subtle scaling */
     box-shadow: var(--shadow-large);
 }
 
@@ -1890,7 +2071,8 @@ a:hover {
 }
 
 .product-badge.new {
-    background: #bf4800; /* Orange for NEW */
+    background: #bf4800;
+    /* Orange for NEW */
     color: var(--apple-white);
 }
 
@@ -1958,15 +2140,39 @@ a:hover {
 }
 
 /* Color-coded tile helpers */
-.tile-blue { background: linear-gradient(180deg, #eaf2ff, #ffffff); }
-.tile-dark { background: linear-gradient(180deg, #1d1d1f, #2c2c2e); color: #fff; }
-.tile-purple { background: linear-gradient(180deg, #f3e8ff, #ffffff); }
-.tile-green { background: linear-gradient(180deg, #e7fff1, #ffffff); }
+.tile-blue {
+    background: linear-gradient(180deg, #eaf2ff, #ffffff);
+}
+
+.tile-dark {
+    background: linear-gradient(180deg, #1d1d1f, #2c2c2e);
+    color: #fff;
+}
+
+.tile-purple {
+    background: linear-gradient(180deg, #f3e8ff, #ffffff);
+}
+
+.tile-green {
+    background: linear-gradient(180deg, #e7fff1, #ffffff);
+}
 
 /* Buttons - pill variant */
-.btn-pill { border-radius: 980px; padding: 10px 22px; font-weight: 600; }
-.link-text { color: var(--apple-blue); text-decoration: none; font-weight: 500; }
-.link-text:hover { text-decoration: underline; }
+.btn-pill {
+    border-radius: 980px;
+    padding: 10px 22px;
+    font-weight: 600;
+}
+
+.link-text {
+    color: var(--apple-blue);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-text:hover {
+    text-decoration: underline;
+}
 
 /* =======================================================================
    WooCommerce archive grid - exact 2 columns, 12px gaps
@@ -2086,24 +2292,24 @@ a:hover {
     .filter-tabs {
         gap: var(--medium);
     }
-    
+
     .filter-tab {
         padding: var(--small) var(--medium);
         font-size: var(--body-small);
     }
-    
+
     .shop-title {
         font-size: var(--h2);
     }
-    
+
     .product-image {
         height: 240px;
     }
-    
+
     .product-content {
         padding: var(--medium);
     }
-    
+
     .product-title {
         font-size: var(--body-small);
     }
@@ -2555,28 +2761,685 @@ a:hover {
     line-height: 1.6;
 }
 
+/* =======================================================================
+   CONTACT FORM PLUGIN STYLING - APPLE STYLE
+   ======================================================================= */
+
+/* Contact Form 7 Styling */
+.wpcf7-form {
+    margin: 0;
+}
+
+.wpcf7-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--medium);
+}
+
+.wpcf7-form .form-group {
+    margin-bottom: var(--large);
+}
+
+.wpcf7-form .form-label {
+    display: block;
+    margin-bottom: var(--small);
+    font-weight: 500;
+    color: var(--apple-dark);
+    font-size: var(--body-regular);
+}
+
+.wpcf7-form .form-input,
+.wpcf7-form .form-textarea {
+    width: 100%;
+    padding: var(--medium);
+    border: 1px solid var(--apple-gray-light);
+    border-radius: var(--radius-medium);
+    font-family: var(--font-family);
+    font-size: var(--body-regular);
+    transition: all var(--transition-fast);
+    background: var(--apple-white);
+    color: var(--apple-dark);
+    box-sizing: border-box;
+}
+
+.wpcf7-form .form-input:focus,
+.wpcf7-form .form-textarea:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.wpcf7-form .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--medium) var(--large);
+    border: none;
+    border-radius: 980px;
+    font-family: var(--font-family);
+    font-size: var(--body-regular);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.wpcf7-form .btn-primary {
+    background: var(--apple-blue);
+    color: var(--apple-white);
+}
+
+.wpcf7-form .btn-primary:hover {
+    background: var(--apple-black);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+    color: var(--apple-white);
+}
+
+/* WPForms Styling */
+.wpforms-container {
+    margin: 0;
+}
+
+.wpforms-form .wpforms-field {
+    margin-bottom: var(--large);
+}
+
+.wpforms-form .wpforms-field-label {
+    font-weight: 500;
+    color: var(--apple-dark);
+    font-size: var(--body-regular);
+    margin-bottom: var(--small);
+}
+
+.wpforms-form .wpforms-field input,
+.wpforms-form .wpforms-field textarea {
+    width: 100%;
+    padding: var(--medium);
+    border: 1px solid var(--apple-gray-light);
+    border-radius: var(--radius-medium);
+    font-family: var(--font-family);
+    font-size: var(--body-regular);
+    transition: all var(--transition-fast);
+    background: var(--apple-white);
+    color: var(--apple-dark);
+}
+
+.wpforms-form .wpforms-field input:focus,
+.wpforms-form .wpforms-field textarea:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.wpforms-form .wpforms-submit {
+    background: var(--apple-dark);
+    color: var(--apple-white);
+    border: none;
+    border-radius: 980px;
+    padding: var(--medium) var(--large);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.wpforms-form .wpforms-submit:hover {
+    background: var(--apple-black);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Ninja Forms Styling */
+.ninja-forms-form {
+    margin: 0;
+}
+
+.ninja-forms-form .nf-field {
+    margin-bottom: var(--large);
+}
+
+.ninja-forms-form .nf-field-label {
+    font-weight: 500;
+    color: var(--apple-dark);
+    font-size: var(--body-regular);
+    margin-bottom: var(--small);
+}
+
+.ninja-forms-form .nf-field input,
+.ninja-forms-form .nf-field textarea {
+    width: 100%;
+    padding: var(--medium);
+    border: 1px solid var(--apple-gray-light);
+    border-radius: var(--radius-medium);
+    font-family: var(--font-family);
+    font-size: var(--body-regular);
+    transition: all var(--transition-fast);
+    background: var(--apple-white);
+    color: var(--apple-dark);
+}
+
+.ninja-forms-form .nf-field input:focus,
+.ninja-forms-form .nf-field textarea:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.ninja-forms-form .nf-submit {
+    background: var(--apple-dark);
+    color: var(--apple-white);
+    border: none;
+    border-radius: 980px;
+    padding: var(--medium) var(--large);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.ninja-forms-form .nf-submit:hover {
+    background: var(--apple-black);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Success/Error Messages */
+.wpcf7-response-output,
+.wpforms-confirmation-container,
+.nf-response-msg {
+    padding: var(--large);
+    border-radius: var(--radius-medium);
+    margin-bottom: var(--large);
+    font-weight: 500;
+}
+
+.wpcf7-mail-sent-ok,
+.wpforms-confirmation-container,
+.nf-response-msg.success {
+    background: rgba(52, 199, 89, 0.1);
+    border: 1px solid rgba(52, 199, 89, 0.2);
+    color: #34c759;
+}
+
+.wpcf7-validation-errors,
+.wpcf7-mail-sent-ng,
+.wpforms-error-container,
+.nf-response-msg.error {
+    background: rgba(255, 59, 48, 0.1);
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .wpcf7-form .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .error-404-actions {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .error-404-number {
         font-size: 80px;
     }
-    
+
     .contact-content {
         grid-template-columns: 1fr;
         gap: var(--large);
     }
-    
+
     .privacy-section {
         padding: var(--large);
     }
-    
+
     .contact-page .contact-info,
     .contact-form-section {
         padding: var(--large);
     }
+}
+
+/* =======================================================================
+   NEWSLETTER PLUGIN - APPLE STYLE
+   ======================================================================= */
+
+/* Newsletter container */
+.tnp-newsletter {
+    background: var(--apple-white);
+    padding: var(--xxxl) 0;
+    border-top: 1px solid var(--apple-gray-very-light);
+}
+
+.tnp-newsletter .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--medium);
+}
+
+/* Newsletter header */
+.tnp-newsletter-header {
+    text-align: center;
+    margin-bottom: var(--xxl);
+}
+
+.tnp-newsletter-title {
+    font-size: var(--h2);
+    font-weight: 700;
+    color: var(--apple-dark);
+    margin-bottom: var(--medium);
+    letter-spacing: -0.02em;
+}
+
+.tnp-newsletter-subtitle {
+    font-size: var(--body-large);
+    color: var(--apple-gray-medium);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Newsletter form container */
+.tnp-newsletter-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Form wrapper */
+.tnp-field {
+    margin-bottom: var(--large);
+}
+
+.tnp-field-email {
+    margin-bottom: var(--large);
+}
+
+/* Email input field */
+.tnp-email {
+    width: 20rem !important;
+    border: 1px solid var(--apple-gray-light) !important;
+    border-radius: var(--radius-medium) !important;
+    font-family: var(--font-family) !important;
+    font-size: var(--body-regular) !important;
+    background: var(--apple-white) !important;
+    color: var(--apple-dark) !important;
+    transition: all var(--transition-fast) !important;
+    box-sizing: border-box;
+}
+
+.tnp-email:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.tnp-email::placeholder {
+    color: var(--apple-gray-medium);
+}
+
+/* Submit button */
+.tnp-submit {
+    width: 100%;
+    padding: var(--large) var(--xxl);
+    background: var(--apple-dark);
+    color: var(--apple-white);
+    border: none;
+    border-radius: 980px;
+    font-family: var(--font-family);
+    font-size: var(--body-regular);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.tnp-submit:hover {
+    background: var(--apple-black);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+    color: var(--apple-white);
+}
+
+.tnp-submit:active {
+    transform: translateY(0);
+}
+
+/* Button field wrapper */
+.tnp-field-button {
+    text-align: center !important;
+    margin-bottom: var(--large);
+}
+
+/* Success message */
+.tnp-newsletter .tnp-message {
+    padding: var(--large);
+    border-radius: var(--radius-medium);
+    font-size: var(--body-regular);
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: var(--large);
+}
+
+.tnp-newsletter .tnp-message.tnp-message-ok {
+    background: rgba(52, 199, 89, 0.1);
+    color: #34c759;
+    border: 1px solid rgba(52, 199, 89, 0.2);
+}
+
+.tnp-newsletter .tnp-message.tnp-message-error {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.2);
+}
+
+/* Privacy notice */
+.tnp-privacy {
+    font-size: var(--body-small);
+    color: var(--apple-gray-medium);
+    text-align: center;
+    line-height: 1.5;
+    margin-top: var(--medium);
+}
+
+.tnp-privacy a {
+    color: var(--apple-blue);
+    text-decoration: none;
+}
+
+.tnp-privacy a:hover {
+    text-decoration: underline;
+}
+
+/* Inline form variant */
+.tnp-newsletter-inline {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--medium);
+    align-items: center;
+    background: var(--apple-white);
+    border: 1px solid var(--apple-gray-light);
+    border-radius: var(--radius-medium);
+    overflow: hidden;
+    box-shadow: var(--shadow-small);
+}
+
+.tnp-newsletter-inline .tnp-field-email {
+    margin-bottom: 0;
+}
+
+.tnp-newsletter-inline .tnp-email {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.tnp-newsletter-inline .tnp-field-button {
+    margin-bottom: 0;
+}
+
+.tnp-newsletter-inline .tnp-submit {
+    border-radius: 0;
+    margin: 0;
+    background: var(--apple-dark);
+}
+
+.tnp-newsletter-inline .tnp-submit:hover {
+    background: var(--apple-black);
+}
+
+/* Compact form variant */
+.tnp-newsletter-compact {
+    display: flex;
+    gap: var(--medium);
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.tnp-newsletter-compact .tnp-field-email {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.tnp-newsletter-compact .tnp-field-button {
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
+
+.tnp-newsletter-compact .tnp-submit {
+    white-space: nowrap;
+}
+
+/* Minimal form variant */
+.tnp-newsletter-minimal {
+    text-align: center;
+}
+
+.tnp-newsletter-minimal .tnp-field-email {
+    margin-bottom: var(--medium);
+}
+
+.tnp-newsletter-minimal .tnp-email {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Form with labels */
+.tnp-field-label {
+    display: block;
+    font-size: var(--body-regular);
+    font-weight: 500;
+    color: var(--apple-dark);
+    margin-bottom: var(--small);
+}
+
+/* Checkbox field */
+.tnp-field-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--small);
+    margin-bottom: var(--large);
+}
+
+.tnp-field-checkbox input[type="checkbox"] {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--apple-blue);
+}
+
+.tnp-field-checkbox label {
+    font-size: var(--body-small);
+    color: var(--apple-gray-medium);
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+/* Loading state */
+.tnp-submit:disabled {
+    background: var(--apple-gray-medium);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.tnp-submit:disabled:hover {
+    background: var(--apple-gray-medium);
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .tnp-newsletter-inline {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .tnp-newsletter-inline .tnp-submit {
+        border-radius: 0;
+    }
+
+    .tnp-newsletter-compact {
+        flex-direction: column;
+        gap: var(--medium);
+    }
+
+    .tnp-newsletter-compact .tnp-field-email {
+        width: 100%;
+    }
+
+    .tnp-newsletter-compact .tnp-field-button {
+        width: 100%;
+    }
+
+    .tnp-newsletter-compact .tnp-submit {
+        width: 100%;
+    }
+
+    .tnp-newsletter-title {
+        font-size: var(--h3);
+    }
+
+    .tnp-newsletter-subtitle {
+        font-size: var(--body-regular);
+    }
+}
+
+@media (max-width: 480px) {
+    .tnp-newsletter {
+        padding: var(--xxl) 0;
+    }
+
+    .tnp-email,
+    .tnp-submit {
+        padding: var(--medium) var(--large);
+    }
+}
+
+/* Newsletter widget styling */
+.widget_newsletter {
+    background: var(--apple-white);
+    border: 1px solid var(--apple-gray-very-light);
+    border-radius: var(--radius-large);
+    padding: var(--large);
+    box-shadow: var(--shadow-small);
+}
+
+.widget_newsletter .tnp-newsletter-title {
+    font-size: var(--h4);
+    margin-bottom: var(--medium);
+}
+
+.widget_newsletter .tnp-newsletter-subtitle {
+    font-size: var(--body-small);
+    margin-bottom: var(--large);
+}
+
+/* Newsletter popup styling */
+.tnp-popup {
+    background: var(--apple-white);
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-large);
+    border: 1px solid var(--apple-gray-very-light);
+}
+
+.tnp-popup .tnp-newsletter-title {
+    font-size: var(--h3);
+}
+
+.tnp-popup .tnp-newsletter-subtitle {
+    font-size: var(--body-regular);
+}
+
+/* Newsletter inline flex layout */
+.newsletter-inline-form,
+.tnp-subscription form {
+    display: flex;
+    align-items: stretch;
+    gap: 3rem;
+}
+
+/* Input flexes, button auto */
+.newsletter-inline-form .tnp-email,
+.tnp-subscription input.tnp-email {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: var(--large);
+    border: 0;
+    outline: 0;
+    font-size: var(--body-large);
+    background: transparent;
+    color: var(--apple-dark);
+}
+
+.newsletter-inline-form .tnp-submit,
+.tnp-subscription input.tnp-submit {
+    flex: 0 0 auto;
+    padding: 0 var(--xxl);
+    background: var(--apple-dark);
+    color: #fff;
+    border: 0;
+    border-left: 1px solid var(--apple-gray-very-light);
+    border-radius: 0;
+    font-weight: 600;
+    transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.newsletter-inline-form .tnp-submit:hover,
+.tnp-subscription input.tnp-submit:hover {
+    background: var(--apple-black);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Mobile: stack and full-width button */
+@media (max-width: 768px) {
+
+    .newsletter-inline-form,
+    .tnp-subscription form {
+        flex-direction: column;
+    }
+
+    .newsletter-inline-form .tnp-submit,
+    .tnp-subscription input.tnp-submit {
+        width: 100%;
+        padding: var(--large);
+        border-left: 0;
+        border-top: 1px solid var(--apple-gray-very-light);
+    }
+}
+
+/* Newsletter footer styling */
+.tnp-footer {
+    background: var(--apple-dark);
+    color: var(--apple-white);
+}
+
+.tnp-footer .tnp-newsletter-title {
+    color: var(--apple-white);
+}
+
+.tnp-footer .tnp-newsletter-subtitle {
+    color: var(--apple-gray-light);
+}
+
+.tnp-footer .tnp-email {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--apple-white);
+}
+
+.tnp-footer .tnp-email::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.tnp-footer .tnp-email:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--apple-blue);
 }

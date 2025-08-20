@@ -149,6 +149,8 @@ function dubaidirect_scripts() {
         '6.5.0'
     );
 
+    wp_enqueue_script('dubaidirect-newsletter', get_template_directory_uri() . '/js/newsletter.js', array(), _S_VERSION, true);
+
     wp_enqueue_script('dubaidirect-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true);
 
     if (is_singular() && comments_open() && get_option('thread_comments')) {

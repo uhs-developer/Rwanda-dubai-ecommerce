@@ -224,6 +224,73 @@
         }
     }
 
+        // Newsletter AJAX submission
+    function initializeNewsletterForms() {
+        const newsletterForms = document.querySelectorAll('.tnp-subscription form');
+
+        newsletterForms.forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const submitBtn = form.querySelector('.tnp-submit');
+                const originalText = submitBtn.value;
+
+                // Show loading state
+                submitBtn.value = 'Subscribing...';
+                submitBtn.disabled = true;
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.text())
+                    .then(html => {
+                        // Show success message inline
+                        const successMsg = document.createElement('div');
+                        successMsg.className = 'newsletter-success';
+                        successMsg.innerHTML = `
+                            <div class="message-icon">✓</div>
+                            <div class="message-content">
+                                <h3>Thank you!</h3>
+                                <p>You've been successfully subscribed to our newsletter.</p>
+                            </div>
+                        `;
+
+                        form.parentNode.insertBefore(successMsg, form);
+                        form.reset();
+
+                        // Hide success after 5 seconds
+                        setTimeout(() => {
+                            successMsg.remove();
+                        }, 5000);
+                    })
+                    .catch(error => {
+                        // Show error message
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'newsletter-error';
+                        errorMsg.innerHTML = `
+                            <div class="message-icon">⚠</div>
+                            <div class="message-content">
+                                <h3>Oops!</h3>
+                                <p>Something went wrong. Please try again.</p>
+                            </div>
+                        `;
+
+                        form.parentNode.insertBefore(errorMsg, form);
+                    })
+                    .finally(() => {
+                        // Reset button
+                        submitBtn.value = originalText;
+                        submitBtn.disabled = false;
+                    });
+            });
+        });
+    }
+
+    // Initialize newsletter forms
+    initializeNewsletterForms();
+
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         // Add loading class to body
