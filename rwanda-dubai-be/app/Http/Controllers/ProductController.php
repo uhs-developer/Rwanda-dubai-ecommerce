@@ -17,54 +17,42 @@ class ProductController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            // Start with a simple query for debugging
-            $products = Product::query()
-                ->active()
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'category_id', 'subcategory_id', 'brand_id', 'average_rating', 'total_reviews', 'in_stock', 'stock_status', 'is_featured')
-                ->with([
-                    'category:id,name,slug', 
-                    'subcategory:id,name,slug', 
-                    'brand:id,name,slug'
-                ])
-                ->limit(10) // Limit to 10 for debugging
-                ->get();
+            $query = Product::query()->active()->with([
+                'category:id,name,slug', 
+                'subcategory:id,name,slug', 
+                'brand:id,name,slug', 
+                'images' => function ($query) {
+                    $query->where('is_primary', true)->limit(1);
+                }
+            ]);
 
-            // Simple transformation without complex accessors
-            $transformedProducts = $products->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'slug' => $product->slug,
-                    'price' => (float) $product->price,
-                    'original_price' => $product->original_price ? (float) $product->original_price : null,
-                    'category' => $product->category ? [
-                        'id' => $product->category->id,
-                        'name' => $product->category->name,
-                        'slug' => $product->category->slug,
-                    ] : null,
-                    'subcategory' => $product->subcategory ? [
-                        'id' => $product->subcategory->id,
-                        'name' => $product->subcategory->name,
-                        'slug' => $product->subcategory->slug,
-                    ] : null,
-                    'brand' => $product->brand ? [
-                        'id' => $product->brand->id,
-                        'name' => $product->brand->name,
-                        'slug' => $product->brand->slug,
-                    ] : null,
-                    'average_rating' => (float) $product->average_rating,
-                    'total_reviews' => $product->total_reviews,
-                    'in_stock' => $product->in_stock,
-                    'stock_status' => $product->stock_status,
-                    'is_featured' => $product->is_featured,
-                ];
+            // Apply filters
+            $this->applyFilters($query, $request);
+
+            // Apply sorting
+            $this->applySorting($query, $request);
+
+            // Pagination
+            $perPage = min($request->get('per_page', 12), 50); // Max 50 items per page
+            $products = $query->paginate($perPage);
+
+            // Transform products
+            $transformedProducts = $products->through(function ($product) {
+                return $this->transformProduct($product);
             });
 
             return response()->json([
                 'success' => true,
                 'message' => 'Products retrieved successfully',
-                'data' => $transformedProducts,
-                'total' => $transformedProducts->count()
+                'data' => $transformedProducts->items(),
+                'pagination' => [
+                    'current_page' => $transformedProducts->currentPage(),
+                    'last_page' => $transformedProducts->lastPage(),
+                    'per_page' => $transformedProducts->perPage(),
+                    'total' => $transformedProducts->total(),
+                    'from' => $transformedProducts->firstItem(),
+                    'to' => $transformedProducts->lastItem(),
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -145,7 +133,7 @@ class ProductController extends Controller
     public function search(Request $request): JsonResponse
     {
         try {
-            $searchTerm = $request->get('q', '');
+            $searchTerm = $request->get('q', $request->get('search', ''));
             
             if (empty($searchTerm)) {
                 return response()->json([
@@ -297,7 +285,9 @@ class ProductController extends Controller
     private function applyFilters($query, Request $request): void
     {
         // Category filter
-        if ($request->has('category')) {
+        if ($request->has('category_id')) {
+            $query->byCategory($request->category_id);
+        } elseif ($request->has('category')) {
             if (is_numeric($request->category)) {
                 $query->byCategory($request->category);
             } else {
@@ -309,7 +299,9 @@ class ProductController extends Controller
         }
 
         // Subcategory filter
-        if ($request->has('subcategory')) {
+        if ($request->has('subcategory_id')) {
+            $query->bySubcategory($request->subcategory_id);
+        } elseif ($request->has('subcategory')) {
             if (is_numeric($request->subcategory)) {
                 $query->bySubcategory($request->subcategory);
             } else {
@@ -323,27 +315,34 @@ class ProductController extends Controller
         // Brand filter
         if ($request->has('brands')) {
             $brands = is_array($request->brands) ? $request->brands : explode(',', $request->brands);
-            $brandIds = Brand::whereIn('slug', $brands)->pluck('id');
-            if ($brandIds->isNotEmpty()) {
-                $query->whereIn('brand_id', $brandIds);
+            // Check if brands are IDs or slugs
+            if (is_numeric($brands[0])) {
+                $query->whereIn('brand_id', $brands);
+            } else {
+                $brandIds = Brand::whereIn('slug', $brands)->pluck('id');
+                if ($brandIds->isNotEmpty()) {
+                    $query->whereIn('brand_id', $brandIds);
+                }
             }
         }
 
         // Price range filter
-        if ($request->has('min_price')) {
+        if ($request->has('min_price') && $request->min_price > 0) {
             $query->where('price', '>=', $request->min_price);
         }
-        if ($request->has('max_price')) {
+        if ($request->has('max_price') && $request->max_price < 2000) {
             $query->where('price', '<=', $request->max_price);
         }
 
         // Rating filter
-        if ($request->has('min_rating')) {
+        if ($request->has('min_rating') && $request->min_rating > 0) {
             $query->minRating($request->min_rating);
         }
 
         // Stock filter
-        if ($request->has('in_stock_only') && $request->in_stock_only) {
+        if ($request->has('in_stock') && $request->in_stock) {
+            $query->inStock();
+        } elseif ($request->has('in_stock_only') && $request->in_stock_only) {
             $query->inStock();
         }
 

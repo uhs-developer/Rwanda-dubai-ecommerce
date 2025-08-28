@@ -94,7 +94,7 @@ export function ProductListingPageAPI({
     const filters: ProductFilters = {
       category_id: selectedCategoryId,
       subcategory_id: selectedSubcategoryId,
-      brand_id: selectedBrands.length === 1 ? selectedBrands[0] : undefined,
+      brands: selectedBrands.length > 0 ? selectedBrands : undefined,
       min_price: priceRange[0] > 0 ? priceRange[0] : undefined,
       max_price: priceRange[1] < 2000 ? priceRange[1] : undefined,
       min_rating: minRating > 0 ? minRating : undefined,

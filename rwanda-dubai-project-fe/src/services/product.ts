@@ -78,7 +78,8 @@ export interface Brand {
 export interface ProductFilters {
   category_id?: number;
   subcategory_id?: number;
-  brand_id?: number;
+  brands?: number[];
+  brand_id?: number; // Keep for backward compatibility
   min_price?: number;
   max_price?: number;
   min_rating?: number;
@@ -124,7 +125,12 @@ export class ProductService {
     
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        params.append(key, value.toString());
+        if (key === 'brands' && Array.isArray(value)) {
+          // Handle brands array properly
+          value.forEach(brandId => params.append('brands', brandId.toString()));
+        } else {
+          params.append(key, value.toString());
+        }
       }
     });
 
@@ -141,11 +147,16 @@ export class ProductService {
 
   // Search products
   static async searchProducts(query: string, filters: ProductFilters = {}): Promise<ProductListResponse> {
-    const params = new URLSearchParams({ search: query });
+    const params = new URLSearchParams({ q: query });
     
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '' && key !== 'search') {
-        params.append(key, value.toString());
+      if (value !== undefined && value !== null && value !== '' && key !== 'q') {
+        if (key === 'brands' && Array.isArray(value)) {
+          // Handle brands array properly
+          value.forEach(brandId => params.append('brands', brandId.toString()));
+        } else {
+          params.append(key, value.toString());
+        }
       }
     });
 
