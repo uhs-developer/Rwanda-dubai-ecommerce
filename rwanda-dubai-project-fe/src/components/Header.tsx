@@ -23,6 +23,7 @@ import {
 } from "./ui/dropdown-menu";
 import { categories } from "../data/products";
 import { UserAccountDropdown } from "./UserAccountDropdown";
+import { SearchBar } from "./SearchBar";
 
 interface HeaderProps {
   cartItemCount?: number;
@@ -111,24 +112,13 @@ export function Header({
           </div>
 
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-4">
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Search for electronics, auto parts, tools..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pr-12 bg-muted border-0 focus-visible:ring-1 focus-visible:ring-primary"
-              />
-              <Button
-                type="submit"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-          </form>
+          <div className="flex-1 max-w-2xl mx-4">
+            <SearchBar
+              onSearch={onSearchClick}
+              placeholder="Search for electronics, auto parts, tools..."
+              className="w-full"
+            />
+          </div>
 
           {/* Right actions */}
           <div className="flex items-center gap-2">

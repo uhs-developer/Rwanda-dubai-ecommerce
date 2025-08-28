@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\BrandController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -171,4 +174,24 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
+// Public product and category routes
+Route::prefix('categories')->group(function () {
+    Route::get('/', [CategoryController::class, 'index']);
+    Route::get('/{slug}', [CategoryController::class, 'show']);
+});
 
+Route::prefix('products')->group(function () {
+    Route::get('/test', function() {
+        return response()->json(['success' => true, 'message' => 'Test endpoint works', 'products' => \App\Models\Product::limit(2)->get(['id', 'name'])]);
+    });
+    Route::get('/', [ProductController::class, 'index']);
+    Route::get('/featured', [ProductController::class, 'featured']);
+    Route::get('/search', [ProductController::class, 'search']);
+    Route::get('/filter-options', [ProductController::class, 'filterOptions']);
+    Route::get('/{slug}', [ProductController::class, 'show']);
+});
+
+Route::prefix('brands')->group(function () {
+    Route::get('/', [BrandController::class, 'index']);
+    Route::get('/{slug}', [BrandController::class, 'show']);
+});

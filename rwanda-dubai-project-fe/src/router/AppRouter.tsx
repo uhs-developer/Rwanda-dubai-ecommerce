@@ -1,10 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { AuthProvider } from "../contexts/AuthContext";
+import { ProductProvider } from "../contexts/ProductContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { Header } from "../components/Header";
 import { Homepage } from "../components/Homepage";
+import { HomepageAPI } from "../components/HomepageAPI";
 import { ProductListingPage } from "../components/ProductListingPage";
+import { ProductListingPageAPI } from "../components/ProductListingPageAPI";
+import { SearchResultsPage } from "../components/SearchResultsPage";
 import { ProductDetailPage } from "../components/ProductDetailPage";
 import { CartPage } from "../components/CartPage";
 import { CheckoutPage } from "../components/CheckoutPage";
@@ -39,7 +43,9 @@ import { useAuth } from "../contexts/AuthContext";
 export function AppRouter() {
   return (
     <AuthProvider>
-      <AppRouterContent />
+      <ProductProvider>
+        <AppRouterContent />
+      </ProductProvider>
     </AuthProvider>
   );
 }
@@ -238,7 +244,7 @@ function AppRouterContent() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={
-              <Homepage
+              <HomepageAPI
                 onAddToCart={addToCart}
                 onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
@@ -246,7 +252,7 @@ function AppRouterContent() {
             } />
             
             <Route path="/products" element={
-              <ProductListingPage
+              <ProductListingPageAPI
                 onAddToCart={addToCart}
                 onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
@@ -287,7 +293,7 @@ function AppRouterContent() {
             } />
             
             <Route path="/search" element={
-              <SearchPageWrapper
+              <SearchResultsPage
                 onAddToCart={addToCart}
                 onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
@@ -576,7 +582,7 @@ function CategoryPageWrapper({ onAddToCart, onAddToWishlist, onProductClick }: a
   const navigate = useNavigate();
 
   return (
-    <ProductListingPage
+    <ProductListingPageAPI
       category={categoryId}
       subcategory={subcategory}
       onAddToCart={onAddToCart}
