@@ -2,12 +2,15 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { ChevronRight, Truck, Shield, Clock } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useTranslation } from "react-i18next";
 
 interface HeroBannerProps {
   onShopNow?: () => void;
 }
 
 export function HeroBanner({ onShopNow }: HeroBannerProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="relative bg-gradient-to-br from-slate-50 via-slate-100/30 to-gray-100/40 overflow-hidden">
       {/* Background decorative elements */}
@@ -24,38 +27,37 @@ export function HeroBanner({ onShopNow }: HeroBannerProps) {
           {/* Content */}
           <div className="space-y-8 animate-slide-in-left">
             <Badge className="bg-gradient-to-r from-gray-600 to-slate-600 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
-              ✨ New Platform Launch
+              ✨ {t("hero.platformLaunch")}
             </Badge>
-            
+
             <div className="space-y-6">
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight bg-gradient-to-r from-slate-900 via-gray-900 to-slate-900 bg-clip-text text-transparent">
-                Premium Tech & Parts
+                {t("hero.title")}
                 <span className="block bg-gradient-to-r from-gray-600 to-slate-600 bg-clip-text text-transparent">
                   Dubai to Rwanda
                 </span>
               </h1>
-              
+
               <p className="text-xl text-slate-600 max-w-lg leading-relaxed">
-                Discover authentic electronics, auto parts, and tools shipped directly 
-                from Dubai to Rwanda. Quality guaranteed, competitive prices.
+                {t("hero.subtitle")}
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
-                className="group bg-gradient-to-r from-gray-600 to-slate-600 hover:from-gray-700 hover:to-slate-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 text-lg" 
+              <Button
+                size="lg"
+                className="group bg-gradient-to-r from-gray-600 to-slate-600 hover:from-gray-700 hover:to-slate-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 text-lg"
                 onClick={onShopNow}
               >
-                Shop Now
+                {t("hero.shopNow")}
                 <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
                 className="border-2 border-slate-300 hover:border-gray-300 hover:bg-gray-50/50 transition-all duration-300 px-8 py-6 text-lg"
               >
-                View Categories
+                {t("hero.viewCategories")}
               </Button>
             </div>
 
@@ -66,28 +68,28 @@ export function HeroBanner({ onShopNow }: HeroBannerProps) {
                   <Truck className="h-6 w-6 text-gray-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">Free Shipping</p>
-                  <p className="text-sm text-slate-600">On orders $500+</p>
+                  <p className="font-semibold text-slate-800">{t("hero.freeShipping")}</p>
+                  <p className="text-sm text-slate-600">{t("hero.freeShippingDesc")}</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-4 group">
                 <div className="p-3 bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl group-hover:from-emerald-200 group-hover:to-green-200 transition-all duration-300">
                   <Shield className="h-6 w-6 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">Authentic Products</p>
-                  <p className="text-sm text-slate-600">100% genuine</p>
+                  <p className="font-semibold text-slate-800">{t("hero.authenticProducts")}</p>
+                  <p className="text-sm text-slate-600">{t("hero.authenticProductsDesc")}</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-4 group">
                 <div className="p-3 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl group-hover:from-amber-200 group-hover:to-orange-200 transition-all duration-300">
                   <Clock className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">Fast Delivery</p>
-                  <p className="text-sm text-slate-600">7-14 days</p>
+                  <p className="font-semibold text-slate-800">{t("hero.fastDelivery")}</p>
+                  <p className="text-sm text-slate-600">{t("hero.fastDeliveryDesc")}</p>
                 </div>
               </div>
             </div>
@@ -110,16 +112,16 @@ export function HeroBanner({ onShopNow }: HeroBannerProps) {
                   <div className="w-4 h-4 bg-white rounded-full animate-pulse"></div>
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">In Stock</p>
-                  <p className="text-sm text-slate-600">1000+ items</p>
+                  <p className="font-semibold text-slate-800">{t("hero.inStock")}</p>
+                  <p className="text-sm text-slate-600">{t("hero.itemsAvailable")}</p>
                 </div>
               </div>
             </div>
-            
+
             <div className="absolute -top-8 -right-8 bg-white/90 backdrop-blur-sm p-5 rounded-2xl shadow-xl border border-white/20 animate-fade-in">
               <div className="text-center">
                 <p className="text-3xl font-bold bg-gradient-to-r from-gray-600 to-slate-600 bg-clip-text text-transparent">$2M+</p>
-                <p className="text-sm text-slate-600">Successfully delivered</p>
+                <p className="text-sm text-slate-600">{t("hero.successfullyDelivered")}</p>
               </div>
             </div>
           </div>

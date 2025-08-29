@@ -7,6 +7,7 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Truck, Shield, Headphones, CreditCard, Star, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { 
   categories, 
   featuredProducts, 
@@ -26,12 +27,13 @@ interface HomepageProps {
   onProductClick?: (product: Product) => void;
 }
 
-export function Homepage({ 
-  onAddToCart, 
-  onAddToWishlist, 
+export function Homepage({
+  onAddToCart,
+  onAddToWishlist,
   onProductClick
 }: HomepageProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleCategoryClick = (categoryId: string) => {
     navigate(`/category/${categoryId}`);
@@ -67,8 +69,8 @@ export function Homepage({
 
       {/* Apple Products Showcase */}
       <CategoryFeaturedSlider
-        title="Latest Apple Products"
-        subtitle="Experience the future with iPhone, MacBook, and more"
+        title={t("home.latestAppleProducts")}
+        subtitle={t("home.appleSubtitle")}
         products={appleProducts}
         onAddToCart={onAddToCart}
         onAddToWishlist={onAddToWishlist}
@@ -80,7 +82,7 @@ export function Homepage({
 
       {/* Featured Products */}
       <ProductSlider
-        title="Featured Products"
+        title={t("home.featuredProducts")}
         products={featuredProducts}
         onAddToCart={onAddToCart}
         onAddToWishlist={onAddToWishlist}
@@ -100,21 +102,20 @@ export function Homepage({
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8 animate-slide-in-left">
               <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 shadow-lg animate-pulse">
-                🔥 Limited Time Offer
+                🔥 {t("home.limitedTimeOffer")}
               </Badge>
               <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                Up to 40% Off Electronics
+                {t("home.upToOff")}
               </h2>
               <p className="text-xl text-slate-600 leading-relaxed">
-                Exclusive deals on smartphones, laptops, and accessories. 
-                Shop now and save big on premium tech products.
+                {t("home.electronicsDealDesc")}
               </p>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-gradient-to-r from-gray-600 to-slate-600 hover:from-gray-700 hover:to-slate-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 text-lg group"
                 onClick={() => handleViewCategory('electronics')}
               >
-                Shop Electronics
+                {t("home.shopElectronics")}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
@@ -131,8 +132,8 @@ export function Homepage({
 
       {/* Hyundai Auto Parts Section */}
       <CategoryFeaturedSlider
-        title="Hyundai Auto Parts"
-        subtitle="Genuine OEM parts for your Hyundai vehicle"
+        title={t("home.hyundaiParts")}
+        subtitle={t("home.hyundaiSubtitle")}
         products={hyundaiParts}
         onAddToCart={onAddToCart}
         onAddToWishlist={onAddToWishlist}
@@ -143,7 +144,7 @@ export function Homepage({
 
       {/* Best Sellers */}
       <ProductSlider
-        title="Best Sellers"
+        title={t("home.bestSellers")}
         products={bestSellers}
         onAddToCart={onAddToCart}
         onAddToWishlist={onAddToWishlist}
@@ -153,8 +154,8 @@ export function Homepage({
 
       {/* Samsung Products Section */}
       <CategoryFeaturedSlider
-        title="Samsung Galaxy Collection"
-        subtitle="Discover the latest Galaxy smartphones and devices"
+        title={t("home.samsungCollection")}
+        subtitle={t("home.samsungSubtitle")}
         products={samsungProducts}
         onAddToCart={onAddToCart}
         onAddToWishlist={onAddToWishlist}
@@ -174,11 +175,10 @@ export function Homepage({
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-              Why Choose TechBridge?
+              {t("home.whyChooseTitle")}
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              We're committed to delivering the best shopping experience 
-              from Dubai to Rwanda with unmatched service quality.
+              {t("home.whyChooseDesc")}
             </p>
           </div>
 
@@ -186,29 +186,29 @@ export function Homepage({
             {[
               {
                 icon: Truck,
-                title: "Free Shipping",
-                description: "Free delivery on orders over $500 to any location in Rwanda",
+                title: t("home.freeShippingTitle"),
+                description: t("home.freeShippingDesc"),
                 color: "from-gray-500 to-gray-600",
                 bgColor: "from-gray-100 to-gray-200"
               },
               {
                 icon: Shield,
-                title: "Authentic Products",
-                description: "100% genuine products with manufacturer warranties",
+                title: t("home.authenticProductsTitle"),
+                description: t("home.authenticProductsDesc"),
                 color: "from-emerald-500 to-emerald-600",
                 bgColor: "from-emerald-100 to-emerald-200"
               },
               {
                 icon: Headphones,
-                title: "24/7 Support",
-                description: "Round-the-clock customer support in English and Kinyarwanda",
+                title: t("home.supportTitle"),
+                description: t("home.supportDesc"),
                 color: "from-purple-500 to-purple-600",
                 bgColor: "from-purple-100 to-purple-200"
               },
               {
                 icon: CreditCard,
-                title: "Secure Payment",
-                description: "Safe and secure payment options with buyer protection",
+                title: t("home.securePaymentTitle"),
+                description: t("home.securePaymentDesc"),
                 color: "from-amber-500 to-amber-600",
                 bgColor: "from-amber-100 to-amber-200"
               }
@@ -238,8 +238,8 @@ export function Homepage({
       {/* Audio Products Section */}
       {audioProducts.length > 0 && (
         <CategoryFeaturedSlider
-          title="Premium Audio"
-          subtitle="Immerse yourself in superior sound quality"
+          title={t("home.premiumAudio")}
+          subtitle={t("home.audioSubtitle")}
           products={audioProducts}
           onAddToCart={onAddToCart}
           onAddToWishlist={onAddToWishlist}
@@ -251,7 +251,7 @@ export function Homepage({
 
       {/* New Arrivals */}
       <ProductSlider
-        title="New Arrivals"
+        title={t("footer.newArrivals")}
         products={newArrivals}
         onAddToCart={onAddToCart}
         onAddToWishlist={onAddToWishlist}
@@ -270,7 +270,7 @@ export function Homepage({
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-              What Our Customers Say
+              {t("home.testimonialsTitle")}
             </h2>
             <div className="flex justify-center items-center gap-3 mb-6">
               <div className="flex">
@@ -278,7 +278,7 @@ export function Homepage({
                   <Star key={star} className="h-6 w-6 fill-yellow-400 text-yellow-400 drop-shadow-sm" />
                 ))}
               </div>
-              <span className="text-lg text-slate-600 font-medium">4.8/5 from 2000+ reviews</span>
+              <span className="text-lg text-slate-600 font-medium">{t("home.testimonialsRating")}</span>
             </div>
           </div>
 
@@ -342,33 +342,33 @@ export function Homepage({
         <div className="container mx-auto px-4 text-center relative">
           <div className="max-w-4xl mx-auto animate-fade-in">
             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-              Stay in the Loop
+              {t("home.newsletterTitle")}
             </h2>
             <p className="text-xl lg:text-2xl mb-12 opacity-90 leading-relaxed">
-              Get exclusive deals, new arrivals, and tech tips delivered to your inbox
+              {t("home.newsletterDesc")}
             </p>
             <div className="max-w-lg mx-auto flex flex-col sm:flex-row gap-4 mb-8">
               <input
                 type="email"
-                placeholder="Enter your email address"
+                placeholder={t("footer.newsletterPlaceholder")}
                 className="flex-1 px-6 py-4 rounded-xl text-gray-900 placeholder-gray-500 text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-white/30 transition-all"
               />
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-white text-gray-600 hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl"
               >
-                Subscribe
+                {t("footer.subscribe")}
               </Button>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-white/80">
               <p className="text-sm">
-                ✨ Join 10,000+ satisfied customers
+                {t("home.newsletterJoin")}
               </p>
               <p className="text-sm">
-                🔒 Unsubscribe anytime
+                {t("home.newsletterUnsubscribe")}
               </p>
               <p className="text-sm">
-                📧 No spam, ever
+                {t("home.newsletterSpam")}
               </p>
             </div>
           </div>

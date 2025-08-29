@@ -1,7 +1,8 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Alert, AlertDescription } from "./ui/alert";
-import { 
+import { useTranslation } from "react-i18next";
+import {
   WifiOff,
   RotateCcw,
   Home,
@@ -17,20 +18,21 @@ interface OfflinePageProps {
   cartItemCount?: number;
 }
 
-export function OfflinePage({ 
-  onTryAgain, 
-  onGoHome, 
-  onViewCart, 
+export function OfflinePage({
+  onTryAgain,
+  onGoHome,
+  onViewCart,
   onDismiss,
-  cartItemCount = 0 
+  cartItemCount = 0
 }: OfflinePageProps) {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       {/* Offline Alert Banner */}
       <Alert className="fixed top-4 left-4 right-4 max-w-md mx-auto bg-red-500 text-white border-red-600 z-50">
         <WifiOff className="h-4 w-4" />
         <AlertDescription className="flex items-center justify-between">
-          <span>No internet connection</span>
+          <span>{t("offline.noInternetConnection")}</span>
           {onDismiss && (
             <Button
               variant="ghost"
@@ -56,40 +58,40 @@ export function OfflinePage({
 
           {/* Title and Description */}
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            You're Offline
+            {t("offline.youAreOffline")}
           </h1>
-          
+
           <div className="text-gray-600 mb-8 space-y-2">
-            <p>It looks like you've lost your internet connection.</p>
-            <p>Some features may not be available right now.</p>
+            <p>{t("offline.lostConnection")}</p>
+            <p>{t("offline.featuresUnavailable")}</p>
           </div>
 
           {/* Action Buttons */}
           <div className="space-y-3 mb-8">
-            <Button 
+            <Button
               onClick={onTryAgain}
               className="w-full bg-gray-800 hover:bg-gray-900 text-white"
             >
               <RotateCcw className="h-4 w-4 mr-2" />
-              Try Again
+              {t("offline.tryAgain")}
             </Button>
-            
-            <Button 
+
+            <Button
               variant="outline"
               onClick={onGoHome}
               className="w-full"
             >
               <Home className="h-4 w-4 mr-2" />
-              Go to Homepage
+              {t("offline.goToHomepage")}
             </Button>
-            
-            <Button 
+
+            <Button
               variant="outline"
               onClick={onViewCart}
               className="w-full relative"
             >
               <ShoppingCart className="h-4 w-4 mr-2" />
-              View Cart
+              {t("offline.viewCart")}
               {cartItemCount > 0 && (
                 <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">
                   {cartItemCount > 99 ? "99+" : cartItemCount}
@@ -101,12 +103,12 @@ export function OfflinePage({
           {/* What you can still do */}
           <div className="border-t pt-6">
             <h3 className="font-medium text-gray-900 mb-3">
-              What you can still do:
+              {t("offline.whatYouCanDo")}
             </h3>
             <ul className="text-sm text-gray-600 space-y-1 text-left">
-              <li>• View your shopping cart</li>
-              <li>• Browse previously loaded products</li>
-              <li>• Edit your wishlist</li>
+              <li>• {t("offline.viewShoppingCart")}</li>
+              <li>• {t("offline.browseProducts")}</li>
+              <li>• {t("offline.editWishlist")}</li>
             </ul>
           </div>
         </CardContent>

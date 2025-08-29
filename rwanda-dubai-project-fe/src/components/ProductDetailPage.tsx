@@ -5,12 +5,12 @@ import { Separator } from "./ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { 
-  Star, 
-  Heart, 
-  ShoppingCart, 
-  Truck, 
-  Shield, 
+import {
+  Star,
+  Heart,
+  ShoppingCart,
+  Truck,
+  Shield,
   RotateCcw,
   Share2,
   ChevronLeft,
@@ -21,6 +21,7 @@ import {
 import { Product } from "../data/products";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { ProductImageModal } from "./ProductImageModal";
+import { useTranslation } from "react-i18next";
 
 interface ProductDetailPageProps {
   product: Product;
@@ -39,6 +40,7 @@ export function ProductDetailPage({
   relatedProducts = [],
   onRelatedProductClick,
 }: ProductDetailPageProps) {
+  const { t } = useTranslation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -183,7 +185,7 @@ export function ProductDetailPage({
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Quantity</label>
+                <label className="text-sm font-medium mb-1 block">{t("product.quantity")}</label>
                 <div className="flex items-center border rounded-lg">
                   <Button
                     variant="ghost"
@@ -213,7 +215,7 @@ export function ProductDetailPage({
                 onClick={() => onAddToCart?.(product, quantity)}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
-                {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                {product.inStock ? t("product.addToCart") : 'Out of Stock'}
               </Button>
               <Button
                 variant="outline"
@@ -224,6 +226,7 @@ export function ProductDetailPage({
               </Button>
               <Button variant="outline" size="lg">
                 <Share2 className="h-4 w-4" />
+                {t("product.share")}
               </Button>
             </div>
           </div>
@@ -235,27 +238,27 @@ export function ProductDetailPage({
                 <div className="flex items-center gap-3">
                   <Truck className="h-5 w-5 text-green-600" />
                   <div>
-                    <p className="font-medium">Free Shipping</p>
+                    <p className="font-medium">{t("product.freeShipping")}</p>
                     <p className="text-sm text-muted-foreground">
-                      On orders over $500 • 7-14 business days
+                      {t("product.freeShippingDesc")}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <RotateCcw className="h-5 w-5 text-gray-600" />
                   <div>
-                    <p className="font-medium">Free Returns</p>
+                    <p className="font-medium">{t("product.freeReturns")}</p>
                     <p className="text-sm text-muted-foreground">
-                      30-day return policy
+                      {t("product.freeReturnsDesc")}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Shield className="h-5 w-5 text-purple-600" />
                   <div>
-                    <p className="font-medium">Warranty</p>
+                    <p className="font-medium">{t("product.warranty")}</p>
                     <p className="text-sm text-muted-foreground">
-                      2-year manufacturer warranty
+                      {t("product.warrantyDesc")}
                     </p>
                   </div>
                 </div>
@@ -268,15 +271,15 @@ export function ProductDetailPage({
       {/* Product Details Tabs */}
       <Tabs defaultValue="specifications" className="mb-12">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="specifications">Specifications</TabsTrigger>
-          <TabsTrigger value="reviews">Reviews ({product.reviews})</TabsTrigger>
-          <TabsTrigger value="shipping">Shipping & Returns</TabsTrigger>
+          <TabsTrigger value="specifications">{t("product.specifications")}</TabsTrigger>
+          <TabsTrigger value="reviews">{t("product.reviews")} ({product.reviews})</TabsTrigger>
+          <TabsTrigger value="shipping">{t("product.shippingReturns")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="specifications" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Technical Specifications</CardTitle>
+              <CardTitle>{t("product.technicalSpecifications")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
@@ -294,7 +297,7 @@ export function ProductDetailPage({
         <TabsContent value="reviews" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Customer Reviews</CardTitle>
+              <CardTitle>{t("product.customerReviews")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">

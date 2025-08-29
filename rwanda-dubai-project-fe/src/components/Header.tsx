@@ -1,21 +1,18 @@
-import { useState } from "react";
+
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import { 
-  Search, 
-  ShoppingCart, 
-  User, 
-  Menu, 
-  Heart, 
+import {
+  ShoppingCart,
+  User,
+  Menu,
+  Heart,
   ChevronDown,
   Package,
-  Headphones,
   Wrench,
   Home
 } from "lucide-react";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -24,6 +21,9 @@ import {
 import { categories } from "../data/products";
 import { UserAccountDropdown } from "./UserAccountDropdown";
 import { SearchBar } from "./SearchBar";
+import { ThemeToggle } from "./ui/ThemeToggle";
+import { LanguageSelector } from "./ui/LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 interface HeaderProps {
   cartItemCount?: number;
@@ -41,10 +41,10 @@ interface HeaderProps {
   onLogout?: () => void;
 }
 
-export function Header({ 
-  cartItemCount = 0, 
+export function Header({
+  cartItemCount = 0,
   wishlistItemCount = 0,
-  onCartClick, 
+  onCartClick,
   onWishlistClick,
   onSearchClick,
   onCategoryClick,
@@ -52,36 +52,29 @@ export function Header({
   user,
   onLogout
 }: HeaderProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim() && onSearchClick) {
-      onSearchClick(searchQuery);
-    }
-  };
+  const { t } = useTranslation();
 
   const navigationItems = [
     {
-      label: "Electronics",
+      label: t("nav.electronics"),
       id: "electronics",
       icon: Package,
       subcategories: ["Smartphones", "Laptops", "Tablets", "Audio", "Cameras", "Gaming"]
     },
     {
-      label: "Auto Parts", 
+      label: t("nav.autoParts"),
       id: "auto-parts",
       icon: Wrench,
       subcategories: ["Toyota", "Honda", "Hyundai", "BMW", "Mercedes", "Nissan"]
     },
     {
-      label: "Home Appliances",
-      id: "home-appliances", 
+      label: t("nav.homeAppliances"),
+      id: "home-appliances",
       icon: Home,
       subcategories: ["Kitchen", "Laundry", "Air Conditioning", "Small Appliances"]
     },
     {
-      label: "Tools & Equipment",
+      label: t("nav.tools"),
       id: "tools",
       icon: Wrench,
       subcategories: ["Hand Tools", "Power Tools", "Measuring", "Safety Equipment"]
@@ -115,44 +108,50 @@ export function Header({
           <div className="flex-1 max-w-2xl mx-4">
             <SearchBar
               onSearch={onSearchClick}
-              placeholder="Search for electronics, auto parts, tools..."
+              placeholder={t("header.search")}
               className="w-full"
             />
           </div>
 
           {/* Right actions */}
           <div className="flex items-center gap-2">
+            {/* Language Selector */}
+            <LanguageSelector />
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* User Account - Show dropdown if logged in, button if not */}
             {user ? (
-              <UserAccountDropdown 
-                user={user} 
+              <UserAccountDropdown
+                user={user}
                 onLogout={onLogout!}
                 onNavigate={onNavigate}
               />
             ) : (
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="hidden sm:flex"
                 onClick={() => onNavigate?.('auth')}
               >
                 <User className="h-4 w-4 mr-2" />
-                Account
+                {t("header.account")}
               </Button>
             )}
             
             {/* Mini Wishlist */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="relative hidden sm:flex"
               onClick={onWishlistClick}
             >
               <Heart className="h-4 w-4 mr-2" />
-              Wishlist
+              {t("header.wishlist")}
               {wishlistItemCount > 0 && (
-                <Badge 
-                  variant="destructive" 
+                <Badge
+                  variant="destructive"
                   className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
                 >
                   {wishlistItemCount > 99 ? "99+" : wishlistItemCount}
@@ -168,10 +167,10 @@ export function Header({
               onClick={onCartClick}
             >
               <ShoppingCart className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Cart</span>
+              <span className="hidden sm:inline">{t("header.cart")}</span>
               {cartItemCount > 0 && (
-                <Badge 
-                  variant="destructive" 
+                <Badge
+                  variant="destructive"
                   className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
                 >
                   {cartItemCount > 99 ? "99+" : cartItemCount}
@@ -200,48 +199,48 @@ export function Header({
                           <div className="text-xs text-muted-foreground">{user.email}</div>
                         </div>
                       </div>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className="justify-start w-full"
                         onClick={() => onNavigate?.('account-dashboard')}
                       >
                         <User className="h-4 w-4 mr-2" />
-                        Account Dashboard
+                        {t("header.accountDashboard")}
                       </Button>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className="justify-start w-full"
                         onClick={() => onNavigate?.('order-history')}
                       >
                         <Package className="h-4 w-4 mr-2" />
-                        Order History
+                        {t("header.orderHistory")}
                       </Button>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className="justify-start w-full text-red-600"
                         onClick={onLogout}
                       >
                         <User className="h-4 w-4 mr-2" />
-                        Sign Out
+                        {t("header.signOut")}
                       </Button>
                     </div>
                   ) : (
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="justify-start"
                       onClick={() => onNavigate?.('auth')}
                     >
                       <User className="h-4 w-4 mr-2" />
-                      Account
+                      {t("header.account")}
                     </Button>
                   )}
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="justify-start"
                     onClick={onWishlistClick}
                   >
                     <Heart className="h-4 w-4 mr-2" />
-                    Wishlist
+                    {t("header.wishlist")}
                     {wishlistItemCount > 0 && (
                       <Badge variant="secondary" className="ml-auto">
                         {wishlistItemCount}
@@ -249,7 +248,7 @@ export function Header({
                     )}
                   </Button>
                   <div className="border-t pt-4">
-                    <h3 className="font-medium mb-3">Categories</h3>
+                    <h3 className="font-medium mb-3">{t("header.categories")}</h3>
                     {categories.map((category) => (
                       <Button
                         key={category.id}
@@ -283,7 +282,7 @@ export function Header({
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={() => onCategoryClick?.(item.id)}>
-                  View All {item.label}
+                  {t("nav.viewAll")} {item.label}
                 </DropdownMenuItem>
                 {item.subcategories.map((sub) => (
                   <DropdownMenuItem 
@@ -297,19 +296,19 @@ export function Header({
             </DropdownMenu>
           ))}
           
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="text-foreground hover:text-primary"
             onClick={() => onNavigate?.('deals')}
           >
-            Deals
+            {t("header.deals")}
           </Button>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="text-foreground hover:text-primary"
             onClick={() => onNavigate?.('new-arrivals')}
           >
-            New Arrivals
+            {t("header.newArrivals")}
           </Button>
         </nav>
       </div>

@@ -9,12 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Separator } from "./ui/separator";
 import { Checkbox } from "./ui/checkbox";
 import { Alert, AlertDescription } from "./ui/alert";
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Phone, 
-  Eye, 
+import {
+  User,
+  Mail,
+  Lock,
+  Phone,
+  Eye,
   EyeOff,
   Facebook,
   Chrome,
@@ -22,6 +22,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface AuthPageProps {
   onBack?: () => void;
@@ -31,6 +32,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, register, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { t } = useTranslation();
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -154,7 +156,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Authenticating...</p>
+          <p className="text-muted-foreground">{t("auth.authenticating")}</p>
         </div>
       </div>
     );
@@ -166,14 +168,14 @@ export function AuthPage({ onBack }: AuthPageProps) {
         {/* Back Button */}
         <Button variant="ghost" onClick={handleBackClick} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          {t("auth.back")}
         </Button>
 
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome to Rwanda-Dubai</CardTitle>
+            <CardTitle className="text-2xl">{t("auth.welcomeTitle")}</CardTitle>
             <p className="text-muted-foreground">
-              Sign in to your account or create a new one
+              {t("auth.welcomeDesc")}
             </p>
           </CardHeader>
           <CardContent>
@@ -187,15 +189,15 @@ export function AuthPage({ onBack }: AuthPageProps) {
 
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Sign In</TabsTrigger>
-                <TabsTrigger value="register">Sign Up</TabsTrigger>
+                <TabsTrigger value="login">{t("auth.signIn")}</TabsTrigger>
+                <TabsTrigger value="register">{t("auth.signUp")}</TabsTrigger>
               </TabsList>
 
               {/* Login Tab */}
               <TabsContent value="login" className="space-y-4">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
-                    <Label htmlFor="login-email">Email Address</Label>
+                    <Label htmlFor="login-email">{t("auth.email")}</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -217,7 +219,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                   </div>
 
                   <div>
-                    <Label htmlFor="login-password">Password</Label>
+                    <Label htmlFor="login-password">{t("auth.password")}</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -254,15 +256,15 @@ export function AuthPage({ onBack }: AuthPageProps) {
                         checked={loginData.rememberMe}
                         onCheckedChange={(checked: boolean) => setLoginData(prev => ({ ...prev, rememberMe: checked as boolean }))}
                       />
-                      <Label htmlFor="remember" className="text-sm">Remember me</Label>
+                      <Label htmlFor="remember" className="text-sm">{t("auth.rememberMe")}</Label>
                     </div>
                     <Button variant="link" size="sm" className="p-0 h-auto">
-                      Forgot password?
+                      {t("auth.forgotPassword")}
                     </Button>
                   </div>
 
                   <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Signing in..." : "Sign In"}
+                    {isLoading ? t("auth.signingIn") : t("auth.signIn")}
                   </Button>
                 </form>
 
@@ -271,7 +273,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                     <Separator />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                    <span className="bg-background px-2 text-muted-foreground">{t("auth.orContinueWith")}</span>
                   </div>
                 </div>
 

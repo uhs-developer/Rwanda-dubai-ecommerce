@@ -59,7 +59,7 @@ function AppRouterContent() {
   const [showFlashSale, setShowFlashSale] = useState(false);
   const [orderData, setOrderData] = useState<any>(null);
   const [showOfflinePage, setShowOfflinePage] = useState(false);
-  
+
   const isOnline = useOnlineStatus();
 
   // Load data from localStorage on mount
@@ -105,7 +105,7 @@ function AppRouterContent() {
       const existingItem = prevItems.find(item => item.id === product.id);
       if (existingItem) {
         return prevItems.map(item =>
-          item.id === product.id 
+          item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
@@ -125,7 +125,7 @@ function AppRouterContent() {
       removeFromCart(productId);
       return;
     }
-    
+
     setCartItems(prevItems =>
       prevItems.map(item =>
         item.id === productId ? { ...item, quantity } : item
@@ -138,7 +138,7 @@ function AppRouterContent() {
       ...product,
       dateAdded: new Date(),
     };
-    
+
     setWishlistItems(prevItems => {
       const isAlreadyInWishlist = prevItems.some(item => item.id === product.id);
       if (isAlreadyInWishlist) {
@@ -221,8 +221,8 @@ function AppRouterContent() {
   // Get related products for product detail page
   const getRelatedProducts = (product: Product) => {
     return products
-      .filter(p => 
-        p.id !== product.id && 
+      .filter(p =>
+        p.id !== product.id &&
         (p.category === product.category || p.brand === product.brand)
       )
       .slice(0, 4);
@@ -250,7 +250,7 @@ function AppRouterContent() {
                 onProductClick={handleProductClick}
               />
             } />
-            
+
             <Route path="/products" element={
               <ProductListingPageAPI
                 onAddToCart={addToCart}
@@ -258,7 +258,7 @@ function AppRouterContent() {
                 onProductClick={handleProductClick}
               />
             } />
-            
+
             <Route path="/deals" element={
               <ProductListingPage
                 searchQuery=""
@@ -267,7 +267,7 @@ function AppRouterContent() {
                 onProductClick={handleProductClick}
               />
             } />
-            
+
             <Route path="/new-arrivals" element={
               <ProductListingPage
                 onAddToCart={addToCart}
@@ -275,7 +275,7 @@ function AppRouterContent() {
                 onProductClick={handleProductClick}
               />
             } />
-            
+
             <Route path="/category/:categoryId" element={
               <CategoryPageWrapper
                 onAddToCart={addToCart}
@@ -283,7 +283,7 @@ function AppRouterContent() {
                 onProductClick={handleProductClick}
               />
             } />
-            
+
             <Route path="/category/:categoryId/:subcategory" element={
               <CategoryPageWrapper
                 onAddToCart={addToCart}
@@ -291,7 +291,7 @@ function AppRouterContent() {
                 onProductClick={handleProductClick}
               />
             } />
-            
+
             <Route path="/search" element={
               <SearchResultsPage
                 onAddToCart={addToCart}
@@ -299,7 +299,7 @@ function AppRouterContent() {
                 onProductClick={handleProductClick}
               />
             } />
-            
+
             <Route path="/product/:productId" element={
               <ProductDetailWrapper
                 onAddToCart={addToCart}
@@ -308,70 +308,70 @@ function AppRouterContent() {
                 onRelatedProductClick={handleProductClick}
               />
             } />
-            
+
             <Route path="/cart" element={
               <CartPage
                 items={cartItems}
                 onUpdateQuantity={updateCartQuantity}
                 onRemoveItem={removeFromCart}
                 onCheckout={handleCheckout}
-                onContinueShopping={() => {}}
+                onContinueShopping={() => { }}
               />
             } />
-            
+
             <Route path="/checkout" element={
               <CheckoutPage
                 items={cartItems}
-                onBack={() => {}}
+                onBack={() => { }}
                 onPlaceOrder={handlePlaceOrder}
               />
             } />
-            
+
             <Route path="/thank-you" element={
               <ThankYouPage
                 orderData={orderData}
-                onContinueShopping={() => {}}
+                onContinueShopping={() => { }}
                 onTrackOrder={() => toast.info('Order tracking feature coming soon!')}
               />
             } />
-            
+
             <Route path="/auth" element={<AuthPage />} />
-            
+
             <Route path="/account" element={
               <ProtectedRoute>
-                <AccountDashboardWrapper 
+                <AccountDashboardWrapper
                   user={user}
                   onLogout={handleLogout}
                 />
               </ProtectedRoute>
             } />
-            
+
             <Route path="/orders" element={
               <ProtectedRoute>
                 <OrderHistoryPageWrapper />
               </ProtectedRoute>
             } />
-            
+
             <Route path="/profile-settings" element={
               <ProtectedRoute>
-                <ProfileSettingsPageWrapper 
+                <ProfileSettingsPageWrapper
                   user={user}
                 />
               </ProtectedRoute>
             } />
-            
+
             <Route path="/address-book" element={
               <ProtectedRoute>
                 <AddressBookPageWrapper />
               </ProtectedRoute>
             } />
-            
+
             <Route path="/account-security" element={
               <ProtectedRoute>
                 <AccountSecurityPageWrapper />
               </ProtectedRoute>
             } />
-            
+
             <Route path="/offline" element={
               <OfflinePage
                 onTryAgain={handleOfflineTryAgain}
@@ -381,31 +381,31 @@ function AppRouterContent() {
                 cartItemCount={cartItemCount}
               />
             } />
-            
+
             <Route path="/about" element={
               <AboutPageWrapper />
             } />
-            
+
             <Route path="/contact" element={
               <ContactPageWrapper />
             } />
-            
+
             <Route path="/returns" element={
               <ReturnsWarrantyPageWrapper />
             } />
-            
+
             <Route path="/faq" element={
               <FAQPageWrapper />
             } />
-            
+
             <Route path="/blog" element={
               <BlogPageWrapper />
             } />
-            
+
             <Route path="/blog/:articleId" element={
               <BlogDetailWrapper />
             } />
-            
+
             <Route path="/wishlist" element={
               <ProductListingPage
                 onAddToCart={addToCart}
@@ -413,13 +413,13 @@ function AppRouterContent() {
                 onProductClick={handleProductClick}
               />
             } />
-            
+
             {/* Catch-all route for 404 */}
             <Route path="*" element={
               <NotFoundPage
-                onNavigateHome={() => {}}
-                onNavigateCategory={() => {}}
-                onSearch={() => {}}
+                onNavigateHome={() => { }}
+                onNavigateCategory={() => { }}
+                onSearch={() => { }}
               />
             } />
           </Routes>
@@ -463,6 +463,8 @@ function AppRouterContent() {
         <Chatbot
           onAddToCart={addToCart}
           onProductClick={handleProductClick}
+          cartItems={cartItems}
+          wishlistItems={wishlistItems}
         />
 
         {/* Offline Page Overlay */}
@@ -479,8 +481,8 @@ function AppRouterContent() {
         )}
 
         {/* Toast Notifications */}
-        <Toaster 
-          position="bottom-right" 
+        <Toaster
+          position="bottom-right"
           toastOptions={{
             style: {
               background: '#343434',
@@ -497,7 +499,7 @@ function AppRouterContent() {
 // Wrapper components to handle URL parameters
 function HeaderWrapper({ cartItemCount, wishlistItemCount, onWishlistClick, user, onLogout }: any) {
   const navigate = useNavigate();
-  
+
   const handleCategoryClick = (categoryId: string) => {
     navigate(`/category/${categoryId}`);
   };
@@ -612,9 +614,9 @@ function SearchPageWrapper({ onAddToCart, onAddToWishlist, onProductClick }: any
 function ProductDetailWrapper({ onAddToCart, onAddToWishlist, getRelatedProducts, onRelatedProductClick }: any) {
   const { productId } = useParams();
   const navigate = useNavigate();
-  
+
   const product = products.find(p => p.id === productId);
-  
+
   if (!product) {
     return <Navigate to="/404" replace />;
   }
@@ -690,7 +692,7 @@ function BlogPageWrapper() {
 
 function AccountDashboardWrapper({ user, onLogout }: any) {
   const navigate = useNavigate();
-  
+
   return (
     <AccountDashboard
       user={user}
@@ -733,7 +735,7 @@ function OrderHistoryPageWrapper() {
 function ProfileSettingsPageWrapper({ user }: any) {
   const navigate = useNavigate();
   const { updateUser } = useAuth();
-  
+
   return (
     <ProfileSettingsPage
       user={user}

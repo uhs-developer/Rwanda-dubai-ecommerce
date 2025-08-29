@@ -5,12 +5,14 @@ import { Card, CardContent } from "./ui/card";
 import { ArrowLeft, MapPin, Phone, Mail, Clock, MessageCircle, Headphones } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface ContactPageProps {
   onBack: () => void;
 }
 
 export function ContactPage({ onBack }: ContactPageProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -68,11 +70,11 @@ export function ContactPage({ onBack }: ContactPageProps) {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t("common.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Contact Us</h1>
-              <p className="text-gray-600">Get in touch with our team for support, inquiries, or partnerships</p>
+              <h1 className="text-2xl font-bold text-gray-900">{t("contact.title")}</h1>
+              <p className="text-gray-600">{t("contact.subtitle")}</p>
             </div>
           </div>
         </div>
@@ -83,11 +85,9 @@ export function ContactPage({ onBack }: ContactPageProps) {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Information */}
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Get in Touch</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">{t("contact.getInTouch")}</h2>
             <p className="text-gray-600 mb-8">
-              We're here to help with your electronics and auto parts needs. 
-              Whether you have questions about products, shipping, or need 
-              technical support, our team is ready to assist you.
+              {t("contact.description")}
             </p>
 
             <div className="space-y-6">
@@ -99,12 +99,12 @@ export function ContactPage({ onBack }: ContactPageProps) {
                       <MapPin className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">Address</h3>
+                      <h3 className="font-semibold text-gray-900 mb-2">{t("contact.address")}</h3>
                       <p className="text-gray-600 text-sm">
-                        Dubai Office: Business Bay, Dubai, UAE
+                        {t("contact.dubaiOffice")}
                       </p>
                       <p className="text-gray-600 text-sm">
-                        Kigali Office: Kigali City, Rwanda
+                        {t("contact.kigaliOffice")}
                       </p>
                     </div>
                   </div>
@@ -119,12 +119,12 @@ export function ContactPage({ onBack }: ContactPageProps) {
                       <Phone className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
+                      <h3 className="font-semibold text-gray-900 mb-2">{t("contact.phone")}</h3>
                       <p className="text-gray-600 text-sm">
-                        +971 4 XXX XXXX (Dubai)
+                        {t("contact.dubaiPhone")}
                       </p>
                       <p className="text-gray-600 text-sm">
-                        +250 788 XXX XXX (Kigali)
+                        {t("contact.kigaliPhone")}
                       </p>
                     </div>
                   </div>
@@ -139,12 +139,12 @@ export function ContactPage({ onBack }: ContactPageProps) {
                       <Mail className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
+                      <h3 className="font-semibold text-gray-900 mb-2">{t("contact.email")}</h3>
                       <p className="text-gray-600 text-sm">
-                        support@techbridge.com
+                        {t("contact.supportEmail")}
                       </p>
                       <p className="text-gray-600 text-sm">
-                        orders@techbridge.com
+                        {t("contact.ordersEmail")}
                       </p>
                     </div>
                   </div>
@@ -159,15 +159,15 @@ export function ContactPage({ onBack }: ContactPageProps) {
                       <Clock className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">Business Hours</h3>
+                      <h3 className="font-semibold text-gray-900 mb-2">{t("contact.businessHours")}</h3>
                       <p className="text-gray-600 text-sm">
-                        Monday - Friday: 9:00 AM - 6:00 PM
+                        {t("contact.mondayFriday")}
                       </p>
                       <p className="text-gray-600 text-sm">
-                        Saturday: 10:00 AM - 4:00 PM
+                        {t("contact.saturday")}
                       </p>
                       <p className="text-gray-600 text-sm">
-                        Sunday: Closed
+                        {t("contact.sunday")}
                       </p>
                     </div>
                   </div>
@@ -180,35 +180,35 @@ export function ContactPage({ onBack }: ContactPageProps) {
           <div>
             <Card className="p-8">
               <CardContent className="pt-0">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Send us a Message</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{t("contact.sendMessage")}</h3>
                 <p className="text-gray-600 mb-6">
-                  Fill out the form below and we'll get back to you within 24 hours.
+                  {t("contact.formDescription")}
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name *
+                        {t("contact.fullName")} *
                       </label>
                       <Input
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleInputChange}
-                        placeholder="Your full name"
+                        placeholder={t("contact.fullNamePlaceholder")}
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address *
+                        {t("contact.emailAddress")} *
                       </label>
                       <Input
                         name="email"
                         type="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="your@email.com"
+                        placeholder={t("contact.emailPlaceholder")}
                         required
                       />
                     </div>
@@ -216,25 +216,25 @@ export function ContactPage({ onBack }: ContactPageProps) {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Subject
+                      {t("contact.subject")}
                     </label>
                     <Input
                       name="subject"
                       value={formData.subject}
                       onChange={handleInputChange}
-                      placeholder="What is this regarding?"
+                      placeholder={t("contact.subjectPlaceholder")}
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Message *
+                      {t("contact.message")} *
                     </label>
                     <Textarea
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
-                      placeholder="Tell us how we can help you..."
+                      placeholder={t("contact.messagePlaceholder")}
                       rows={4}
                       required
                     />
@@ -242,18 +242,18 @@ export function ContactPage({ onBack }: ContactPageProps) {
 
                   <Button type="submit" className="w-full">
                     <Mail className="h-4 w-4 mr-2" />
-                    Send Message
+                    {t("contact.sendMessage")}
                   </Button>
                 </form>
 
                 <div className="mt-8 pt-8 border-t">
                   <div className="text-center">
-                    <h4 className="font-semibold text-gray-900 mb-4">Have a Quick Question?</h4>
+                    <h4 className="font-semibold text-gray-900 mb-4">{t("contact.haveQuickQuestion")}</h4>
                     <p className="text-gray-600 text-sm mb-4">
-                      Check our FAQ section for instant answers to common questions.
+                      {t("contact.faqDescription")}
                     </p>
                     <Button variant="outline" className="mb-4">
-                      View FAQ
+                      {t("contact.viewFAQ")}
                     </Button>
                   </div>
                 </div>
@@ -267,7 +267,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
           <Card className="p-8">
             <CardContent className="pt-0">
               <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-                Other Ways to Reach Us
+                {t("contact.otherWaysToReachUs")}
               </h3>
 
               <div className="grid md:grid-cols-2 gap-8">
@@ -276,13 +276,12 @@ export function ContactPage({ onBack }: ContactPageProps) {
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <MessageCircle className="h-8 w-8 text-primary" />
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Live Chat</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">{t("contact.liveChat")}</h4>
                   <p className="text-gray-600 text-sm mb-4">
-                    Use our AI chatbot for instant assistance with product 
-                    recommendations and order support.
+                    {t("contact.liveChatDescription")}
                   </p>
                   <Button variant="outline" onClick={handleStartChat}>
-                    Start Chat
+                    {t("contact.startChat")}
                   </Button>
                 </div>
 
@@ -291,13 +290,12 @@ export function ContactPage({ onBack }: ContactPageProps) {
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Headphones className="h-8 w-8 text-green-600" />
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-2">WhatsApp Support</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">{t("contact.whatsappSupport")}</h4>
                   <p className="text-gray-600 text-sm mb-4">
-                    Connect with us on WhatsApp for quick responses and order 
-                    updates.
+                    {t("contact.whatsappDescription")}
                   </p>
                   <Button variant="outline" onClick={handleWhatsApp}>
-                    Message on WhatsApp
+                    {t("contact.messageOnWhatsapp")}
                   </Button>
                 </div>
               </div>

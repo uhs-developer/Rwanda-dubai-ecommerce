@@ -12,6 +12,7 @@ import { Skeleton } from "./ui/skeleton";
 import { Truck, Shield, Headphones, CreditCard, Star, ArrowRight, AlertCircle } from "lucide-react";
 import { transformProductForDisplay } from "../services/product";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useTranslation } from "react-i18next";
 
 interface HomepageAPIProps {
   onAddToCart?: (product: any) => void;
@@ -19,12 +20,13 @@ interface HomepageAPIProps {
   onProductClick?: (product: any) => void;
 }
 
-export function HomepageAPI({ 
-  onAddToCart, 
-  onAddToWishlist, 
+export function HomepageAPI({
+  onAddToCart,
+  onAddToWishlist,
   onProductClick
 }: HomepageAPIProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     featuredProducts,
     categories,
@@ -102,9 +104,9 @@ export function HomepageAPI({
         {/* Categories Grid */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Shop by Category</h2>
+            <h2 className="text-2xl font-bold">{t("categories.shopByCategory")}</h2>
             <Button variant="ghost" onClick={() => navigate('/categories')}>
-              View All <ArrowRight className="ml-2 h-4 w-4" />
+              {t("common.viewAll")} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
           {categories.length > 0 ? (
@@ -129,7 +131,7 @@ export function HomepageAPI({
               ))}
             </div>
           ) : (
-            <ErrorState title="Failed to load categories" message="Please try refreshing the page" />
+            <ErrorState title={t("home.failedToLoadCategories")} message={t("home.refreshPage")} />
           )}
         </section>
 
@@ -137,19 +139,20 @@ export function HomepageAPI({
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold">Featured Products</h2>
-              <p className="text-muted-foreground">Hand-picked products just for you</p>
+              <h2 className="text-2xl font-bold">{t("home.featuredProducts")}</h2>
+              <p className="text-muted-foreground">{t("home.handPickedProducts")}</p>
             </div>
             <Button variant="ghost" onClick={handleViewAllProducts}>
-              View All <ArrowRight className="ml-2 h-4 w-4" />
+              {t("common.viewAll")} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
           {error && !loading ? (
-            <ErrorState title="Failed to load featured products" message={error} />
+            <ErrorState title={t("home.failedToLoadFeaturedProducts")} message={error} />
           ) : loading ? (
             <LoadingSkeleton />
           ) : displayFeaturedProducts.length > 0 ? (
             <ProductSlider
+              title={t("home.featuredProducts")}
               products={displayFeaturedProducts}
               onAddToCart={onAddToCart}
               onAddToWishlist={onAddToWishlist}
@@ -157,7 +160,7 @@ export function HomepageAPI({
             />
           ) : (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">No featured products available</p>
+              <p className="text-muted-foreground">{t("home.noFeaturedProducts")}</p>
             </div>
           )}
         </section>
@@ -169,11 +172,11 @@ export function HomepageAPI({
               <div>
                 <h2 className="text-2xl font-bold">{category.name}</h2>
                 <p className="text-muted-foreground">
-                  {category.description || `Explore our ${category.name.toLowerCase()} collection`}
+                  {category.description || t("home.exploreCollection", { category: category.name.toLowerCase() })}
                 </p>
               </div>
               <Button variant="ghost" onClick={() => handleViewCategory(category.slug)}>
-                View All <ArrowRight className="ml-2 h-4 w-4" />
+                {t("common.viewAll")} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
             {/* For now, show featured products filtered by category if available */}
@@ -190,7 +193,7 @@ export function HomepageAPI({
               <LoadingSkeleton />
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No products available in this category</p>
+                <p className="text-muted-foreground">{t("home.noProductsInCategory")}</p>
               </div>
             )}
           </section>
@@ -198,41 +201,41 @@ export function HomepageAPI({
 
         {/* Why Choose Us */}
         <section>
-          <h2 className="text-2xl font-bold text-center mb-8">Why Choose Rwanda-Dubai Platform</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">{t("home.whyChoosePlatform")}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardContent className="p-6 text-center">
                 <Truck className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">Fast Shipping</h3>
+                <h3 className="font-semibold mb-2">{t("home.fastShippingTitle")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Express delivery from Dubai to Rwanda in 5-7 business days
+                  {t("home.fastShippingDesc")}
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <Shield className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">Quality Guaranteed</h3>
+                <h3 className="font-semibold mb-2">{t("home.qualityGuaranteedTitle")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  All products are authentic and quality-checked before shipping
+                  {t("home.qualityGuaranteedDesc")}
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <Headphones className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">24/7 Support</h3>
+                <h3 className="font-semibold mb-2">{t("home.supportTitle")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Round-the-clock customer support in English and Kinyarwanda
+                  {t("home.supportDesc")}
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <CreditCard className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">Secure Payments</h3>
+                <h3 className="font-semibold mb-2">{t("home.securePaymentsTitle")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Multiple payment options including Mobile Money and Bank Transfer
+                  {t("home.securePaymentsDesc")}
                 </p>
               </CardContent>
             </Card>
@@ -241,7 +244,7 @@ export function HomepageAPI({
 
         {/* Testimonials */}
         <section>
-          <h2 className="text-2xl font-bold text-center mb-8">What Our Customers Say</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">{t("home.testimonialsTitle")}</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
@@ -285,20 +288,20 @@ export function HomepageAPI({
 
         {/* Newsletter */}
         <section className="bg-muted rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold mb-2">Stay Updated</h2>
+          <h2 className="text-2xl font-bold mb-2">{t("home.newsletterTitle")}</h2>
           <p className="text-muted-foreground mb-6">
-            Get the latest deals and new arrivals delivered to your inbox
+            {t("home.newsletterDesc")}
           </p>
           <div className="flex max-w-md mx-auto gap-2">
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("home.emailPlaceholder")}
               className="flex-1 px-4 py-2 rounded-md border border-input bg-background"
             />
-            <Button>Subscribe</Button>
+            <Button>{t("footer.subscribe")}</Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            We respect your privacy. Unsubscribe at any time.
+            {t("home.privacyNotice")}
           </p>
         </section>
       </div>

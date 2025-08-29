@@ -9,11 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import { 
-  CreditCard, 
-  Smartphone, 
-  Building2, 
-  Lock, 
+import {
+  CreditCard,
+  Smartphone,
+  Building2,
+  Lock,
   ArrowLeft,
   Check,
   Truck,
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { CartItem } from "./ShoppingCart";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useTranslation } from "react-i18next";
 
 interface CheckoutPageProps {
   items: CartItem[];
@@ -29,6 +30,7 @@ interface CheckoutPageProps {
 }
 
 export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Shipping Information
@@ -91,9 +93,9 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
   };
 
   const steps = [
-    { id: 1, title: "Shipping", icon: Truck },
-    { id: 2, title: "Payment", icon: CreditCard },
-    { id: 3, title: "Review", icon: Check },
+    { id: 1, title: t("checkout.shipping"), icon: Truck },
+    { id: 2, title: t("checkout.payment"), icon: CreditCard },
+    { id: 3, title: t("checkout.review"), icon: Check },
   ];
 
   const rwandanDistricts = [
@@ -110,11 +112,11 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
       <div className="flex items-center gap-4 mb-8">
         <Button variant="ghost" onClick={onBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Cart
+          {t("checkout.backToCart")}
         </Button>
         <div>
-          <h1 className="text-3xl font-bold">Checkout</h1>
-          <p className="text-muted-foreground">Complete your order</p>
+          <h1 className="text-3xl font-bold">{t("checkout.title")}</h1>
+          <p className="text-muted-foreground">{t("checkout.subtitle")}</p>
         </div>
       </div>
 
@@ -154,13 +156,13 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Truck className="h-5 w-5" />
-                  Shipping Information
+                  {t("checkout.shippingInformation")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName">First Name *</Label>
+                    <Label htmlFor="firstName">{t("checkout.firstName")} *</Label>
                     <Input
                       id="firstName"
                       value={formData.firstName}
@@ -169,7 +171,7 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
                     />
                   </div>
                   <div>
-                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Label htmlFor="lastName">{t("checkout.lastName")} *</Label>
                     <Input
                       id="lastName"
                       value={formData.lastName}
@@ -181,7 +183,7 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="email">Email Address *</Label>
+                    <Label htmlFor="email">{t("checkout.emailAddress")} *</Label>
                     <Input
                       id="email"
                       type="email"
@@ -191,7 +193,7 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Label htmlFor="phone">{t("checkout.phoneNumber")} *</Label>
                     <Input
                       id="phone"
                       type="tel"

@@ -1,24 +1,103 @@
-*.log
-.DS_Store
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
+# Laravel specific
+/vendor/
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 /public/build
 /public/hot
 /public/storage
+/storage/app/private/*
+!/storage/app/private/.gitkeep
 /storage/*.key
 /storage/pail
-/vendor
+/bootstrap/cache/
+.phpunit.result.cache
+.phpunit.cache
+
+# Environment files
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+.env.testing
+.env.staging
+.env.development
+
+# IDE and editor files
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+.phpactor.json
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# Logs
+*.log
+logs/
+storage/logs/*
+!/storage/logs/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+/database/database.sqlite
+
+# Backup files
+*.bak
+*.backup
+*.old
+*~
+*.orig
+*.rej
+
+# Security files
+/auth.json
 Homestead.json
 Homestead.yaml
-Thumbs.db
+
+# SSL Certificates
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# Deployment files
+/deploy/
+/deployment/
+.env.deploy
+ansible.cfg
+
+# Testing
+/coverage
+*.lcov
+.nyc_output
+.scoverage
+
+# Cache
+.cache/
+.tmp/
+temp/

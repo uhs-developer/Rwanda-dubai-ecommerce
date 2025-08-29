@@ -1,0 +1,339 @@
+# ==========================================
+# Rwanda-Dubai E-commerce Project .gitignore
+# ==========================================
+
+# This is the root .gitignore file for the entire project
+# Individual project directories have their own .gitignore files
+# This file contains global patterns that apply to the entire repository
+
+# ==========================================
+# SECURITY & SENSITIVE FILES
+# ==========================================
+
+# Environment files - NEVER commit these!
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+.env.staging
+.env.backup
+.env.example
+.env.template
+
+# API Keys and Secrets
+*.key
+*.pem
+*.crt
+*.csr
+*.p12
+*.pfx
+secrets.json
+config/secrets.*
+auth.json
+credentials.json
+
+# SSL Certificates
+ssl/
+certs/
+certificates/
+
+# Private keys and certificates
+*.key
+*.pem
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# ==========================================
+# DATABASE & DATA FILES
+# ==========================================
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+database.sqlite
+database.db
+
+# Database dumps and backups
+*.sql.gz
+*.sql.bz2
+dump.sql
+backup.sql
+db_backup/
+database_backup/
+
+# ==========================================
+# LOGS & DEBUGGING
+# ==========================================
+
+# Log files
+*.log
+logs/
+log/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Debug files
+debug.log
+error.log
+access.log
+
+# ==========================================
+# BUILD & DISTRIBUTION
+# ==========================================
+
+# Build directories
+build/
+dist/
+out/
+public/build/
+target/
+
+# Cache directories
+.cache/
+.tmp/
+temp/
+.cache
+node_modules/.cache
+
+# ==========================================
+# IDE & EDITOR FILES
+# ==========================================
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Other editors
+.fleet/
+.nova/
+.zed/
+.phpactor.json
+
+# ==========================================
+# OS GENERATED FILES
+# ==========================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ==========================================
+# BACKUP & TEMPORARY FILES
+# ==========================================
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.tmp
+*.temp
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+.tmp/
+
+# ==========================================
+# TESTING & COVERAGE
+# ==========================================
+
+# Test coverage
+coverage/
+*.lcov
+.nyc_output/
+.coverage/
+coverage.json
+coverage.xml
+test-results/
+playwright-report/
+test-results.xml
+
+# PHPUnit specific
+.phpunit.result.cache
+.phpunit.cache
+
+# ==========================================
+# DEPLOYMENT & INFRASTRUCTURE
+# ==========================================
+
+# Deployment files
+deploy/
+deployment/
+ansible.cfg
+.terraform/
+*.tfstate
+*.tfvars
+
+# Docker
+.dockerignore
+
+# CI/CD
+.github/workflows/*.log
+.gitlab-ci.yml.bak
+
+# ==========================================
+# PACKAGE MANAGERS
+# ==========================================
+
+# Composer (PHP)
+vendor/
+composer.lock.bak
+
+# NPM/Yarn/PNPM
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.yarn-integrity
+.parcel-cache
+
+# ==========================================
+# FRAMEWORK SPECIFIC
+# ==========================================
+
+# Laravel specific
+storage/app/private/*
+!/storage/app/private/.gitkeep
+storage/logs/*
+!/storage/logs/.gitkeep
+bootstrap/cache/
+.phpunit.result.cache
+
+# React/Vue specific
+.next/
+.nuxt/
+.output/
+storybook-static/
+.vercel
+.netlify/
+
+# ==========================================
+# MISCELLANEOUS
+# ==========================================
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn
+.yarn/cache
+.yarn/install-state.gz
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Stylelint cache
+.stylelintcache
+
+# ==========================================
+# PROJECT SPECIFIC
+# ==========================================
+
+# E-commerce specific
+uploads/
+temp_uploads/
+cache/
+sessions/
+
+# Documentation that might contain sensitive info
+docs/secrets/
+docs/private/
+
+# ==========================================
+# NOTES
+# ==========================================
+#
+# This .gitignore is organized for a production-ready
+# cross-border e-commerce application with Laravel backend
+# and React/TypeScript frontend.
+#
+# Individual project directories (rwanda-dubai-be/, rwanda-dubai-project-fe/)
+# have their own .gitignore files for project-specific patterns.
+#
+# Remember to:
+# - Never commit .env files
+# - Never commit API keys or secrets
+# - Never commit database files with real data
+# - Always check for sensitive data before committing
+# - Use .env.example for environment file templates

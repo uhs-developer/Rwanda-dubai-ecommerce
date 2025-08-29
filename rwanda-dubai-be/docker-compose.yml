@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  # Note: Using existing PostGIS container on port 5432
+  # Uncomment below if you want a separate PostgreSQL instance on different port
+
+  # postgres:
+  #   image: postgres:15
+  #   container_name: rwanda-dubai-postgres
+  #   environment:
+  #     POSTGRES_DB: rwanda_dubai_ecommerce
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password123
+  #   ports:
+  #     - "5433:5432"  # Using port 5433 to avoid conflict
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - rwanda-dubai-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: rwanda-dubai-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - rwanda-dubai-network
+
+volumes:
+  postgres_data:
+
+networks:
+  rwanda-dubai-network:
+    driver: bridge

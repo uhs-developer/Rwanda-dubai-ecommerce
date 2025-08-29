@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { ArrowRight } from "lucide-react";
 import { Category } from "../data/products";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useTranslation } from "react-i18next";
 
 interface CategoriesGridProps {
   categories: Category[];
@@ -10,17 +11,18 @@ interface CategoriesGridProps {
 }
 
 export function CategoriesGrid({ categories, onCategoryClick }: CategoriesGridProps) {
+  const { t } = useTranslation();
+
   return (
     <section className="py-20 bg-gradient-to-b from-white to-slate-50/50">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-            Shop by Category
+            {t("categories.shopByCategory")}
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Find exactly what you need from our comprehensive selection of 
-            electronics, auto parts, tools, and home appliances.
+            {t("categories.description")}
           </p>
         </div>
 
@@ -56,17 +58,17 @@ export function CategoriesGrid({ categories, onCategoryClick }: CategoriesGridPr
                     ))}
                     {category.subcategories.length > 3 && (
                       <p className="text-sm text-slate-500 font-medium">
-                        +{category.subcategories.length - 3} more categories
+                        +{category.subcategories.length - 3} {t("categories.moreCategories")}
                       </p>
                     )}
                   </div>
-                  
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="p-0 h-auto text-gray-600 hover:text-gray-700 font-semibold group-hover:translate-x-1 transition-all duration-300"
                   >
-                    Explore Collection
+                    {t("categories.exploreCollection")}
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </div>

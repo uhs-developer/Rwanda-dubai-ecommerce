@@ -6,6 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collap
 import { ArrowLeft, Search, Plus, Minus, Mail, Phone, MessageCircle, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface FAQPageProps {
   onBack: () => void;
@@ -141,6 +142,7 @@ const categories = [
 ];
 
 export function FAQPage({ onBack }: FAQPageProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [openItems, setOpenItems] = useState<string[]>([]);
@@ -185,11 +187,11 @@ export function FAQPage({ onBack }: FAQPageProps) {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t("common.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Frequently Asked Questions</h1>
-              <p className="text-gray-600">Find answers to common questions about our products and services</p>
+              <h1 className="text-2xl font-bold text-gray-900">{t("faq.title")}</h1>
+              <p className="text-gray-600">{t("faq.subtitle")}</p>
             </div>
           </div>
         </div>
@@ -202,7 +204,7 @@ export function FAQPage({ onBack }: FAQPageProps) {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search frequently asked questions..."
+              placeholder={t("faq.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -231,7 +233,7 @@ export function FAQPage({ onBack }: FAQPageProps) {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-6">
             <HelpCircle className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold text-gray-900">Popular Questions</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{t("faq.popularQuestions")}</h2>
           </div>
 
           <div className="space-y-4">
@@ -277,9 +279,9 @@ export function FAQPage({ onBack }: FAQPageProps) {
           {filteredFAQs.length === 0 && (
             <div className="text-center py-12">
               <HelpCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No questions found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t("faq.noQuestionsFound")}</h3>
               <p className="text-gray-600">
-                Try adjusting your search terms or browse a different category.
+                {t("faq.tryAdjustingSearch")}
               </p>
             </div>
           )}
@@ -290,10 +292,9 @@ export function FAQPage({ onBack }: FAQPageProps) {
           <CardContent className="p-8 text-center">
             <div className="max-w-2xl mx-auto">
               <HelpCircle className="h-12 w-12 mx-auto mb-4 text-white" />
-              <h3 className="text-2xl font-bold mb-4">Still Need Help?</h3>
+              <h3 className="text-2xl font-bold mb-4">{t("faq.stillNeedHelp")}</h3>
               <p className="text-gray-300 mb-8">
-                Can't find the answer you're looking for? Our customer support team is here to help with any 
-                questions about products, orders, or technical issues.
+                {t("faq.supportDescription")}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -303,23 +304,23 @@ export function FAQPage({ onBack }: FAQPageProps) {
                   className="flex items-center gap-2"
                 >
                   <Mail className="h-4 w-4" />
-                  Email Support
+                  {t("faq.emailSupport")}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleCallUs}
                   className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-gray-900"
                 >
                   <Phone className="h-4 w-4" />
-                  Call Us
+                  {t("faq.callUs")}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleLiveChat}
                   className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-gray-900"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  Live Chat
+                  {t("faq.liveChat")}
                 </Button>
               </div>
             </div>
@@ -329,31 +330,31 @@ export function FAQPage({ onBack }: FAQPageProps) {
         {/* Customer Support Hours */}
         <div className="mt-8 grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Customer Support Hours</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t("faq.customerSupportHours")}</h3>
             <p className="text-gray-600 text-sm mb-4">
-              Our team is available to assist you during these hours:
+              {t("faq.supportHoursDescription")}
             </p>
             
             <div className="space-y-2 text-sm">
               <div>
-                <span className="font-medium text-gray-900">Email Support</span>
-                <p className="text-gray-600">Available 24/7</p>
-                <p className="text-gray-600">Response within 24 hours</p>
+                <span className="font-medium text-gray-900">{t("faq.emailSupport")}</span>
+                <p className="text-gray-600">{t("faq.available247")}</p>
+                <p className="text-gray-600">{t("faq.responseWithin24h")}</p>
               </div>
             </div>
           </div>
-          
+
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Phone & Chat</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t("faq.phoneAndChat")}</h3>
             <div className="space-y-2 text-sm">
               <p className="text-gray-600">
-                <span className="font-medium text-gray-900">Monday - Friday:</span> 9:00 AM - 6:00 PM
+                <span className="font-medium text-gray-900">{t("faq.mondayFriday")}:</span> 9:00 AM - 6:00 PM
               </p>
               <p className="text-gray-600">
-                <span className="font-medium text-gray-900">Saturday:</span> 10:00 AM - 4:00 PM
+                <span className="font-medium text-gray-900">{t("faq.saturday")}:</span> 10:00 AM - 4:00 PM
               </p>
               <p className="text-gray-600">
-                <span className="font-medium text-gray-900">Sunday:</span> Closed
+                <span className="font-medium text-gray-900">{t("faq.sunday")}:</span> {t("faq.closed")}
               </p>
             </div>
           </div>
