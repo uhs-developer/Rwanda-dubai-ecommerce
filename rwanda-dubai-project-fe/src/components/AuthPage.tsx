@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { getRoleBasedRedirectPath } from "../utils/roleBasedRouting";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -79,9 +80,14 @@ export function AuthPage({ onBack }: AuthPageProps) {
         password: loginData.password,
       });
       
-      // Navigate to intended page or home
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      // Get the current user from auth context to check role
+      const currentUser = JSON.parse(localStorage.getItem('rwanda-dubai-user') || '{}');
+      
+      // Use the role-based routing utility
+      const redirectPath = getRoleBasedRedirectPath(currentUser);
+      
+      // Navigate to role-appropriate dashboard
+      navigate(redirectPath, { replace: true });
     } catch (error: any) {
       console.error('Login error:', error);
       
@@ -121,9 +127,14 @@ export function AuthPage({ onBack }: AuthPageProps) {
         phone: registerData.phone || undefined,
       });
       
-      // Navigate to intended page or home
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      // Get the current user from auth context to check role
+      const currentUser = JSON.parse(localStorage.getItem('rwanda-dubai-user') || '{}');
+      
+      // Use the role-based routing utility
+      const redirectPath = getRoleBasedRedirectPath(currentUser);
+      
+      // Navigate to role-appropriate dashboard
+      navigate(redirectPath, { replace: true });
     } catch (error: any) {
       console.error('Registration error:', error);
       

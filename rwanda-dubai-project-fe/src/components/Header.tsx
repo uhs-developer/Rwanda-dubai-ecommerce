@@ -10,7 +10,8 @@ import {
   ChevronDown,
   Package,
   Wrench,
-  Home
+  Home,
+  Shield
 } from "lucide-react";
 import {
   DropdownMenu,

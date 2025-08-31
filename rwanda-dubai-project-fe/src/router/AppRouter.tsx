@@ -26,6 +26,8 @@ import { OrderHistoryPage } from "../components/OrderHistoryPage";
 import { ProfileSettingsPage } from "../components/ProfileSettingsPage";
 import { AddressBookPage } from "../components/AddressBookPage";
 import { AccountSecurityPage } from "../components/AccountSecurityPage";
+import SuperAdminDashboard from "../components/SuperAdminDashboard";
+import AdminDashboard from "../components/AdminDashboard";
 import { OfflinePage } from "../components/OfflinePage";
 import { Footer } from "../components/Footer";
 import { ShoppingCart, CartItem } from "../components/ShoppingCart";
@@ -338,7 +340,7 @@ function AppRouterContent() {
             <Route path="/auth" element={<AuthPage />} />
 
             <Route path="/account" element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRoles={['user', 'admin', 'editor', 'manager', 'super-admin']}>
                 <AccountDashboardWrapper
                   user={user}
                   onLogout={handleLogout}
@@ -369,6 +371,18 @@ function AppRouterContent() {
             <Route path="/account-security" element={
               <ProtectedRoute>
                 <AccountSecurityPageWrapper />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/super-admin" element={
+              <ProtectedRoute requiredRoles={['super-admin']}>
+                <SuperAdminDashboard />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/admin-dashboard" element={
+              <ProtectedRoute requiredRoles={['admin', 'editor', 'manager']}>
+                <AdminDashboard />
               </ProtectedRoute>
             } />
 
@@ -534,12 +548,18 @@ function HeaderWrapper({ cartItemCount, wishlistItemCount, onWishlistClick, user
       case 'order-history':
         navigate('/orders');
         break;
-      case 'settings':
-        navigate('/profile-settings');
-        break;
-      case 'about':
-        navigate('/about');
-        break;
+             case 'settings':
+         navigate('/profile-settings');
+         break;
+       case 'super-admin':
+         navigate('/super-admin');
+         break;
+       case 'admin-dashboard':
+         navigate('/admin-dashboard');
+         break;
+       case 'about':
+         navigate('/about');
+         break;
       case 'contact':
         navigate('/contact');
         break;

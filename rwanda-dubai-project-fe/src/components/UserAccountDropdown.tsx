@@ -8,19 +8,18 @@ import {
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { 
-  User, 
+  User as UserIcon, 
   Package, 
   Settings, 
   LogOut,
-  ChevronDown 
+  ChevronDown,
+  Shield
 } from "lucide-react";
+import { User } from "../services/auth";
+import { isSuperAdmin, hasAdminAccess, getPrimaryRole } from "../utils/roleBasedRouting";
 
 interface UserAccountDropdownProps {
-  user: {
-    name: string;
-    email: string;
-    avatar?: string;
-  };
+  user: User;
   onLogout: () => void;
   onNavigate?: (view: string) => void;
 }
@@ -35,6 +34,10 @@ export function UserAccountDropdown({ user, onLogout, onNavigate }: UserAccountD
       .slice(0, 2);
   };
 
+  const userRole = getPrimaryRole(user);
+  const isUserSuperAdmin = isSuperAdmin(user);
+  const hasUserAdminAccess = hasAdminAccess(user);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -47,7 +50,7 @@ export function UserAccountDropdown({ user, onLogout, onNavigate }: UserAccountD
           </Avatar>
           <div className="hidden sm:flex flex-col items-start">
             <span className="text-sm font-medium">{user.name}</span>
-            <span className="text-xs text-muted-foreground">{user.email}</span>
+            <span className="text-xs text-muted-foreground">{userRole}</span>
           </div>
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </Button>
@@ -64,6 +67,7 @@ export function UserAccountDropdown({ user, onLogout, onNavigate }: UserAccountD
           <div className="flex flex-col">
             <span className="font-medium text-sm">{user.name}</span>
             <span className="text-xs text-muted-foreground">{user.email}</span>
+            <span className="text-xs text-blue-600 font-medium">{userRole}</span>
           </div>
         </div>
         
@@ -71,7 +75,7 @@ export function UserAccountDropdown({ user, onLogout, onNavigate }: UserAccountD
         
         {/* Menu Items */}
         <DropdownMenuItem onClick={() => onNavigate?.('account-dashboard')}>
-          <User className="h-4 w-4 mr-3" />
+          <UserIcon className="h-4 w-4 mr-3" />
           Account Dashboard
         </DropdownMenuItem>
         
@@ -85,11 +89,33 @@ export function UserAccountDropdown({ user, onLogout, onNavigate }: UserAccountD
           Settings
         </DropdownMenuItem>
         
+        {/* Super Admin Link - Only show for super admins */}
+        {isUserSuperAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onNavigate?.('super-admin')}>
+              <Shield className="h-4 w-4 mr-3" />
+              Super Admin Dashboard
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {/* Admin Dashboard Link - Show for admins, editors, and managers (but not super admin) */}
+        {hasUserAdminAccess && !isUserSuperAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onNavigate?.('admin-dashboard')}>
+              <Shield className="h-4 w-4 mr-3" />
+              Admin Dashboard
+            </DropdownMenuItem>
+          </>
+        )}
+        
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={onLogout}
-          className="text-red-600 focus:text-red-600 focus:bg-red-50"
+          className="text-red-600 focus:text-red-600"
         >
           <LogOut className="h-4 w-4 mr-3" />
           Sign Out
