@@ -5,33 +5,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { Badge } from "./ui/badge";
 import { Plus, Minus, Trash2, ShoppingBag, ArrowLeft, Truck, Shield } from "lucide-react";
-import { CartItem } from "./ShoppingCart";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useCart } from "../contexts/CartContext";
 
 interface CartPageProps {
-  items: CartItem[];
-  onUpdateQuantity: (productId: string, quantity: number) => void;
-  onRemoveItem: (productId: string) => void;
   onCheckout: () => void;
   onContinueShopping: () => void;
 }
 
 export function CartPage({
-  items,
-  onUpdateQuantity,
-  onRemoveItem,
   onCheckout,
   onContinueShopping,
 }: CartPageProps) {
+  const { cartItems, updateCartItem, removeFromCart } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.total_price, 0);
   const promoDiscount = appliedPromo === "SAVE10" ? subtotal * 0.1 : 0;
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = (subtotal - promoDiscount) * 0.05; // 5% tax
   const total = subtotal - promoDiscount + shipping + tax;
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const applyPromoCode = () => {
     if (promoCode.toUpperCase() === "SAVE10") {
@@ -47,7 +42,7 @@ export function CartPage({
     setAppliedPromo(null);
   };
 
-  if (items.length === 0) {
+  if (cartItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto text-center">
@@ -91,13 +86,13 @@ export function CartPage({
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y">
-                {items.map((item) => (
+                {cartItems.map((item) => (
                   <div key={item.id} className="p-6">
                     <div className="flex gap-4">
                       {/* Product Image */}
                       <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted">
                         <ImageWithFallback
-                          src={item.image}
+                          src={item.product.image || ''}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
@@ -107,12 +102,12 @@ export function CartPage({
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <h3 className="font-semibold line-clamp-2">{item.name}</h3>
-                            <p className="text-sm text-muted-foreground">{item.brand}</p>
-                            {item.originalPrice && (
+                            <h3 className="font-semibold line-clamp-2">{item.product.name}</h3>
+                            <p className="text-sm text-muted-foreground">{item.product.brand?.name || 'Unknown Brand'}</p>
+                            {item.product.original_price && (
                               <div className="flex items-center gap-2 mt-1">
                                 <Badge variant="destructive" className="text-xs">
-                                  -{Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% OFF
+                                  -{Math.round(((item.product.original_price - item.price) / item.product.original_price) * 100)}% OFF
                                 </Badge>
                               </div>
                             )}
@@ -121,7 +116,7 @@ export function CartPage({
                             variant="ghost"
                             size="sm"
                             className="text-muted-foreground hover:text-destructive"
-                            onClick={() => onRemoveItem(item.id)}
+                            onClick={() => removeFromCart(item.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -133,7 +128,7 @@ export function CartPage({
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                              onClick={() => updateCartItem(item.id, Math.max(1, item.quantity - 1))}
                               disabled={item.quantity <= 1}
                             >
                               <Minus className="h-4 w-4" />
@@ -142,7 +137,7 @@ export function CartPage({
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => updateCartItem(item.id, item.quantity + 1)}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -151,11 +146,11 @@ export function CartPage({
                           {/* Price */}
                           <div className="text-right">
                             <div className="font-semibold">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              ${item.total_price.toFixed(2)}
                             </div>
-                            {item.originalPrice && (
+                            {item.product.original_price && (
                               <div className="text-sm text-muted-foreground line-through">
-                                ${(item.originalPrice * item.quantity).toFixed(2)}
+                                ${(item.product.original_price * item.quantity).toFixed(2)}
                               </div>
                             )}
                             <div className="text-xs text-muted-foreground">

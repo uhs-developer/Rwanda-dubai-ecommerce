@@ -1,39 +1,31 @@
-import { useState } from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
 import { Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
-import { Product } from "../data/products";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useCart } from "../contexts/CartContext";
 
-export interface CartItem extends Product {
-  quantity: number;
-}
-
+// CartItem interface is now imported from the cart service
 interface ShoppingCartProps {
   isOpen: boolean;
   onClose: () => void;
-  items: CartItem[];
-  onUpdateQuantity: (productId: string, quantity: number) => void;
-  onRemoveItem: (productId: string) => void;
   onCheckout: () => void;
 }
 
 export function ShoppingCart({
   isOpen,
   onClose,
-  items,
-  onUpdateQuantity,
-  onRemoveItem,
   onCheckout,
 }: ShoppingCartProps) {
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const { cartItems, updateCartItem, removeFromCart, totalPrice } = useCart();
+  
+  const subtotal = totalPrice;
   const shipping = subtotal > 500 ? 0 : 50; // Free shipping over $500
   const total = subtotal + shipping;
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  if (items.length === 0) {
+  if (cartItems.length === 0) {
     return (
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className="w-full sm:max-w-lg">
@@ -71,19 +63,19 @@ export function ShoppingCart({
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-4">
-            {items.map((item) => (
+            {cartItems.map((item) => (
               <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
                 <div className="w-16 h-16 rounded-lg overflow-hidden">
                   <ImageWithFallback
-                    src={item.image}
-                    alt={item.name}
+                    src={item.product.image || ''}
+                    alt={item.product.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-medium line-clamp-2 mb-1">{item.name}</h4>
-                  <p className="text-sm text-muted-foreground mb-2">{item.brand}</p>
+                  <h4 className="font-medium line-clamp-2 mb-1">{item.product.name}</h4>
+                  <p className="text-sm text-muted-foreground mb-2">{item.product.brand?.name || 'Unknown Brand'}</p>
                   <p className="font-semibold">${item.price}</p>
                 </div>
                 
@@ -92,7 +84,7 @@ export function ShoppingCart({
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-                    onClick={() => onRemoveItem(item.id)}
+                    onClick={() => removeFromCart(item.id)}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -102,7 +94,7 @@ export function ShoppingCart({
                       variant="outline"
                       size="sm"
                       className="h-6 w-6 p-0"
-                      onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                      onClick={() => updateCartItem(item.id, Math.max(1, item.quantity - 1))}
                     >
                       <Minus className="h-3 w-3" />
                     </Button>
@@ -111,7 +103,7 @@ export function ShoppingCart({
                       variant="outline"
                       size="sm"
                       className="h-6 w-6 p-0"
-                      onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateCartItem(item.id, item.quantity + 1)}
                     >
                       <Plus className="h-3 w-3" />
                     </Button>

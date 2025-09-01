@@ -19,17 +19,17 @@ import {
   Truck,
   Shield
 } from "lucide-react";
-import { CartItem } from "./ShoppingCart";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTranslation } from "../../node_modules/react-i18next";
+import { useCart } from "../contexts/CartContext";
 
 interface CheckoutPageProps {
-  items: CartItem[];
   onBack: () => void;
   onPlaceOrder: (orderData: any) => void;
 }
 
-export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps) {
+export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
+  const { cartItems } = useCart();
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -57,7 +57,7 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
     agreeTerms: false,
   });
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.total_price, 0);
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
@@ -73,7 +73,7 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
     }
 
     const orderData = {
-      items,
+      items: cartItems,
       shipping: formData,
       payment: {
         method: formData.paymentMethod,
@@ -427,23 +427,23 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
                 <div>
                   <h3 className="font-semibold mb-3">Order Items</h3>
                   <div className="space-y-3">
-                    {items.map((item) => (
+                    {cartItems.map((item) => (
                       <div key={item.id} className="flex gap-3 p-3 border rounded-lg">
                         <div className="w-16 h-16 rounded overflow-hidden">
-                          <ImageWithFallback
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
+                                                  <ImageWithFallback
+                          src={item.product.image || ''}
+                          alt={item.product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium line-clamp-1">{item.product.name}</h4>
+                        <p className="text-sm text-muted-foreground">{item.product.brand?.name || 'Unknown Brand'}</p>
+                        <div className="flex justify-between items-center mt-1">
+                          <span className="text-sm">Qty: {item.quantity}</span>
+                          <span className="font-semibold">${item.total_price.toFixed(2)}</span>
                         </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium line-clamp-1">{item.name}</h4>
-                          <p className="text-sm text-muted-foreground">{item.brand}</p>
-                          <div className="flex justify-between items-center mt-1">
-                            <span className="text-sm">Qty: {item.quantity}</span>
-                            <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
-                          </div>
-                        </div>
+                      </div>
                       </div>
                     ))}
                   </div>
@@ -530,7 +530,7 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
+                  <span>Subtotal ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">

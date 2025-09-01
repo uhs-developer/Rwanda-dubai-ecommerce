@@ -7,14 +7,10 @@ import { Badge } from './ui/badge';
 import { Search, ArrowLeft } from 'lucide-react';
 
 interface SearchResultsPageProps {
-  onAddToCart?: (product: any) => void;
-  onAddToWishlist?: (product: any) => void;
   onProductClick?: (product: any) => void;
 }
 
 export function SearchResultsPage({
-  onAddToCart,
-  onAddToWishlist,
   onProductClick
 }: SearchResultsPageProps) {
   const [searchParams] = useSearchParams();
@@ -85,8 +81,6 @@ export function SearchResultsPage({
     <div className="min-h-screen">
       <ProductListingPageAPI
         searchQuery={query}
-        onAddToCart={onAddToCart}
-        onAddToWishlist={onAddToWishlist}
         onProductClick={onProductClick}
         onBack={handleBack}
       />

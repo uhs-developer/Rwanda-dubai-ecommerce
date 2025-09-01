@@ -101,6 +101,16 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
     // Scopes
     public function scopeActive($query): Builder
     {

@@ -7,8 +7,6 @@ import { Product } from "../data/products";
 interface ProductSliderProps {
   title: string;
   products: Product[];
-  onAddToCart?: (product: Product) => void;
-  onAddToWishlist?: (product: Product) => void;
   onProductClick?: (product: Product) => void;
   onViewAll?: () => void;
 }
@@ -16,8 +14,6 @@ interface ProductSliderProps {
 export function ProductSlider({
   title,
   products,
-  onAddToCart,
-  onAddToWishlist,
   onProductClick,
   onViewAll,
 }: ProductSliderProps) {
@@ -72,7 +68,7 @@ export function ProductSlider({
                 size="sm"
                 className="h-8 w-8 p-0"
                 onClick={() => scroll('right')}
-                disabled={!canScrollRight}
+                disabled={!canScrollLeft}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -91,8 +87,6 @@ export function ProductSlider({
               <div key={product.id} className="flex-none w-80">
                 <ProductCard
                   product={product}
-                  onAddToCart={onAddToCart}
-                  onAddToWishlist={onAddToWishlist}
                   onProductClick={onProductClick}
                 />
               </div>

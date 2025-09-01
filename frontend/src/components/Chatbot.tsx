@@ -20,16 +20,17 @@ import { chatbotService, ChatMessage, ChatAction } from "../services/chatbot";
 import { useTranslation } from "../../node_modules/react-i18next";
 import { useAuth } from "../contexts/AuthContext";
 import { useProducts } from "../contexts/ProductContext";
+import { useCart } from "../contexts/CartContext";
+import { useWishlist } from "../contexts/WishlistContext";
 import { useLocation } from "react-router-dom";
 
 interface ChatbotProps {
-  onAddToCart?: (product: Product) => void;
   onProductClick?: (product: Product) => void;
-  cartItems?: any[];
-  wishlistItems?: any[];
 }
 
-export function Chatbot({ onAddToCart, onProductClick, cartItems = [], wishlistItems = [] }: ChatbotProps) {
+export function Chatbot({ onProductClick }: ChatbotProps) {
+  const { cartItems, addToCart } = useCart();
+  const { wishlistItems } = useWishlist();
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const { categories, brands } = useProducts();
@@ -168,8 +169,8 @@ export function Chatbot({ onAddToCart, onProductClick, cartItems = [], wishlistI
   const handleChatAction = (action: ChatAction) => {
     switch (action.type) {
       case 'add_to_cart':
-        if (onAddToCart && action.data) {
-          onAddToCart(action.data);
+        if (action.data) {
+          addToCart(action.data);
           // Add confirmation message
           const confirmMessage: ChatMessage = {
             id: Date.now().toString(),
@@ -307,7 +308,7 @@ export function Chatbot({ onAddToCart, onProductClick, cartItems = [], wishlistI
                                       <Button
                                         size="sm"
                                         className="h-6 text-xs px-2"
-                                        onClick={() => onAddToCart?.(product)}
+                                        onClick={() => addToCart(product)}
                                       >
                                         <ShoppingCart className="h-3 w-3 mr-1" />
                                         {t("chatbot.addToCart", "Add")}

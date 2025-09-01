@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useState, useEffect } from "react";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ProductProvider } from "../contexts/ProductContext";
+import { CartProvider } from "../contexts/CartContext";
+import { WishlistProvider } from "../contexts/WishlistContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { Header } from "../components/Header";
 import { Homepage } from "../components/Homepage";
@@ -31,23 +33,28 @@ import AdminDashboard from "../components/AdminDashboard";
 import EditorDashboard from "../components/EditorDashboard";
 import { OfflinePage } from "../components/OfflinePage";
 import { Footer } from "../components/Footer";
-import { ShoppingCart, CartItem } from "../components/ShoppingCart";
+import { ShoppingCart } from "../components/ShoppingCart";
 import { MiniWishlist } from "../components/MiniWishlist";
 import { FlashSalePopup } from "../components/FlashSalePopup";
 import { Chatbot } from "../components/Chatbot";
 import { Toaster } from "../components/ui/sonner";
 import { toast } from "sonner";
 import { Product, products } from "../data/products";
-import { WishlistItem, getWishlistFromStorage, saveWishlistToStorage } from "../data/wishlist";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 import { useAuth } from "../contexts/AuthContext";
+import { useCart } from "../contexts/CartContext";
+import { useWishlist } from "../contexts/WishlistContext";
 
 export function AppRouter() {
   return (
     <AuthProvider>
       <ProductProvider>
-        <AppRouterContent />
+        <CartProvider>
+          <WishlistProvider>
+            <AppRouterContent />
+          </WishlistProvider>
+        </CartProvider>
       </ProductProvider>
     </AuthProvider>
   );
@@ -55,8 +62,8 @@ export function AppRouter() {
 
 function AppRouterContent() {
   const { user, logout } = useAuth();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const { cartItems, cartItemCount, updateCartItem, removeFromCart, clearCart } = useCart();
+  const { wishlistItems, wishlistItemCount, removeFromWishlist, clearWishlist } = useWishlist();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [showFlashSale, setShowFlashSale] = useState(false);
@@ -65,32 +72,14 @@ function AppRouterContent() {
 
   const isOnline = useOnlineStatus();
 
-  // Load data from localStorage on mount
+  // Load data on mount
   useEffect(() => {
-    // Load cart
-    const savedCart = localStorage.getItem('rwanda-dubai-cart');
-    if (savedCart) {
-      try {
-        setCartItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Failed to load cart from localStorage:', error);
-      }
-    }
-
-    // Load wishlist
-    setWishlistItems(getWishlistFromStorage());
-
     // Show flash sale popup on first visit
     const hasSeenFlashSale = localStorage.getItem('rwanda-dubai-flash-sale-seen');
     if (!hasSeenFlashSale) {
       setShowFlashSale(true);
     }
   }, []);
-
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('rwanda-dubai-cart', JSON.stringify(cartItems));
-  }, [cartItems]);
 
   // Handle offline status changes
   useEffect(() => {
@@ -103,66 +92,8 @@ function AppRouterContent() {
     }
   }, [isOnline, showOfflinePage]);
 
-  const addToCart = (product: Product, quantity = 1) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prevItems, { ...product, quantity }];
-    });
-    toast.success(`${product.name} added to cart!`);
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
-    toast.success('Item removed from cart');
-  };
-
-  const updateCartQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const addToWishlist = (product: Product) => {
-    const newWishlistItem: WishlistItem = {
-      ...product,
-      dateAdded: new Date(),
-    };
-
-    setWishlistItems(prevItems => {
-      const isAlreadyInWishlist = prevItems.some(item => item.id === product.id);
-      if (isAlreadyInWishlist) {
-        toast.info('Item already in wishlist');
-        return prevItems;
-      }
-      const updatedItems = [...prevItems, newWishlistItem];
-      saveWishlistToStorage(updatedItems);
-      toast.success('Added to wishlist!');
-      return updatedItems;
-    });
-  };
-
-  const removeFromWishlist = (productId: string) => {
-    setWishlistItems(prevItems => {
-      const updatedItems = prevItems.filter(item => item.id !== productId);
-      saveWishlistToStorage(updatedItems);
-      toast.success('Removed from wishlist');
-      return updatedItems;
-    });
-  };
+  // Cart and wishlist functions are now handled by the contexts
+  // No need for local function declarations
 
   const handleProductClick = (_product: Product) => {
     // Navigate to product detail page
@@ -178,7 +109,7 @@ function AppRouterContent() {
 
   const handlePlaceOrder = (orderData: any) => {
     setOrderData(orderData);
-    setCartItems([]); // Clear cart
+    clearCart(); // Clear cart using context method
     toast.success('Order placed successfully!');
   };
 
@@ -218,8 +149,7 @@ function AppRouterContent() {
     setShowOfflinePage(false);
   };
 
-  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const wishlistItemCount = wishlistItems.length;
+  // Cart and wishlist counts are now provided by the contexts
 
   // Get related products for product detail page
   const getRelatedProducts = (product: Product) => {
@@ -248,16 +178,12 @@ function AppRouterContent() {
           <Routes>
             <Route path="/" element={
               <HomepageAPI
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
               />
             } />
 
             <Route path="/products" element={
               <ProductListingPageAPI
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
               />
             } />
@@ -265,48 +191,36 @@ function AppRouterContent() {
             <Route path="/deals" element={
               <ProductListingPage
                 searchQuery=""
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
               />
             } />
 
             <Route path="/new-arrivals" element={
               <ProductListingPage
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
               />
             } />
 
             <Route path="/category/:categoryId" element={
               <CategoryPageWrapper
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
               />
             } />
 
             <Route path="/category/:categoryId/:subcategory" element={
               <CategoryPageWrapper
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
               />
             } />
 
             <Route path="/search" element={
               <SearchResultsPage
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
               />
             } />
 
             <Route path="/product/:productId" element={
               <ProductDetailWrapper
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 getRelatedProducts={getRelatedProducts}
                 onRelatedProductClick={handleProductClick}
               />
@@ -314,9 +228,6 @@ function AppRouterContent() {
 
             <Route path="/cart" element={
               <CartPage
-                items={cartItems}
-                onUpdateQuantity={updateCartQuantity}
-                onRemoveItem={removeFromCart}
                 onCheckout={handleCheckout}
                 onContinueShopping={() => { }}
               />
@@ -324,7 +235,6 @@ function AppRouterContent() {
 
             <Route path="/checkout" element={
               <CheckoutPage
-                items={cartItems}
                 onBack={() => { }}
                 onPlaceOrder={handlePlaceOrder}
               />
@@ -429,8 +339,6 @@ function AppRouterContent() {
 
             <Route path="/wishlist" element={
               <ProductListingPage
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
                 onProductClick={handleProductClick}
               />
             } />
@@ -453,9 +361,6 @@ function AppRouterContent() {
         <ShoppingCart
           isOpen={isCartOpen}
           onClose={() => setIsCartOpen(false)}
-          items={cartItems}
-          onUpdateQuantity={updateCartQuantity}
-          onRemoveItem={removeFromCart}
           onCheckout={handleCheckout}
         />
 
@@ -463,9 +368,6 @@ function AppRouterContent() {
         <MiniWishlist
           isOpen={isWishlistOpen}
           onClose={() => setIsWishlistOpen(false)}
-          items={wishlistItems}
-          onRemoveItem={removeFromWishlist}
-          onAddToCart={(item) => addToCart(item)}
           onProductClick={handleProductClick}
           onViewAll={() => {
             setIsWishlistOpen(false);
@@ -482,10 +384,7 @@ function AppRouterContent() {
 
         {/* Chatbot */}
         <Chatbot
-          onAddToCart={addToCart}
           onProductClick={handleProductClick}
-          cartItems={cartItems}
-          wishlistItems={wishlistItems}
         />
 
         {/* Offline Page Overlay */}
@@ -518,7 +417,9 @@ function AppRouterContent() {
 }
 
 // Wrapper components to handle URL parameters
-function HeaderWrapper({ cartItemCount, wishlistItemCount, onWishlistClick, user, onLogout }: any) {
+function HeaderWrapper({ onWishlistClick, user, onLogout }: any) {
+  const { cartItemCount } = useCart();
+  const { wishlistItemCount } = useWishlist();
   const navigate = useNavigate();
 
   const handleCategoryClick = (categoryId: string) => {
@@ -608,7 +509,7 @@ function HeaderWrapper({ cartItemCount, wishlistItemCount, onWishlistClick, user
   );
 }
 
-function CategoryPageWrapper({ onAddToCart, onAddToWishlist, onProductClick }: any) {
+function CategoryPageWrapper({ onProductClick }: any) {
   const { categoryId, subcategory } = useParams();
   const navigate = useNavigate();
 
@@ -616,15 +517,13 @@ function CategoryPageWrapper({ onAddToCart, onAddToWishlist, onProductClick }: a
     <ProductListingPageAPI
       category={categoryId}
       subcategory={subcategory}
-      onAddToCart={onAddToCart}
-      onAddToWishlist={onAddToWishlist}
       onProductClick={onProductClick}
       onBack={() => navigate('/')}
     />
   );
 }
 
-function SearchPageWrapper({ onAddToCart, onAddToWishlist, onProductClick }: any) {
+function SearchPageWrapper({ onProductClick }: any) {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(window.location.search);
   const query = searchParams.get('q') || '';
@@ -632,15 +531,13 @@ function SearchPageWrapper({ onAddToCart, onAddToWishlist, onProductClick }: any
   return (
     <ProductListingPage
       searchQuery={query}
-      onAddToCart={onAddToCart}
-      onAddToWishlist={onAddToWishlist}
       onProductClick={onProductClick}
       onBack={() => navigate('/')}
     />
   );
 }
 
-function ProductDetailWrapper({ onAddToCart, onAddToWishlist, getRelatedProducts, onRelatedProductClick }: any) {
+function ProductDetailWrapper({ getRelatedProducts, onRelatedProductClick }: any) {
   const { productId } = useParams();
   const navigate = useNavigate();
 
@@ -653,8 +550,6 @@ function ProductDetailWrapper({ onAddToCart, onAddToWishlist, getRelatedProducts
   return (
     <ProductDetailPage
       product={product}
-      onAddToCart={onAddToCart}
-      onAddToWishlist={onAddToWishlist}
       onBack={() => navigate('/')}
       relatedProducts={getRelatedProducts(product)}
       onRelatedProductClick={onRelatedProductClick}

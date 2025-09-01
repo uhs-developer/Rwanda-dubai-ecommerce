@@ -2,29 +2,27 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
 import { Trash2, ShoppingCart, Heart } from "lucide-react";
-import { WishlistItem } from "../data/wishlist";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useWishlist } from "../contexts/WishlistContext";
+import { useCart } from "../contexts/CartContext";
 
 interface MiniWishlistProps {
   isOpen: boolean;
   onClose: () => void;
-  items: WishlistItem[];
-  onRemoveItem: (productId: string) => void;
-  onAddToCart: (item: WishlistItem) => void;
-  onProductClick: (item: WishlistItem) => void;
+  onProductClick: (item: any) => void;
   onViewAll: () => void;
 }
 
 export function MiniWishlist({
   isOpen,
   onClose,
-  items,
-  onRemoveItem,
-  onAddToCart,
   onProductClick,
   onViewAll,
 }: MiniWishlistProps) {
-  if (items.length === 0) {
+  const { wishlistItems, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
+  
+  if (wishlistItems.length === 0) {
     return (
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className="w-full sm:max-w-lg">
@@ -56,7 +54,7 @@ export function MiniWishlist({
             <div className="flex items-center gap-2">
               <Heart className="h-5 w-5" />
               Wishlist
-              <Badge variant="secondary">{items.length}</Badge>
+              <Badge variant="secondary">{wishlistItems.length}</Badge>
             </div>
             <Button variant="outline" size="sm" onClick={onViewAll}>
               View All
@@ -67,15 +65,15 @@ export function MiniWishlist({
         {/* Wishlist Items */}
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-4">
-            {items.slice(0, 5).map((item) => (
+            {wishlistItems.slice(0, 5).map((item) => (
               <div key={item.id} className="flex gap-4 p-3 border rounded-lg">
                 <div 
                   className="w-16 h-16 rounded-lg overflow-hidden cursor-pointer"
                   onClick={() => onProductClick(item)}
                 >
                   <ImageWithFallback
-                    src={item.image}
-                    alt={item.name}
+                    src={item.product.image || ''}
+                    alt={item.product.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -85,17 +83,17 @@ export function MiniWishlist({
                     className="font-medium line-clamp-2 mb-1 cursor-pointer hover:text-primary"
                     onClick={() => onProductClick(item)}
                   >
-                    {item.name}
+                    {item.product.name}
                   </h4>
-                  <p className="text-sm text-muted-foreground mb-2">{item.brand}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{item.product.brand?.name || 'Unknown Brand'}</p>
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold">${item.price}</span>
+                    <span className="font-semibold">${item.product.price}</span>
                     <div className="flex gap-1">
                       <Button
                         size="sm"
                         className="h-8 px-3"
-                        onClick={() => onAddToCart(item)}
-                        disabled={!item.inStock}
+                        onClick={() => addToCart(item.product, 1)}
+                        disabled={!item.product.in_stock}
                       >
                         <ShoppingCart className="h-3 w-3 mr-1" />
                         Add
@@ -104,7 +102,7 @@ export function MiniWishlist({
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                        onClick={() => onRemoveItem(item.id)}
+                        onClick={() => removeFromWishlist(item.id)}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
@@ -114,13 +112,13 @@ export function MiniWishlist({
               </div>
             ))}
             
-            {items.length > 5 && (
+            {wishlistItems.length > 5 && (
               <div className="text-center py-4">
                 <Button variant="outline" onClick={onViewAll}>
-                  View All {items.length} Items
+                  View All {wishlistItems.length} Items
                 </Button>
               </div>
-            )}
+        )}
           </div>
         </div>
 

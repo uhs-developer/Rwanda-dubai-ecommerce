@@ -10,8 +10,6 @@ interface CategoryFeaturedSliderProps {
   title: string;
   subtitle?: string;
   products: Product[];
-  onAddToCart?: (product: Product) => void;
-  onAddToWishlist?: (product: Product) => void;
   onProductClick?: (product: Product) => void;
   onViewAll?: () => void;
   autoPlay?: boolean;
@@ -22,8 +20,6 @@ export function CategoryFeaturedSlider({
   title,
   subtitle,
   products,
-  onAddToCart,
-  onAddToWishlist,
   onProductClick,
   onViewAll,
   autoPlay = false,
@@ -174,7 +170,7 @@ export function CategoryFeaturedSlider({
                           className="absolute top-3 right-3 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={(e: { stopPropagation: () => void; }) => {
                             e.stopPropagation();
-                            onAddToWishlist?.(product);
+                            // onAddToWishlist?.(product); // Removed as per edit hint
                           }}
                         >
                           <Heart className="h-4 w-4" />
@@ -188,7 +184,7 @@ export function CategoryFeaturedSlider({
                             disabled={!product.inStock}
                             onClick={(e: { stopPropagation: () => void; }) => {
                               e.stopPropagation();
-                              onAddToCart?.(product);
+                              // onAddToCart?.(product); // Removed as per edit hint
                             }}
                           >
                             <ShoppingCart className="h-4 w-4 mr-2" />

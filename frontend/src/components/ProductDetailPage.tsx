@@ -22,11 +22,11 @@ import { Product } from "../data/products";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { ProductImageModal } from "./ProductImageModal";
 import { useTranslation } from "../../node_modules/react-i18next";
+import { useCart } from "../contexts/CartContext";
+import { useWishlist } from "../contexts/WishlistContext";
 
 interface ProductDetailPageProps {
   product: Product;
-  onAddToCart?: (product: Product, quantity: number) => void;
-  onAddToWishlist?: (product: Product) => void;
   onBack?: () => void;
   relatedProducts?: Product[];
   onRelatedProductClick?: (product: Product) => void;
@@ -34,12 +34,12 @@ interface ProductDetailPageProps {
 
 export function ProductDetailPage({
   product,
-  onAddToCart,
-  onAddToWishlist,
   onBack,
   relatedProducts = [],
   onRelatedProductClick,
 }: ProductDetailPageProps) {
+  const { addToCart, isInCart } = useCart();
+  const { addToWishlist, isInWishlist, removeByProduct } = useWishlist();
   const { t } = useTranslation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -212,7 +212,7 @@ export function ProductDetailPage({
                 size="lg"
                 className="flex-1"
                 disabled={!product.inStock}
-                onClick={() => onAddToCart?.(product, quantity)}
+                onClick={() => addToCart(product, quantity)}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 {product.inStock ? t("product.addToCart") : 'Out of Stock'}
@@ -220,7 +220,7 @@ export function ProductDetailPage({
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => onAddToWishlist?.(product)}
+                onClick={() => addToWishlist(product)}
               >
                 <Heart className="h-4 w-4" />
               </Button>

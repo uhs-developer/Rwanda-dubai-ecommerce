@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -182,5 +183,21 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->hasRole('user');
+    }
+
+    /**
+     * The cart items that belong to the user.
+     */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    /**
+     * The wishlist items that belong to the user.
+     */
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
     }
 }

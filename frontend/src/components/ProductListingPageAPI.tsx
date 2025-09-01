@@ -18,8 +18,6 @@ interface ProductListingPageAPIProps {
   category?: string;
   subcategory?: string;
   searchQuery?: string;
-  onAddToCart?: (product: any) => void;
-  onAddToWishlist?: (product: any) => void;
   onProductClick?: (product: any) => void;
   onBack?: () => void;
 }
@@ -31,8 +29,6 @@ export function ProductListingPageAPI({
   category,
   subcategory,
   searchQuery,
-  onAddToCart,
-  onAddToWishlist,
   onProductClick,
   onBack,
 }: ProductListingPageAPIProps) {
@@ -512,8 +508,6 @@ export function ProductListingPageAPI({
                   <ProductCard
                     key={product.id}
                     product={product}
-                    onAddToCart={onAddToCart}
-                    onAddToWishlist={onAddToWishlist}
                     onProductClick={onProductClick}
                     className={viewMode === 'list' ? "flex flex-row" : ""}
                   />

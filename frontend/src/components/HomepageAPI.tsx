@@ -15,14 +15,10 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTranslation } from "../../node_modules/react-i18next";
 
 interface HomepageAPIProps {
-  onAddToCart?: (product: any) => void;
-  onAddToWishlist?: (product: any) => void;
   onProductClick?: (product: any) => void;
 }
 
 export function HomepageAPI({
-  onAddToCart,
-  onAddToWishlist,
   onProductClick
 }: HomepageAPIProps) {
   const navigate = useNavigate();
@@ -154,8 +150,6 @@ export function HomepageAPI({
             <ProductSlider
               title={t("home.featuredProducts")}
               products={displayFeaturedProducts}
-              onAddToCart={onAddToCart}
-              onAddToWishlist={onAddToWishlist}
               onProductClick={handleProductClick}
             />
           ) : (
@@ -184,8 +178,6 @@ export function HomepageAPI({
               <CategoryFeaturedSlider
                 title={category.name}
                 products={displayFeaturedProducts.slice(0, 6)}
-                onAddToCart={onAddToCart}
-                onAddToWishlist={onAddToWishlist}
                 onProductClick={handleProductClick}
                 onViewAll={() => handleViewCategory(category.slug)}
               />
