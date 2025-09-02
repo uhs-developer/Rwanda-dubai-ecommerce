@@ -105,6 +105,7 @@ function AppRouterContent() {
       toast.error('Your cart is empty');
       return;
     }
+    // Navigation will be handled by the CartPageWrapper component
   };
 
   const handlePlaceOrder = (orderData: any) => {
@@ -226,12 +227,7 @@ function AppRouterContent() {
               />
             } />
 
-            <Route path="/cart" element={
-              <CartPage
-                onCheckout={handleCheckout}
-                onContinueShopping={() => { }}
-              />
-            } />
+            <Route path="/cart" element={<CartPageWrapper onCheckout={handleCheckout} />} />
 
             <Route path="/checkout" element={
               <CheckoutPage
@@ -358,10 +354,10 @@ function AppRouterContent() {
         <Footer />
 
         {/* Shopping Cart Sidebar */}
-        <ShoppingCart
+        <ShoppingCartWrapper
           isOpen={isCartOpen}
           onClose={() => setIsCartOpen(false)}
-          onCheckout={handleCheckout}
+          cartItems={cartItems}
         />
 
         {/* Mini Wishlist */}
@@ -369,9 +365,6 @@ function AppRouterContent() {
           isOpen={isWishlistOpen}
           onClose={() => setIsWishlistOpen(false)}
           onProductClick={handleProductClick}
-          onViewAll={() => {
-            setIsWishlistOpen(false);
-          }}
         />
 
         {/* Flash Sale Popup */}
@@ -683,6 +676,47 @@ function AccountSecurityPageWrapper() {
   return (
     <AccountSecurityPage
       onBack={() => navigate('/account')}
+    />
+  );
+}
+
+function CartPageWrapper({ }: any) {
+  const navigate = useNavigate();
+  const { cartItems } = useCart();
+  
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+    navigate('/checkout');
+  };
+  
+  return (
+    <CartPage
+      onCheckout={handleCheckout}
+      onContinueShopping={() => navigate('/')}
+    />
+  );
+}
+
+function ShoppingCartWrapper({ isOpen, onClose, cartItems }: any) {
+  const navigate = useNavigate();
+  
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+    onClose();
+    navigate('/checkout');
+  };
+  
+  return (
+    <ShoppingCart
+      isOpen={isOpen}
+      onClose={onClose}
+      onCheckout={handleCheckout}
     />
   );
 }

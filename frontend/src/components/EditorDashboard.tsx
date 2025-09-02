@@ -26,7 +26,11 @@ import {
   Phone,
   Mail,
   Settings,
-  MessageCircle
+  MessageCircle,
+  Package,
+  FileText,
+  Image,
+  BarChart3
 } from 'lucide-react';
 
 interface Product {
@@ -135,49 +139,6 @@ const EditorDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top Navigation Bar */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 gap-4">
-            {/* Left side - Logo and search */}
-            <div className="flex items-center space-x-4 sm:space-x-6 w-full sm:w-auto">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">TechBridge</h1>
-              <div className="relative flex-1 sm:flex-none">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search products..."
-                  className="pl-10 w-full sm:w-80"
-                />
-              </div>
-            </div>
-
-            {/* Right side - Navigation icons */}
-            <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
-              <Button variant="ghost" size="sm">
-                <Heart className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
-              <div className="flex items-center space-x-2">
-                <User className="h-5 w-5" />
-                <span className="text-sm font-medium hidden sm:block">Mike Admin</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Secondary Navigation */}
-          <div className="flex items-center space-x-4 sm:space-x-8 pb-4 overflow-x-auto">
-            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap">Home</a>
-            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap">Electronics</a>
-            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap">Auto Parts</a>
-            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap">Computers</a>
-            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap">Deals</a>
-            <a href="#" className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap">New Arrivals</a>
-          </div>
-        </div>
-      </div>
-
       {/* Dashboard Header */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -232,8 +193,8 @@ const EditorDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">My Products</CardTitle>
-              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                <div className="w-4 h-4 bg-gray-400 rounded-sm"></div>
+              <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                <Package className="h-4 w-4 text-blue-600" />
               </div>
             </CardHeader>
             <CardContent>
@@ -251,8 +212,8 @@ const EditorDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Draft Products</CardTitle>
-              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                <div className="w-4 h-4 bg-gray-400 rounded"></div>
+              <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
+                <Edit className="h-4 w-4 text-orange-600" />
               </div>
             </CardHeader>
             <CardContent>
@@ -270,8 +231,8 @@ const EditorDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Media Library</CardTitle>
-              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                <div className="w-4 h-4 bg-gray-400 rounded-sm"></div>
+              <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
+                <Image className="h-4 w-4 text-green-600" />
               </div>
             </CardHeader>
             <CardContent>
@@ -289,8 +250,8 @@ const EditorDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
-              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                <div className="w-4 h-4 bg-gray-400 rounded"></div>
+              <div className="w-8 h-8 bg-purple-100 rounded flex items-center justify-center">
+                <FileText className="h-4 w-4 text-purple-600" />
               </div>
             </CardHeader>
             <CardContent>
@@ -565,24 +526,7 @@ const EditorDashboard: React.FC = () => {
         </Tabs>
       </div>
 
-      {/* Stay Updated Section */}
-      <div className="bg-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
-          <p className="text-gray-300 mb-8 text-lg">
-            Get the latest deals and product updates delivered to your inbox.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <Input
-              placeholder="Enter your email"
-              className="w-full sm:w-80"
-            />
-            <Button className="w-full sm:w-auto bg-white text-gray-900 hover:bg-gray-100">
-              Subscribe
-            </Button>
-          </div>
-        </div>
-      </div>
+
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white">

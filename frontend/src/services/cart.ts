@@ -156,13 +156,14 @@ export const cartLocalStorage = {
     return cart;
   },
 
-  updateQuantity(productId: number, quantity: number): CartItem[] {
+  updateQuantity(targetId: number, quantity: number): CartItem[] {
     const cart = this.getCart();
-    const item = cart.find(item => item.product_id === productId);
+    // Support both product_id and item id inputs
+    const item = cart.find(item => item.product_id === targetId || item.id === targetId);
     
     if (item) {
       if (quantity <= 0) {
-        return this.removeFromCart(productId);
+        return this.removeFromCart(targetId);
       }
       item.quantity = quantity;
       item.total_price = item.price * quantity;
@@ -173,9 +174,10 @@ export const cartLocalStorage = {
     return cart;
   },
 
-  removeFromCart(productId: number): CartItem[] {
+  removeFromCart(targetId: number): CartItem[] {
     const cart = this.getCart();
-    const filteredCart = cart.filter(item => item.product_id !== productId);
+    // Support both product_id and item id inputs
+    const filteredCart = cart.filter(item => item.product_id !== targetId && item.id !== targetId);
     this.saveCart(filteredCart);
     return filteredCart;
   },

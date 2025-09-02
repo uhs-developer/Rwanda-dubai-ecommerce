@@ -10,14 +10,12 @@ interface MiniWishlistProps {
   isOpen: boolean;
   onClose: () => void;
   onProductClick: (item: any) => void;
-  onViewAll: () => void;
 }
 
 export function MiniWishlist({
   isOpen,
   onClose,
   onProductClick,
-  onViewAll,
 }: MiniWishlistProps) {
   const { wishlistItems, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
@@ -50,15 +48,10 @@ export function MiniWishlist({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-lg flex flex-col">
         <SheetHeader>
-          <SheetTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Heart className="h-5 w-5" />
-              Wishlist
-              <Badge variant="secondary">{wishlistItems.length}</Badge>
-            </div>
-            <Button variant="outline" size="sm" onClick={onViewAll}>
-              View All
-            </Button>
+          <SheetTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5" />
+            Wishlist
+            <Badge variant="secondary">{wishlistItems.length}</Badge>
           </SheetTitle>
         </SheetHeader>
 
@@ -111,14 +104,6 @@ export function MiniWishlist({
                 </div>
               </div>
             ))}
-            
-            {wishlistItems.length > 5 && (
-              <div className="text-center py-4">
-                <Button variant="outline" onClick={onViewAll}>
-                  View All {wishlistItems.length} Items
-                </Button>
-              </div>
-        )}
           </div>
         </div>
 

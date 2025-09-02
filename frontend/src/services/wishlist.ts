@@ -163,9 +163,10 @@ export const wishlistLocalStorage = {
     return wishlist;
   },
 
-  removeFromWishlist(productId: number): WishlistItem[] {
+  removeFromWishlist(targetId: number): WishlistItem[] {
     const wishlist = this.getWishlist();
-    const filteredWishlist = wishlist.filter(item => item.product_id !== productId);
+    // Support both item id and product_id inputs
+    const filteredWishlist = wishlist.filter(item => item.id !== targetId && item.product_id !== targetId);
     this.saveWishlist(filteredWishlist);
     return filteredWishlist;
   },

@@ -33,13 +33,30 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  // Load wishlist on mount and when user changes
-  useEffect(() => {
-    refreshWishlist();
-  }, [user]);
-
   // Calculate derived values
   const wishlistItemCount = wishlistItems.length;
+
+  // Load from localStorage immediately on mount
+  useEffect(() => {
+    console.log('WishlistContext: Loading wishlist from localStorage on mount...');
+    const localWishlist = wishlistLocalStorage.getWishlist();
+    console.log('WishlistContext: localStorage wishlist data:', localWishlist);
+    
+    if (localWishlist.length > 0) {
+      console.log('WishlistContext: Setting wishlist items from localStorage:', localWishlist);
+      setWishlistItems(localWishlist);
+    } else {
+      console.log('WishlistContext: No localStorage wishlist data found');
+    }
+  }, []); // Empty dependency array - only run on mount
+
+  // Sync with API when user changes (but don't override localStorage data)
+  useEffect(() => {
+    if (user) {
+      console.log('WishlistContext: User changed, syncing with API...');
+      syncWithAPI();
+    }
+  }, [user]);
 
   // Refresh wishlist from API
   const refreshWishlist = async () => {
@@ -66,6 +83,25 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Sync with API without overriding localStorage data
+  const syncWithAPI = async () => {
+    try {
+      const response = await wishlistService.getWishlist();
+      if (response.success && response.data && response.data.items && response.data.items.length > 0) {
+        // Only update if API has data and it's different from current
+        setWishlistItems(prev => {
+          if (JSON.stringify(prev) !== JSON.stringify(response.data!.items)) {
+            return response.data!.items;
+          }
+          return prev;
+        });
+      }
+    } catch (error: any) {
+      console.warn('Failed to sync wishlist with API:', error);
+      // Don't override localStorage data on API failure
     }
   };
 
@@ -120,8 +156,8 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       // Try to remove via API first
       const response = await wishlistService.removeFromWishlist(id);
       if (response.success) {
-        // Refresh wishlist to get updated data
-        await refreshWishlist();
+        // Update local state immediately for better UX
+        setWishlistItems(prev => prev.filter(item => item.id !== id));
         toast.success('Item removed from wishlist');
         return;
       }
@@ -152,8 +188,8 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       // Try to remove via API first
       const response = await wishlistService.removeByProduct(productId);
       if (response.success) {
-        // Refresh wishlist to get updated data
-        await refreshWishlist();
+        // Update local state immediately for better UX
+        setWishlistItems(prev => prev.filter(item => item.product_id !== productId));
         toast.success('Item removed from wishlist');
         return;
       }

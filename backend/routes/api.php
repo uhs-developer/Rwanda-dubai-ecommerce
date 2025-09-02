@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -194,4 +195,11 @@ Route::prefix('products')->group(function () {
 Route::prefix('brands')->group(function () {
     Route::get('/', [BrandController::class, 'index']);
     Route::get('/{slug}', [BrandController::class, 'show']);
+});
+
+// Payment routes
+Route::prefix('payment')->group(function () {
+    Route::post('/verify', [PaymentController::class, 'verifyPayment']);
+    Route::post('/initialize', [PaymentController::class, 'initializePayment']);
+    Route::post('/webhook', [PaymentController::class, 'handleWebhook']);
 });

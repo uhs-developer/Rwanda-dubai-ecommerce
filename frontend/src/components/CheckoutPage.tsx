@@ -22,6 +22,8 @@ import {
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTranslation } from "../../node_modules/react-i18next";
 import { useCart } from "../contexts/CartContext";
+import { FlutterwavePayment } from "./FlutterwavePayment";
+import { FlutterwaveResponse, FlutterwaveError } from "../services/flutterwaveService";
 
 interface CheckoutPageProps {
   onBack: () => void;
@@ -43,7 +45,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
     district: "",
     postalCode: "",
     // Payment Information
-    paymentMethod: "card",
+    paymentMethod: "flutterwave",
     cardNumber: "",
     expiryDate: "",
     cvv: "",
@@ -57,6 +59,9 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
     agreeTerms: false,
   });
 
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [paymentError, setPaymentError] = useState<string>('');
+
   const subtotal = cartItems.reduce((sum, item) => sum + item.total_price, 0);
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.05;
@@ -66,12 +71,47 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handlePaymentSuccess = (response: FlutterwaveResponse) => {
+    console.log('Payment successful:', response);
+    setPaymentStatus('success');
+    
+    const orderData = {
+      items: cartItems,
+      shipping: formData,
+      payment: {
+        method: formData.paymentMethod,
+        tx_ref: response.data?.tx_ref,
+        flw_ref: response.data?.flw_ref,
+        status: 'completed'
+      },
+      totals: { subtotal, shipping, tax, total },
+      timestamp: new Date(),
+    };
+
+    // Delay to show success state before proceeding
+    setTimeout(() => {
+      onPlaceOrder(orderData);
+    }, 2000);
+  };
+
+  const handlePaymentError = (error: FlutterwaveError) => {
+    console.error('Payment failed:', error);
+    setPaymentStatus('error');
+    setPaymentError(error.message);
+  };
+
   const handleSubmit = () => {
     if (!formData.agreeTerms) {
       alert("Please agree to the terms and conditions");
       return;
     }
 
+    if (formData.paymentMethod === 'flutterwave') {
+      // Payment will be handled by FlutterwavePayment component
+      return;
+    }
+
+    // For other payment methods (mobile money, bank transfer)
     const orderData = {
       items: cartItems,
       shipping: formData,
@@ -289,10 +329,10 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                   onValueChange={(value) => handleInputChange('paymentMethod', value)}
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex items-center gap-2">
+                    <RadioGroupItem value="flutterwave" id="flutterwave" />
+                    <Label htmlFor="flutterwave" className="flex items-center gap-2">
                       <CreditCard className="h-4 w-4" />
-                      Credit/Debit Card
+                      Flutterwave (Card, Mobile Money, USSD)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -310,6 +350,37 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                     </Label>
                   </div>
                 </RadioGroup>
+
+                {formData.paymentMethod === 'flutterwave' && (
+                  <div className="space-y-4 border rounded-lg p-4">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Pay securely with Flutterwave. Supports Card, Mobile Money, and USSD payments.
+                      </p>
+                      <FlutterwavePayment
+                        email={formData.email}
+                        amount={total}
+                        customerName={`${formData.firstName} ${formData.lastName}`}
+                        phoneNumber={formData.phone}
+                        metadata={{
+                          customer_name: `${formData.firstName} ${formData.lastName}`,
+                          phone: formData.phone,
+                          address: formData.address,
+                          city: formData.city,
+                          district: formData.district,
+                          items: cartItems.map(item => ({
+                            name: item.product.name,
+                            quantity: item.quantity,
+                            price: item.total_price
+                          }))
+                        }}
+                        onSuccess={handlePaymentSuccess}
+                        onError={handlePaymentError}
+                        disabled={!formData.email || !formData.firstName || !formData.lastName}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {formData.paymentMethod === 'card' && (
                   <div className="space-y-4 border rounded-lg p-4">
@@ -469,6 +540,9 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                 <div>
                   <h3 className="font-semibold mb-2">Payment Method</h3>
                   <div className="text-sm text-muted-foreground">
+                    {formData.paymentMethod === 'flutterwave' && (
+                      <p>Flutterwave (Card, Mobile Money, USSD)</p>
+                    )}
                     {formData.paymentMethod === 'card' && (
                       <p>Credit/Debit Card ending in {formData.cardNumber.slice(-4)}</p>
                     )}
@@ -503,18 +577,45 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                     variant="outline" 
                     size="lg" 
                     onClick={() => setCurrentStep(2)}
+                    disabled={paymentStatus === 'processing' || paymentStatus === 'success'}
                   >
                     Back
                   </Button>
-                  <Button 
-                    size="lg" 
-                    className="flex-1"
-                    onClick={handleSubmit}
-                    disabled={!formData.agreeTerms}
-                  >
-                    <Lock className="h-4 w-4 mr-2" />
-                    Place Order - ${total.toFixed(2)}
-                  </Button>
+                  {formData.paymentMethod === 'flutterwave' ? (
+                    <div className="flex-1">
+                      <FlutterwavePayment
+                        email={formData.email}
+                        amount={total}
+                        customerName={`${formData.firstName} ${formData.lastName}`}
+                        phoneNumber={formData.phone}
+                        metadata={{
+                          customer_name: `${formData.firstName} ${formData.lastName}`,
+                          phone: formData.phone,
+                          address: formData.address,
+                          city: formData.city,
+                          district: formData.district,
+                          items: cartItems.map(item => ({
+                            name: item.product.name,
+                            quantity: item.quantity,
+                            price: item.total_price
+                          }))
+                        }}
+                        onSuccess={handlePaymentSuccess}
+                        onError={handlePaymentError}
+                        disabled={!formData.agreeTerms || !formData.email || !formData.firstName || !formData.lastName}
+                      />
+                    </div>
+                  ) : (
+                    <Button 
+                      size="lg" 
+                      className="flex-1"
+                      onClick={handleSubmit}
+                      disabled={!formData.agreeTerms}
+                    >
+                      <Lock className="h-4 w-4 mr-2" />
+                      Place Order - ${total.toFixed(2)}
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

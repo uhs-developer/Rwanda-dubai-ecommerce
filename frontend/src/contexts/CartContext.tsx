@@ -34,14 +34,31 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  // Load cart on mount and when user changes
-  useEffect(() => {
-    refreshCart();
-  }, [user]);
-
   // Calculate derived values
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce((sum, item) => sum + item.total_price, 0);
+
+  // Load from localStorage immediately on mount
+  useEffect(() => {
+    console.log('CartContext: Loading cart from localStorage on mount...');
+    const localCart = cartLocalStorage.getCart();
+    console.log('CartContext: localStorage cart data:', localCart);
+    
+    if (localCart.length > 0) {
+      console.log('CartContext: Setting cart items from localStorage:', localCart);
+      setCartItems(localCart);
+    } else {
+      console.log('CartContext: No localStorage cart data found');
+    }
+  }, []); // Empty dependency array - only run on mount
+
+  // Sync with API when user changes (but don't override localStorage data)
+  useEffect(() => {
+    if (user) {
+      console.log('CartContext: User changed, syncing with API...');
+      syncWithAPI();
+    }
+  }, [user]);
 
   // Refresh cart from API
   const refreshCart = async () => {
@@ -68,6 +85,25 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Sync with API without overriding localStorage data
+  const syncWithAPI = async () => {
+    try {
+      const response = await cartService.getCart();
+      if (response.success && response.data && response.data.items && response.data.items.length > 0) {
+        // Only update if API has data and it's different from current
+        setCartItems(prev => {
+          if (JSON.stringify(prev) !== JSON.stringify(response.data!.items)) {
+            return response.data!.items;
+          }
+          return prev;
+        });
+      }
+    } catch (error: any) {
+      console.warn('Failed to sync cart with API:', error);
+      // Don't override localStorage data on API failure
     }
   };
 
@@ -124,8 +160,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       const request: UpdateCartRequest = { quantity };
       const response = await cartService.updateCartItem(id, request);
       if (response.success && response.data) {
-        // Refresh cart to get updated data
-        await refreshCart();
+        // Update local state immediately for better UX
+        setCartItems(prev => prev.map(item => 
+          item.id === id 
+            ? { ...item, quantity, total_price: item.price * quantity, updated_at: new Date().toISOString() }
+            : item
+        ));
         toast.success('Cart updated successfully!');
         return;
       }
@@ -156,8 +196,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       // Try to remove via API first
       const response = await cartService.removeFromCart(id);
       if (response.success) {
-        // Refresh cart to get updated data
-        await refreshCart();
+        // Update local state immediately for better UX
+        setCartItems(prev => prev.filter(item => item.id !== id));
         toast.success('Item removed from cart');
         return;
       }

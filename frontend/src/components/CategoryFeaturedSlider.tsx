@@ -4,6 +4,7 @@ import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
 import { ChevronLeft, ChevronRight, Star, ShoppingCart, Heart } from "lucide-react";
 import { Product } from "../data/products";
+import { useCart } from "../contexts/CartContext";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface CategoryFeaturedSliderProps {
@@ -29,6 +30,7 @@ export function CategoryFeaturedSlider({
   const [isHovered, setIsHovered] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout>();
+  const { addToCart } = useCart();
 
   // Auto-play functionality
   useEffect(() => {
@@ -57,15 +59,7 @@ export function CategoryFeaturedSlider({
     setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
   };
 
-  const getVisibleProducts = () => {
-    if (showOneOnMobile) {
-      // Mobile: show 1, Desktop: show 4
-      return products.slice(currentIndex, currentIndex + 4);
-    } else {
-      // Show 3-4 products at once
-      return products.slice(currentIndex, currentIndex + 3);
-    }
-  };
+  // helper removed
 
   return (
     <section 
@@ -182,9 +176,9 @@ export function CategoryFeaturedSlider({
                             size="sm"
                             className="w-full"
                             disabled={!product.inStock}
-                            onClick={(e: { stopPropagation: () => void; }) => {
+                            onClick={async (e: { stopPropagation: () => void; }) => {
                               e.stopPropagation();
-                              // onAddToCart?.(product); // Removed as per edit hint
+                              await addToCart(product, 1);
                             }}
                           >
                             <ShoppingCart className="h-4 w-4 mr-2" />
