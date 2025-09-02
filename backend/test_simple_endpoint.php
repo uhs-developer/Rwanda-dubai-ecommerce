@@ -27,3 +27,4 @@ echo "Response: " . substr($response, 0, 200) . "...\n";
 curl_close($ch);
 
 echo "\nBasic test completed!\n";
+

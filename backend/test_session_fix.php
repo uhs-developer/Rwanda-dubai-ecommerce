@@ -52,3 +52,4 @@ echo "Response:\n$response\n";
 curl_close($ch);
 
 echo "\nTest completed!\n";
+

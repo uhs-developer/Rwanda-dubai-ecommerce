@@ -125,3 +125,4 @@ echo "Response: " . json_encode($response['body'], JSON_PRETTY_PRINT) . "\n\n";
 echo "=== Testing Complete ===\n";
 echo "Note: Make sure your Laravel server is running on http://localhost:8000\n";
 echo "Also ensure you have at least one product in your database with ID 1\n";
+

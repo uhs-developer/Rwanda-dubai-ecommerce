@@ -184,3 +184,4 @@ export const wishlistLocalStorage = {
     return this.getWishlist().length;
   }
 };
+
