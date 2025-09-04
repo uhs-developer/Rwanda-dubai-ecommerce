@@ -2,10 +2,13 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Heart, ShoppingCart, Star } from "lucide-react";
-import { Product } from "../data/products";
+import { Product as MockProduct } from "../data/products";
+import { Product as ApiProduct } from "../services/product";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useCart } from "../contexts/CartContext";
 import { useWishlist } from "../contexts/WishlistContext";
+
+type Product = MockProduct | ApiProduct;
 
 interface ProductCardProps {
   product: Product;
@@ -20,9 +23,14 @@ export function ProductCard({
 }: ProductCardProps) {
   const { addToCart, isInCart } = useCart();
   const { addToWishlist, isInWishlist, removeByProduct } = useWishlist();
-  const discount = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
+  
+  // Handle both mock and API product types
+  const isApiProduct = 'effective_price' in product;
+  const displayPrice = isApiProduct ? product.effective_price : product.price;
+  const originalPrice = isApiProduct ? product.price : product.originalPrice;
+  const hasPromotionalPrice = isApiProduct ? product.has_promotional_price : false;
+  const discountPercentage = isApiProduct ? product.promotional_discount_percentage : 
+    (product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0);
 
   return (
     <Card className={`group cursor-pointer hover:shadow-md transition-shadow ${className || ''}`}>
@@ -41,9 +49,9 @@ export function ProductCard({
           
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {discount > 0 && (
+            {(discountPercentage > 0 || hasPromotionalPrice) && (
               <Badge variant="destructive" className="text-xs">
-                -{discount}%
+                -{discountPercentage}%
               </Badge>
             )}
             {!product.inStock && (
@@ -101,10 +109,10 @@ export function ProductCard({
 
           {/* Price */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="font-semibold text-lg">${product.price}</span>
-            {product.originalPrice && (
+            <span className="font-semibold text-lg">${displayPrice}</span>
+            {(originalPrice && originalPrice > displayPrice) && (
               <span className="text-sm text-muted-foreground line-through">
-                ${product.originalPrice}
+                ${originalPrice}
               </span>
             )}
           </div>

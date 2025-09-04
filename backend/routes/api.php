@@ -5,6 +5,12 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ReturnController;
+use App\Http\Controllers\ProductBulkController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\PerformanceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -202,4 +208,63 @@ Route::prefix('payment')->group(function () {
     Route::post('/verify', [PaymentController::class, 'verifyPayment']);
     Route::post('/initialize', [PaymentController::class, 'initializePayment']);
     Route::post('/webhook', [PaymentController::class, 'handleWebhook']);
+});
+
+// Promotion routes (admin protected)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('role:super-admin,admin,editor')->group(function () {
+        Route::prefix('promotions')->group(function () {
+            Route::get('/', [PromotionController::class, 'index']);
+            Route::post('/', [PromotionController::class, 'store']);
+            Route::get('/{promotion}', [PromotionController::class, 'show']);
+            Route::put('/{promotion}', [PromotionController::class, 'update']);
+            Route::delete('/{promotion}', [PromotionController::class, 'destroy']);
+            Route::post('/{promotion}/activate', [PromotionController::class, 'activate']);
+            Route::post('/{promotion}/expire', [PromotionController::class, 'expire']);
+            Route::post('/apply-to-products', [PromotionController::class, 'applyToProducts']);
+            Route::post('/remove-expired', [PromotionController::class, 'removeExpiredPromotions']);
+            Route::get('/products/available', [PromotionController::class, 'getAvailableProducts']);
+        });
+        // Returns management
+        Route::prefix('returns')->group(function () {
+            Route::get('/', [ReturnController::class, 'index']);
+            Route::post('/', [ReturnController::class, 'store']);
+            Route::put('/{return}', [ReturnController::class, 'update']);
+            Route::post('/{return}/approve', [ReturnController::class, 'approve']);
+            Route::post('/{return}/reject', [ReturnController::class, 'reject']);
+            Route::post('/{return}/complete', [ReturnController::class, 'complete']);
+        });
+
+        // Product bulk operations
+        Route::post('/products/bulk-update', [ProductBulkController::class, 'update']);
+        
+        // Product creation and updates (admin/editor only)
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::put('/products/{id}', [ProductController::class, 'update']);
+        
+        // Blog posts management
+        Route::prefix('posts')->group(function () {
+            Route::get('/', [PostController::class, 'index']);
+            Route::post('/', [PostController::class, 'store']);
+            Route::get('/{slug}', [PostController::class, 'show']);
+            Route::put('/{id}', [PostController::class, 'update']);
+            Route::delete('/{id}', [PostController::class, 'destroy']);
+        });
+        
+        // Media management
+        Route::prefix('media')->group(function () {
+            Route::get('/', [MediaController::class, 'index']);
+            Route::post('/upload', [MediaController::class, 'upload']);
+            Route::get('/stats', [MediaController::class, 'stats']);
+            Route::get('/{id}', [MediaController::class, 'show']);
+            Route::delete('/{id}', [MediaController::class, 'destroy']);
+        });
+        
+        // Performance metrics
+        Route::prefix('performance')->group(function () {
+            Route::get('/products', [PerformanceController::class, 'getProductPerformance']);
+            Route::get('/content', [PerformanceController::class, 'getContentPerformance']);
+            Route::get('/dashboard', [PerformanceController::class, 'getDashboardMetrics']);
+        });
+    });
 });

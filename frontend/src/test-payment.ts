@@ -86,3 +86,4 @@ export const testCards = {
 
 console.log('Payment test utilities loaded');
 console.log('Available functions: testPaymentService(), testCheckoutData, testCards');
+

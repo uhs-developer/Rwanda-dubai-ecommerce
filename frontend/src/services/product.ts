@@ -1,14 +1,18 @@
 import { apiRequest, ApiResponse } from './api';
 
-// Product Types (matching backend API responses)
+// Product Types (matching backend API responses) - Updated with additional fields
 export interface Product {
   id: number;
   name: string;
   slug: string;
   price: number;
+  promotional_price?: number;
+  effective_price: number;
   original_price?: number;
   discount_percentage?: number;
+  promotional_discount_percentage?: number;
   is_on_sale: boolean;
+  has_promotional_price: boolean;
   primary_image?: string;
   category: {
     id: number;
@@ -30,8 +34,20 @@ export interface Product {
   in_stock: boolean;
   stock_status: string;
   is_featured: boolean;
+  is_active?: boolean;
+  is_digital?: boolean;
+  created_at?: string;
+  updated_at?: string;
   short_description?: string;
   description?: string;
+  sku?: string;
+  stock_quantity?: number;
+  min_stock_level?: number;
+  weight?: number;
+  dimensions?: string;
+  cost_price?: number;
+  meta_title?: string;
+  meta_description?: string;
   specifications?: Record<string, string>;
   images?: ProductImage[];
   tags?: string[];
@@ -85,6 +101,7 @@ export interface ProductFilters {
   min_rating?: number;
   in_stock?: boolean;
   is_featured?: boolean;
+  include_inactive?: boolean; // Include inactive products for editors
   search?: string;
   sort_by?: 'price_asc' | 'price_desc' | 'rating' | 'newest' | 'name';
   page?: number;
@@ -198,6 +215,11 @@ export class ProductService {
   static async getBrand(slug: string): Promise<ApiResponse<Brand>> {
     return await apiRequest<Brand>('GET', `/brands/${slug}`);
   }
+
+  // Update product
+  static async updateProduct(id: number, data: CreateProductData): Promise<ApiResponse<Product>> {
+    return await apiRequest<Product>('PUT', `/products/${id}`, data);
+  }
 }
 
 // Helper functions for data transformation
@@ -205,8 +227,8 @@ export const transformProductForDisplay = (product: Product) => {
   return {
     id: product.id.toString(),
     name: product.name,
-    price: product.price,
-    originalPrice: product.original_price,
+    price: product.effective_price, // Use effective price (promotional or regular)
+    originalPrice: product.has_promotional_price ? product.price : product.original_price, // Show original price if on promotion
     image: product.primary_image || 'https://via.placeholder.com/400x400?text=No+Image',
     images: product.images?.map(img => img.image_url) || [],
     category: product.category.name,
@@ -220,8 +242,8 @@ export const transformProductForDisplay = (product: Product) => {
     tags: product.tags || [],
     features: product.features || [],
     slug: product.slug,
-    discount_percentage: product.discount_percentage,
-    is_on_sale: product.is_on_sale,
+    discount_percentage: product.has_promotional_price ? product.promotional_discount_percentage : product.discount_percentage,
+    is_on_sale: product.has_promotional_price || product.is_on_sale,
     is_featured: product.is_featured
   };
 };
@@ -247,6 +269,43 @@ export const formatPrice = (price: number): string => {
 export const calculateDiscount = (price: number, originalPrice?: number): number => {
   if (!originalPrice || originalPrice <= price) return 0;
   return Math.round(((originalPrice - price) / originalPrice) * 100);
+};
+
+// Create product interface
+export interface CreateProductData {
+  name: string;
+  description: string;
+  short_description?: string;
+  price: number;
+  original_price?: number;
+  cost_price?: number;
+  category_id: number;
+  subcategory_id?: number;
+  brand_id?: number;
+  sku?: string;
+  stock_quantity: number;
+  min_stock_level?: number;
+  weight?: number;
+  dimensions?: string;
+  specifications?: Record<string, string>;
+  features?: string[];
+  tags?: string[];
+  meta_title?: string;
+  meta_description?: string;
+  is_active?: boolean;
+  is_featured?: boolean;
+  is_digital?: boolean;
+  status?: 'active' | 'inactive' | 'draft';
+  images?: Array<{
+    url: string;
+    alt_text?: string;
+    is_primary?: boolean;
+  }>;
+}
+
+// Create product function - Updated with new fields
+export const createProduct = async (data: CreateProductData): Promise<ApiResponse<Product>> => {
+  return apiRequest<Product>('POST', '/products', data);
 };
 
 // Default export

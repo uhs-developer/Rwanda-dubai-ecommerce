@@ -71,19 +71,20 @@ class ProductController extends Controller
     }
 
     /**
-     * Get a single product by ID or slug
+     * Get single product by slug
      */
-    public function show(Request $request, $identifier): JsonResponse
+    public function show($slug): JsonResponse
     {
         try {
-            $product = Product::query()
-                ->where('id', $identifier)
-                ->orWhere('slug', $identifier)
+            $product = Product::where('slug', $slug)
+                ->active()
                 ->with([
                     'category:id,name,slug', 
                     'subcategory:id,name,slug', 
                     'brand:id,name,slug', 
-                    'images'
+                    'images' => function ($query) {
+                        $query->orderBy('is_primary', 'desc')->orderBy('sort_order', 'asc');
+                    }
                 ])
                 ->first();
 
@@ -96,8 +97,12 @@ class ProductController extends Controller
 
             // Get related products
             $relatedProducts = Product::active()
-                ->where('category_id', $product->category_id)
                 ->where('id', '!=', $product->id)
+                ->where(function ($query) use ($product) {
+                    $query->where('category_id', $product->category_id)
+                          ->orWhere('subcategory_id', $product->subcategory_id)
+                          ->orWhere('brand_id', $product->brand_id);
+                })
                 ->with([
                     'category:id,name,slug', 
                     'subcategory:id,name,slug', 
@@ -106,7 +111,7 @@ class ProductController extends Controller
                         $query->where('is_primary', true)->limit(1);
                     }
                 ])
-                ->limit(4)
+                ->limit(6)
                 ->get()
                 ->map(function ($product) {
                     return $this->transformProduct($product);
@@ -172,6 +177,7 @@ class ProductController extends Controller
                 'success' => true,
                 'message' => 'Search results retrieved successfully',
                 'data' => $transformedProducts->items(),
+                'search_term' => $searchTerm,
                 'pagination' => [
                     'current_page' => $transformedProducts->currentPage(),
                     'last_page' => $transformedProducts->lastPage(),
@@ -184,7 +190,7 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to search products',
+                'message' => 'Search failed',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -233,24 +239,28 @@ class ProductController extends Controller
     {
         try {
             $brands = Brand::active()
-                ->select('id', 'name', 'slug')
+                ->whereHas('products', function ($query) {
+                    $query->active();
+                })
                 ->orderBy('name')
-                ->get();
+                ->get(['id', 'name', 'slug']);
 
             $categories = Category::active()
-                ->with(['subcategories' => function ($query) {
-                    $query->select('id', 'name', 'slug', 'category_id')
-                          ->where('is_active', true)
-                          ->orderBy('name');
-                }])
-                ->select('id', 'name', 'slug')
+                ->whereHas('products', function ($query) {
+                    $query->active();
+                })
                 ->orderBy('name')
-                ->get();
+                ->get(['id', 'name', 'slug']);
 
-            // Get price range
-            $priceRange = Product::active()
-                ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
-                ->first();
+            $subcategories = Subcategory::active()
+                ->whereHas('products', function ($query) {
+                    $query->active();
+                })
+                ->with('category:id,name')
+                ->orderBy('name')
+                ->get(['id', 'name', 'slug', 'category_id']);
+
+            $priceRange = Product::active()->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
 
             return response()->json([
                 'success' => true,
@@ -258,174 +268,19 @@ class ProductController extends Controller
                 'data' => [
                     'brands' => $brands,
                     'categories' => $categories,
+                    'subcategories' => $subcategories,
                     'price_range' => [
-                        'min' => $priceRange->min_price ?? 0,
-                        'max' => $priceRange->max_price ?? 1000,
-                    ]
+                        'min' => (float) $priceRange->min_price,
+                        'max' => (float) $priceRange->max_price
+                    ],
+                    'rating_options' => [5, 4, 3, 2, 1],
+                    'availability_options' => ['in_stock', 'out_of_stock', 'on_backorder']
                 ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve filter options',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Create a new product
-     */
-    public function store(Request $request): JsonResponse
-    {
-        try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'required|string',
-                'short_description' => 'nullable|string|max:500',
-                'price' => 'required|numeric|min:0',
-                'original_price' => 'nullable|numeric|min:0',
-                'cost_price' => 'nullable|numeric|min:0',
-                'category_id' => 'required|exists:categories,id',
-                'subcategory_id' => 'nullable|exists:subcategories,id',
-                'brand_id' => 'nullable|exists:brands,id',
-                'sku' => 'nullable|string|max:100|unique:products,sku',
-                'stock_quantity' => 'required|integer|min:0',
-                'min_stock_level' => 'nullable|integer|min:0',
-                'weight' => 'nullable|numeric|min:0',
-                'dimensions' => 'nullable|string|max:100',
-                'specifications' => 'nullable|array',
-                'features' => 'nullable|array',
-                'tags' => 'nullable|array',
-                'meta_title' => 'nullable|string|max:255',
-                'meta_description' => 'nullable|string|max:500',
-                'is_active' => 'boolean',
-                'is_featured' => 'boolean',
-                'is_digital' => 'boolean',
-                'images' => 'nullable|array',
-                'images.*.url' => 'required_with:images|string|url',
-                'images.*.alt_text' => 'nullable|string|max:255',
-                'images.*.is_primary' => 'boolean',
-            ]);
-
-            $product = Product::create([
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'description' => $request->description,
-                'short_description' => $request->short_description,
-                'price' => $request->price,
-                'original_price' => $request->original_price,
-                'cost_price' => $request->cost_price,
-                'category_id' => $request->category_id,
-                'subcategory_id' => $request->subcategory_id,
-                'brand_id' => $request->brand_id,
-                'sku' => $request->sku,
-                'stock_quantity' => $request->stock_quantity,
-                'min_stock_level' => $request->min_stock_level ?? 5,
-                'weight' => $request->weight,
-                'dimensions' => $request->dimensions,
-                'specifications' => $request->specifications,
-                'features' => $request->features,
-                'tags' => $request->tags,
-                'meta_title' => $request->meta_title,
-                'meta_description' => $request->meta_description,
-                'is_active' => $request->is_active ?? false, // Default to false
-                'is_featured' => $request->is_featured ?? false,
-                'is_digital' => $request->is_digital ?? false,
-            ]);
-
-            // Handle images if provided
-            if ($request->has('images') && is_array($request->images)) {
-                foreach ($request->images as $index => $imageData) {
-                    $product->images()->create([
-                        'image_url' => $imageData['url'],
-                        'alt_text' => $imageData['alt_text'] ?? $product->name,
-                        'is_primary' => $imageData['is_primary'] ?? ($index === 0),
-                        'sort_order' => $index + 1,
-                    ]);
-                }
-            }
-
-            $product->load(['category', 'subcategory', 'brand', 'images']);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Product created successfully',
-                'data' => $this->transformProduct($product, true)
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create product',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Update a product
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $product = Product::findOrFail($id);
-
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'required|string',
-                'short_description' => 'nullable|string|max:500',
-                'price' => 'required|numeric|min:0',
-                'original_price' => 'nullable|numeric|min:0',
-                'cost_price' => 'nullable|numeric|min:0',
-                'category_id' => 'required|exists:categories,id',
-                'subcategory_id' => 'nullable|exists:subcategories,id',
-                'brand_id' => 'nullable|exists:brands,id',
-                'sku' => 'nullable|string|max:100|unique:products,sku,' . $id,
-                'stock_quantity' => 'required|integer|min:0',
-                'min_stock_level' => 'nullable|integer|min:0',
-                'weight' => 'nullable|numeric|min:0',
-                'dimensions' => 'nullable|string|max:100',
-                'meta_title' => 'nullable|string|max:255',
-                'meta_description' => 'nullable|string|max:500',
-                'is_active' => 'nullable|boolean',
-                'is_featured' => 'nullable|boolean',
-                'is_digital' => 'nullable|boolean',
-            ]);
-
-            $product->update([
-                'name' => $request->name,
-                'description' => $request->description,
-                'short_description' => $request->short_description,
-                'price' => $request->price,
-                'original_price' => $request->original_price,
-                'cost_price' => $request->cost_price,
-                'category_id' => $request->category_id,
-                'subcategory_id' => $request->subcategory_id,
-                'brand_id' => $request->brand_id,
-                'sku' => $request->sku,
-                'stock_quantity' => $request->stock_quantity,
-                'min_stock_level' => $request->min_stock_level,
-                'weight' => $request->weight,
-                'dimensions' => $request->dimensions,
-                'meta_title' => $request->meta_title,
-                'meta_description' => $request->meta_description,
-                'is_active' => $request->is_active ?? $product->is_active,
-                'is_featured' => $request->is_featured ?? $product->is_featured,
-                'is_digital' => $request->is_digital ?? $product->is_digital,
-            ]);
-
-            // Load relationships for response
-            $product->load(['category', 'subcategory', 'brand', 'images']);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Product updated successfully',
-                'data' => $this->transformProduct($product, true)
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update product',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -576,9 +431,6 @@ class ProductController extends Controller
             'in_stock' => $product->in_stock,
             'stock_status' => $product->stock_status,
             'is_featured' => $product->is_featured,
-            'is_active' => $product->is_active, // ← FIXED: Added this line
-            'created_at' => $product->created_at,
-            'updated_at' => $product->updated_at,
         ];
 
         if ($detailed) {
@@ -604,10 +456,101 @@ class ProductController extends Controller
                     'title' => $product->meta_title,
                     'description' => $product->meta_description,
                     'keywords' => $product->meta_keywords,
-                ],
+                ]
             ]);
+        } else {
+            $baseData['short_description'] = $product->short_description;
         }
 
         return $baseData;
+    }
+
+    /**
+     * Create a new product
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'short_description' => 'nullable|string|max:500',
+                'price' => 'required|numeric|min:0',
+                'original_price' => 'nullable|numeric|min:0',
+                'cost_price' => 'nullable|numeric|min:0',
+                'category_id' => 'required|exists:categories,id',
+                'subcategory_id' => 'nullable|exists:subcategories,id',
+                'brand_id' => 'nullable|exists:brands,id',
+                'sku' => 'nullable|string|max:100|unique:products,sku',
+                'stock_quantity' => 'required|integer|min:0',
+                'min_stock_level' => 'nullable|integer|min:0',
+                'weight' => 'nullable|numeric|min:0',
+                'dimensions' => 'nullable|string|max:100',
+                'specifications' => 'nullable|array',
+                'features' => 'nullable|array',
+                'tags' => 'nullable|array',
+                'meta_title' => 'nullable|string|max:255',
+                'meta_description' => 'nullable|string|max:500',
+                'is_active' => 'boolean',
+                'is_featured' => 'boolean',
+                'is_digital' => 'boolean',
+                'images' => 'nullable|array',
+                'images.*.url' => 'required_with:images|string|url',
+                'images.*.alt_text' => 'nullable|string|max:255',
+                'images.*.is_primary' => 'boolean',
+            ]);
+
+            $product = Product::create([
+                'name' => $request->name,
+                'slug' => Str::slug($request->name),
+                'description' => $request->description,
+                'short_description' => $request->short_description,
+                'price' => $request->price,
+                'original_price' => $request->original_price,
+                'cost_price' => $request->cost_price,
+                'category_id' => $request->category_id,
+                'subcategory_id' => $request->subcategory_id,
+                'brand_id' => $request->brand_id,
+                'sku' => $request->sku,
+                'stock_quantity' => $request->stock_quantity,
+                'min_stock_level' => $request->min_stock_level ?? 5,
+                'weight' => $request->weight,
+                'dimensions' => $request->dimensions,
+                'specifications' => $request->specifications,
+                'features' => $request->features,
+                'tags' => $request->tags,
+                'meta_title' => $request->meta_title,
+                'meta_description' => $request->meta_description,
+                'is_active' => $request->is_active ?? false, // Default to false
+                'is_featured' => $request->is_featured ?? false,
+                'is_digital' => $request->is_digital ?? false,
+            ]);
+
+            // Handle images if provided
+            if ($request->has('images') && is_array($request->images)) {
+                foreach ($request->images as $index => $imageData) {
+                    $product->images()->create([
+                        'image_url' => $imageData['url'],
+                        'alt_text' => $imageData['alt_text'] ?? $product->name,
+                        'is_primary' => $imageData['is_primary'] ?? ($index === 0),
+                        'sort_order' => $index + 1,
+                    ]);
+                }
+            }
+
+            $product->load(['category', 'subcategory', 'brand', 'images']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully',
+                'data' => $this->transformProduct($product, true)
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create product',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

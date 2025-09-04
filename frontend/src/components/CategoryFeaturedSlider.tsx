@@ -3,9 +3,12 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
 import { ChevronLeft, ChevronRight, Star, ShoppingCart, Heart } from "lucide-react";
-import { Product } from "../data/products";
+import { Product as MockProduct } from "../data/products";
+import { Product as ApiProduct } from "../services/product";
 import { useCart } from "../contexts/CartContext";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+
+type Product = MockProduct | ApiProduct;
 
 interface CategoryFeaturedSliderProps {
   title: string;
@@ -115,9 +118,13 @@ export function CategoryFeaturedSlider({
             }}
           >
             {products.map((product, index) => {
-              const discount = product.originalPrice 
-                ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-                : 0;
+              // Handle both mock and API product types
+              const isApiProduct = 'effective_price' in product;
+              const displayPrice = isApiProduct ? product.effective_price : product.price;
+              const originalPrice = isApiProduct ? product.price : product.originalPrice;
+              const hasPromotionalPrice = isApiProduct ? product.has_promotional_price : false;
+              const discount = isApiProduct ? product.promotional_discount_percentage : 
+                (product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0);
 
               return (
                 <div
@@ -223,16 +230,16 @@ export function CategoryFeaturedSlider({
                         {/* Price */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-lg">${product.price}</span>
-                            {product.originalPrice && (
+                            <span className="font-bold text-lg">${displayPrice}</span>
+                            {(originalPrice && originalPrice > displayPrice) && (
                               <span className="text-sm text-muted-foreground line-through">
-                                ${product.originalPrice}
+                                ${originalPrice}
                               </span>
                             )}
                           </div>
                           {discount > 0 && (
                             <Badge variant="outline" className="text-xs text-green-600">
-                              Save ${(product.originalPrice! - product.price).toFixed(0)}
+                              Save ${(originalPrice! - displayPrice).toFixed(0)}
                             </Badge>
                           )}
                         </div>

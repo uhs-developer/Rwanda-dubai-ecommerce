@@ -22,6 +22,7 @@ class Product extends Model
         'subcategory_id',
         'brand_id',
         'price',
+        'promotional_price',
         'original_price',
         'cost_price',
         'stock_quantity',
@@ -44,11 +45,14 @@ class Product extends Model
         'is_active',
         'is_featured',
         'is_digital',
+        'active_promotions',
+        'promotion_updated_at',
         'published_at'
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'promotional_price' => 'decimal:2',
         'original_price' => 'decimal:2',
         'cost_price' => 'decimal:2',
         'weight' => 'decimal:2',
@@ -58,12 +62,14 @@ class Product extends Model
         'features' => 'array',
         'tags' => 'array',
         'meta_keywords' => 'array',
+        'active_promotions' => 'array',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'is_digital' => 'boolean',
         'manage_stock' => 'boolean',
         'in_stock' => 'boolean',
         'published_at' => 'datetime',
+        'promotion_updated_at' => 'datetime',
     ];
 
     protected static function boot()
@@ -191,5 +197,50 @@ class Product extends Model
     public function getIsOnSaleAttribute()
     {
         return $this->original_price && $this->original_price > $this->price;
+    }
+
+    // Get the effective price (promotional or regular)
+    public function getEffectivePriceAttribute()
+    {
+        return $this->promotional_price ?? $this->price;
+    }
+
+    // Check if product has active promotional pricing
+    public function getHasPromotionalPriceAttribute()
+    {
+        return $this->promotional_price && $this->promotional_price < $this->price;
+    }
+
+    // Get promotional discount percentage
+    public function getPromotionalDiscountPercentageAttribute()
+    {
+        if (!$this->has_promotional_price) return 0;
+        
+        return round((($this->price - $this->promotional_price) / $this->price) * 100);
+    }
+
+    // Clear promotional pricing
+    public function clearPromotionalPricing()
+    {
+        $this->update([
+            'promotional_price' => null,
+            'active_promotions' => null,
+            'promotion_updated_at' => now(),
+        ]);
+    }
+
+    // Apply promotional pricing
+    public function applyPromotionalPricing($promotionalPrice, $promotionId)
+    {
+        $activePromotions = $this->active_promotions ?? [];
+        if (!in_array($promotionId, $activePromotions)) {
+            $activePromotions[] = $promotionId;
+        }
+
+        $this->update([
+            'promotional_price' => $promotionalPrice,
+            'active_promotions' => $activePromotions,
+            'promotion_updated_at' => now(),
+        ]);
     }
 }

@@ -12,6 +12,13 @@ import {
   ArrowLeft,
   Search,
   Upload,
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  MapPin,
+  Phone,
+  Mail,
   MessageCircle,
   Package,
   FileText,
@@ -19,12 +26,11 @@ import {
   Loader2,
   Trash2,
 } from 'lucide-react';
-import { ProductService, Product as ApiProduct, CreateProductData, createProduct, Brand, Subcategory } from '../services/product'; // Updated interface
+import { ProductService, Product as ApiProduct, CreateProductData, createProduct, Brand, Subcategory } from '../services/product';
 import { postService, Post as ApiPost, CreatePostData } from '../services/post';
 import { mediaService, MediaFile as ApiMediaFile } from '../services/media';
 import { performanceService, ProductPerformanceMetrics, ContentPerformanceMetrics } from '../services/performance';
 import { categoryService, Category as ApiCategory } from '../services/category';
-import { toast } from 'sonner';
 
 // Legacy interfaces removed - using API types instead
 
@@ -51,9 +57,6 @@ const EditorDashboard: React.FC = () => {
   // Modal states
   const [showNewProductModal, setShowNewProductModal] = useState(false);
   const [showNewPostModal, setShowNewPostModal] = useState(false);
-  const [showViewProductModal, setShowViewProductModal] = useState(false);
-  const [showEditProductModal, setShowEditProductModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ApiProduct | null>(null);
   const [showMediaUploadModal, setShowMediaUploadModal] = useState(false);
   
   // Form states
@@ -75,28 +78,6 @@ const EditorDashboard: React.FC = () => {
     meta_title: '',
     meta_description: '',
     is_active: false, // Set to false by default
-    is_featured: false,
-    is_digital: false
-  });
-  
-  const [editProductForm, setEditProductForm] = useState<Partial<CreateProductData>>({
-    name: '',
-    description: '',
-    short_description: '',
-    price: 0,
-    original_price: 0,
-    cost_price: 0,
-    category_id: 1,
-    subcategory_id: undefined,
-    brand_id: undefined,
-    sku: '',
-    stock_quantity: 0,
-    min_stock_level: 5,
-    weight: 0,
-    dimensions: '',
-    meta_title: '',
-    meta_description: '',
-    is_active: false,
     is_featured: false,
     is_digital: false
   });
@@ -235,7 +216,6 @@ const EditorDashboard: React.FC = () => {
     setCreatingProduct(true);
     try {
       await createProduct(newProductForm as CreateProductData);
-      toast.success('Product created successfully!');
       setShowNewProductModal(false);
       setNewProductForm({
         name: '',
@@ -261,25 +241,7 @@ const EditorDashboard: React.FC = () => {
       await fetchProducts(); // Wait for products to refresh
     } catch (error) {
       console.error('Failed to create product:', error);
-      toast.error('Failed to create product. Please try again.');
-    } finally {
-      setCreatingProduct(false);
-    }
-  };
-
-  const handleUpdateProduct = async () => {
-    if (!selectedProduct) return;
-    
-    setCreatingProduct(true);
-    try {
-      await ProductService.updateProduct(selectedProduct.id, editProductForm as CreateProductData);
-      toast.success('Product updated successfully!');
-      setShowEditProductModal(false);
-      setSelectedProduct(null);
-      await fetchProducts(); // Wait for products to refresh
-    } catch (error) {
-      console.error('Failed to update product:', error);
-      toast.error('Failed to update product. Please try again.');
+      alert('Failed to create product. Please try again.');
     } finally {
       setCreatingProduct(false);
     }
@@ -289,7 +251,6 @@ const EditorDashboard: React.FC = () => {
     setCreatingPost(true);
     try {
       await postService.createPost(newPostForm as CreatePostData);
-      toast.success('Post created successfully!');
       setShowNewPostModal(false);
       setNewPostForm({
         title: '',
@@ -299,7 +260,7 @@ const EditorDashboard: React.FC = () => {
       await fetchBlogPosts(); // Wait for posts to refresh
     } catch (error) {
       console.error('Failed to create post:', error);
-      toast.error('Failed to create post. Please try again.');
+      alert('Failed to create post. Please try again.');
     } finally {
       setCreatingPost(false);
     }
@@ -313,14 +274,12 @@ const EditorDashboard: React.FC = () => {
         product_id: selectedProductForMedia || undefined,
         usage_type: selectedUsageType
       });
-      toast.success('File uploaded successfully!');
       setShowMediaUploadModal(false);
       setSelectedProductForMedia(null);
       setSelectedUsageType('general');
       fetchMediaFiles();
     } catch (error) {
       console.error('Failed to upload file:', error);
-      toast.error('Failed to upload file. Please try again.');
     } finally {
       setUploadingFile(false);
     }
@@ -382,6 +341,16 @@ const EditorDashboard: React.FC = () => {
 
             {/* Right side - Actions and user info */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <Button className="bg-gray-900 hover:bg-gray-800 w-full sm:w-auto">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+                <Button variant="outline" className="w-full sm:w-auto">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Media
+                </Button>
+              </div>
               <div className="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white text-lg font-medium">
                   M
@@ -557,47 +526,10 @@ const EditorDashboard: React.FC = () => {
                             </TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedProduct(product);
-                                  setShowViewProductModal(true);
-                                }}
-                                title="View Product"
-                              >
+                              <Button variant="ghost" size="sm">
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedProduct(product);
-                                  setEditProductForm({
-                                    name: product.name,
-                                    description: product.description,
-                                    short_description: product.short_description || '',
-                                    price: product.effective_price,
-                                    original_price: product.original_price || 0,
-                                    cost_price: product.cost_price || 0,
-                                    category_id: product.category?.id || 1,
-                                    subcategory_id: product.subcategory?.id,
-                                    brand_id: product.brand?.id,
-                                    sku: product.sku,
-                                    stock_quantity: product.stock_quantity,
-                                    min_stock_level: product.min_stock_level || 5,
-                                    weight: product.weight || 0,
-                                    dimensions: product.dimensions || '',
-                                    meta_title: product.meta_title || '',
-                                    meta_description: product.meta_description || '',
-                                    is_active: product.is_active,
-                                    is_featured: product.is_featured || false,
-                                    is_digital: product.is_digital || false
-                                  });
-                                  setShowEditProductModal(true);
-                                }}
-                                title="Edit Product"
-                              >
+                              <Button variant="ghost" size="sm">
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </div>
@@ -783,13 +715,9 @@ const EditorDashboard: React.FC = () => {
                                   variant="ghost" 
                                   size="sm"
                                   onClick={() => {
-                                    if (window.confirm('Are you sure you want to delete this file?')) {
+                                    if (confirm('Are you sure you want to delete this file?')) {
                                       mediaService.deleteMediaFile(file.id).then(() => {
                                         fetchMediaFiles();
-                                        toast.success('File deleted successfully');
-                                      }).catch((error) => {
-                                        console.error('Failed to delete file:', error);
-                                        toast.error('Failed to delete file. Please try again.');
                                       });
                                     }
                                   }}
@@ -899,6 +827,79 @@ const EditorDashboard: React.FC = () => {
 
 
       {/* Footer */}
+      <footer className="bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* TechBridge Info */}
+            <div className="col-span-1 md:col-span-1">
+              <h3 className="text-xl font-bold mb-4">TechBridge</h3>
+              <p className="text-gray-400 mb-6">
+                Connecting Dubai's premium electronics and auto parts market with Rwanda through reliable shipping and authentic products.
+              </p>
+              <div className="flex space-x-4">
+                <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+                <Twitter className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+                <Instagram className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+                <Youtube className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-gray-400 hover:text-white">About Us</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">Returns & Warranty</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">FAQ</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">Blog</a></li>
+              </ul>
+            </div>
+
+            {/* Categories */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Categories</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-gray-400 hover:text-white">Electronics</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">Auto Parts</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">Home Appliances</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">New Arrivals</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">Best Sellers</a></li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Contact</h4>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-400">Dubai, UAE → Kigali, Rwanda</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Phone className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-400">+971 4 XXX XXXX</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-400">support@techbridge.com</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Footer */}
+          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm">
+              © 2025 TechBridge. All rights reserved.
+            </p>
+            <div className="flex space-x-6 mt-4 sm:mt-0">
+              <a href="#" className="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
+              <a href="#" className="text-gray-400 hover:text-white text-sm">Terms of Service</a>
+            </div>
+          </div>
+        </div>
+      </footer>
 
       {/* Floating Action Buttons - REMOVED PURPLE SETTINGS BUTTONS */}
       {/* Only keeping the chat button */}
@@ -1008,7 +1009,7 @@ const EditorDashboard: React.FC = () => {
               {/* Pricing */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-700">Pricing</h3>
-                <div>
+                <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Price *</label>
                     <Input
@@ -1016,6 +1017,26 @@ const EditorDashboard: React.FC = () => {
                       step="0.01"
                       value={newProductForm.price}
                       onChange={(e) => setNewProductForm({...newProductForm, price: parseFloat(e.target.value)})}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Original Price</label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={newProductForm.original_price}
+                      onChange={(e) => setNewProductForm({...newProductForm, original_price: parseFloat(e.target.value)})}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Cost Price</label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={newProductForm.cost_price}
+                      onChange={(e) => setNewProductForm({...newProductForm, cost_price: parseFloat(e.target.value)})}
                       placeholder="0.00"
                     />
                   </div>
@@ -1065,7 +1086,65 @@ const EditorDashboard: React.FC = () => {
                 </div>
               </div>
 
+              {/* SEO */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-700">SEO & Meta</h3>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Meta Title</label>
+                  <Input
+                    value={newProductForm.meta_title}
+                    onChange={(e) => setNewProductForm({...newProductForm, meta_title: e.target.value})}
+                    placeholder="SEO title"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Meta Description</label>
+                  <textarea
+                    className="w-full p-2 border rounded-md"
+                    rows={2}
+                    value={newProductForm.meta_description}
+                    onChange={(e) => setNewProductForm({...newProductForm, meta_description: e.target.value})}
+                    placeholder="SEO description"
+                  />
+                </div>
+              </div>
 
+              {/* Status */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-700">Status & Visibility</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="is_active"
+                      checked={newProductForm.is_active}
+                      onChange={(e) => setNewProductForm({...newProductForm, is_active: e.target.checked})}
+                      className="rounded"
+                    />
+                    <label htmlFor="is_active" className="text-sm font-medium">Active</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="is_featured"
+                      checked={newProductForm.is_featured}
+                      onChange={(e) => setNewProductForm({...newProductForm, is_featured: e.target.checked})}
+                      className="rounded"
+                    />
+                    <label htmlFor="is_featured" className="text-sm font-medium">Featured</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="is_digital"
+                      checked={newProductForm.is_digital}
+                      onChange={(e) => setNewProductForm({...newProductForm, is_digital: e.target.checked})}
+                      className="rounded"
+                    />
+                    <label htmlFor="is_digital" className="text-sm font-medium">Digital Product</label>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="flex justify-end space-x-2 mt-6">
               <Button variant="outline" onClick={() => setShowNewProductModal(false)} disabled={creatingProduct}>
@@ -1216,331 +1295,6 @@ const EditorDashboard: React.FC = () => {
             <div className="flex justify-end space-x-2 mt-6">
               <Button variant="outline" onClick={() => setShowMediaUploadModal(false)} disabled={uploadingFile}>
                 Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* View Product Modal */}
-      {showViewProductModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Product Details</h2>
-              <Button variant="ghost" onClick={() => setShowViewProductModal(false)}>
-                ✕
-              </Button>
-            </div>
-            
-            <div className="space-y-6">
-              {/* Basic Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Basic Information</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Product Name</label>
-                    <p className="text-sm text-gray-900">{selectedProduct.name}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">SKU</label>
-                    <p className="text-sm text-gray-900">{selectedProduct.sku || 'N/A'}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Short Description</label>
-                  <p className="text-sm text-gray-900">{selectedProduct.short_description || 'N/A'}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Full Description</label>
-                  <p className="text-sm text-gray-900">{selectedProduct.description || 'N/A'}</p>
-                </div>
-              </div>
-
-              {/* Category & Brand */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Category & Brand</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Category</label>
-                    <p className="text-sm text-gray-900">{selectedProduct.category?.name || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Subcategory</label>
-                    <p className="text-sm text-gray-900">{selectedProduct.subcategory?.name || 'N/A'}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Brand</label>
-                  <p className="text-sm text-gray-900">{selectedProduct.brand?.name || 'N/A'}</p>
-                </div>
-              </div>
-
-              {/* Pricing */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Pricing</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Current Price</label>
-                    <p className="text-sm text-gray-900">${selectedProduct.effective_price.toFixed(2)}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Original Price</label>
-                    <p className="text-sm text-gray-900">${selectedProduct.original_price?.toFixed(2) || 'N/A'}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Inventory */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Inventory</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Stock Quantity</label>
-                    <p className="text-sm text-gray-900">{selectedProduct.stock_quantity}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Min Stock Level</label>
-                    <p className="text-sm text-gray-900">{selectedProduct.min_stock_level || 'N/A'}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Weight (kg)</label>
-                    <p className="text-sm text-gray-900">{selectedProduct.weight || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Dimensions</label>
-                    <p className="text-sm text-gray-900">{selectedProduct.dimensions || 'N/A'}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Status</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Active Status</label>
-                    <Badge className={getStatusColor(selectedProduct.is_active ? 'active' : 'inactive')}>
-                      {selectedProduct.is_active ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Featured</label>
-                    <Badge className={selectedProduct.is_featured ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}>
-                      {selectedProduct.is_featured ? 'Yes' : 'No'}
-                    </Badge>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Digital Product</label>
-                    <Badge className={selectedProduct.is_digital ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}>
-                      {selectedProduct.is_digital ? 'Yes' : 'No'}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Dates</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Created</label>
-                    <p className="text-sm text-gray-900">{new Date(selectedProduct.created_at || '').toLocaleDateString()}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Last Updated</label>
-                    <p className="text-sm text-gray-900">{new Date(selectedProduct.updated_at || '').toLocaleDateString()}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end space-x-2 mt-6">
-              <Button variant="outline" onClick={() => setShowViewProductModal(false)}>
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Product Modal */}
-      {showEditProductModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Edit Product: {selectedProduct.name}</h2>
-            <div className="space-y-6">
-              {/* Basic Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Basic Information</h3>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Product Name *</label>
-                  <Input
-                    value={editProductForm.name}
-                    onChange={(e) => setEditProductForm({...editProductForm, name: e.target.value})}
-                    placeholder="Enter product name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Short Description</label>
-                  <Input
-                    value={editProductForm.short_description}
-                    onChange={(e) => setEditProductForm({...editProductForm, short_description: e.target.value})}
-                    placeholder="Brief product description"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Full Description *</label>
-                  <textarea
-                    className="w-full p-2 border rounded-md"
-                    rows={3}
-                    value={editProductForm.description}
-                    onChange={(e) => setEditProductForm({...editProductForm, description: e.target.value})}
-                    placeholder="Enter detailed product description"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">SKU</label>
-                  <Input
-                    value={editProductForm.sku}
-                    onChange={(e) => setEditProductForm({...editProductForm, sku: e.target.value})}
-                    placeholder="Product SKU (optional)"
-                  />
-                </div>
-              </div>
-
-              {/* Category and Brand */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Category & Brand</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Category *</label>
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value={editProductForm.category_id}
-                      onChange={(e) => {
-                        const categoryId = parseInt(e.target.value);
-                        setEditProductForm({...editProductForm, category_id: categoryId, subcategory_id: undefined});
-                        fetchSubcategories(categoryId);
-                      }}
-                    >
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Subcategory</label>
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value={editProductForm.subcategory_id || ''}
-                      onChange={(e) => setEditProductForm({...editProductForm, subcategory_id: e.target.value ? parseInt(e.target.value) : undefined})}
-                    >
-                      <option value="">Select subcategory</option>
-                      {subcategories.map((subcategory) => (
-                        <option key={subcategory.id} value={subcategory.id}>
-                          {subcategory.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Brand</label>
-                  <select
-                    className="w-full p-2 border rounded-md"
-                    value={editProductForm.brand_id || ''}
-                    onChange={(e) => setEditProductForm({...editProductForm, brand_id: e.target.value ? parseInt(e.target.value) : undefined})}
-                  >
-                    <option value="">Select brand</option>
-                    {brands.map((brand) => (
-                      <option key={brand.id} value={brand.id}>
-                        {brand.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Pricing */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Pricing</h3>
-                <div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Price *</label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={editProductForm.price}
-                      onChange={(e) => setEditProductForm({...editProductForm, price: parseFloat(e.target.value)})}
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Inventory */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-700">Inventory</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Stock Quantity *</label>
-                    <Input
-                      type="number"
-                      value={editProductForm.stock_quantity}
-                      onChange={(e) => setEditProductForm({...editProductForm, stock_quantity: parseInt(e.target.value)})}
-                      placeholder="0"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Min Stock Level</label>
-                    <Input
-                      type="number"
-                      value={editProductForm.min_stock_level}
-                      onChange={(e) => setEditProductForm({...editProductForm, min_stock_level: parseInt(e.target.value)})}
-                      placeholder="5"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Weight (kg)</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={editProductForm.weight}
-                    onChange={(e) => setEditProductForm({...editProductForm, weight: parseFloat(e.target.value)})}
-                    placeholder="0.00"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Dimensions</label>
-                  <Input
-                    value={editProductForm.dimensions}
-                    onChange={(e) => setEditProductForm({...editProductForm, dimensions: e.target.value})}
-                    placeholder="L x W x H (e.g., 10x5x2)"
-                  />
-                </div>
-              </div>
-
-            </div>
-            
-            <div className="flex justify-end space-x-2 mt-6">
-              <Button variant="outline" onClick={() => setShowEditProductModal(false)} disabled={creatingProduct}>
-                Cancel
-              </Button>
-              <Button onClick={handleUpdateProduct} disabled={creatingProduct}>
-                {creatingProduct ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  'Update Product'
-                )}
               </Button>
             </div>
           </div>
