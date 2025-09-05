@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary as CloudinarySDK;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Handler\CurlHandler;
 use Illuminate\Support\Facades\Validator;
 
 class MediaController extends Controller
@@ -99,14 +103,78 @@ class MediaController extends Controller
             $productId = $request->get('product_id');
             $usageType = $request->get('usage_type', 'general');
 
-            // Upload to Cloudinary
+            // Upload to Cloudinary using direct cURL approach
             try {
-                $uploadResult = Cloudinary::upload($file->getRealPath(), [
+                // Get Cloudinary credentials
+                $cloudName = config('cloudinary.cloud_url') ? parse_url(config('cloudinary.cloud_url'), PHP_URL_HOST) : env('CLOUDINARY_CLOUD_NAME');
+                $apiKey = config('cloudinary.cloud_url') ? parse_url(config('cloudinary.cloud_url'), PHP_URL_USER) : env('CLOUDINARY_API_KEY');
+                $apiSecret = config('cloudinary.cloud_url') ? parse_url(config('cloudinary.cloud_url'), PHP_URL_PASS) : env('CLOUDINARY_API_SECRET');
+                $uploadPreset = config('cloudinary.upload_preset');
+
+                \Log::info('Cloudinary Credentials:', [
+                    'cloud_name' => $cloudName,
+                    'api_key' => $apiKey ? 'Set' : 'Not set',
+                    'api_secret' => $apiSecret ? 'Set' : 'Not set',
+                    'upload_preset' => $uploadPreset
+                ]);
+
+                // Prepare upload data
+                $uploadData = [
+                    'file' => new \CURLFile($file->getRealPath(), $file->getMimeType(), $file->getClientOriginalName()),
                     'folder' => $folder,
                     'public_id' => $publicId,
-                    'resource_type' => 'auto', // Automatically detect image, video, or raw
+                    'resource_type' => 'auto',
+                ];
+
+                // Use signed uploads for now (more reliable)
+                $uploadData['api_key'] = $apiKey;
+                $uploadData['timestamp'] = time();
+                $uploadData['signature'] = sha1($uploadData['timestamp'] . $apiSecret);
+                
+                \Log::info('Using signed upload with API key: ' . $apiKey);
+
+                // Upload using cURL directly
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "https://api.cloudinary.com/v1_1/{$cloudName}/auto/upload");
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $uploadData);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // Disable SSL verification
+                curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                curl_close($ch);
+
+                if ($curlError) {
+                    throw new \Exception("cURL Error: " . $curlError);
+                }
+
+                if ($httpCode !== 200) {
+                    throw new \Exception("HTTP Error: " . $httpCode . " - " . $response);
+                }
+
+                $uploadResult = json_decode($response, true);
+                if (!$uploadResult || isset($uploadResult['error'])) {
+                    throw new \Exception("Cloudinary API Error: " . ($uploadResult['error']['message'] ?? 'Unknown error'));
+                }
+
+                // Debug: Log the upload result
+                \Log::info('Cloudinary Upload Result:', [
+                    'type' => gettype($uploadResult),
+                    'is_array' => is_array($uploadResult),
+                    'result' => $uploadResult
                 ]);
+
             } catch (\Exception $e) {
+                \Log::error('Cloudinary Upload Exception:', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
                 return response()->json([
                     'success' => false,
                     'message' => 'Cloudinary upload failed: ' . $e->getMessage(),
@@ -114,24 +182,37 @@ class MediaController extends Controller
                 ], 500);
             }
 
-            // Save to database
+            // Save to database with proper array access
+            try {
             $mediaFile = MediaFile::create([
-                'public_id' => $uploadResult->getPublicId(),
-                'file_name' => $uploadResult->getPublicId(),
+                    'public_id' => $uploadResult['public_id'] ?? null,
+                    'file_name' => $uploadResult['public_id'] ?? $file->getClientOriginalName(),
                 'original_name' => $file->getClientOriginalName(),
                 'mime_type' => $file->getMimeType(),
                 'file_size' => $file->getSize(),
-                'url' => $uploadResult->getSecurePath(),
-                'secure_url' => $uploadResult->getSecurePath(),
-                'format' => $uploadResult->getExtension(),
-                'width' => $uploadResult->getWidth(),
-                'height' => $uploadResult->getHeight(),
-                'resource_type' => $uploadResult->getResourceType(),
-                'metadata' => $uploadResult->getArrayCopy(),
+                    'url' => $uploadResult['secure_url'] ?? null,
+                    'secure_url' => $uploadResult['secure_url'] ?? null,
+                    'format' => $uploadResult['format'] ?? $file->getClientOriginalExtension(),
+                    'width' => $uploadResult['width'] ?? null,
+                    'height' => $uploadResult['height'] ?? null,
+                    'resource_type' => $uploadResult['resource_type'] ?? 'auto',
+                    'metadata' => $uploadResult,
                 'uploaded_by' => Auth::id(),
                 'product_id' => $productId,
                 'usage_type' => $usageType,
             ]);
+            } catch (\Exception $e) {
+                \Log::error('Database Save Exception:', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to save file information to database: ' . $e->getMessage(),
+                    'error' => 'Database error'
+                ], 500);
+            }
 
             $mediaFile->load('uploader:id,name,email');
 

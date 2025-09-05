@@ -11,6 +11,9 @@ use App\Http\Controllers\ProductBulkController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -241,6 +244,27 @@ Route::middleware('auth:sanctum')->group(function () {
         // Product creation and updates (admin/editor only)
         Route::post('/products', [ProductController::class, 'store']);
         Route::put('/products/{id}', [ProductController::class, 'update']);
+        Route::patch('/products/{id}/status', [ProductController::class, 'updateStatus']);
+        
+        // Order management (admin only)
+        Route::prefix('orders')->group(function () {
+            Route::get('/', [OrderController::class, 'index']);
+            Route::get('/statistics', [OrderController::class, 'statistics']);
+            Route::get('/{id}', [OrderController::class, 'show']);
+            Route::put('/{id}', [OrderController::class, 'update']);
+            Route::patch('/{id}/status', [OrderController::class, 'updateStatus']);
+            Route::patch('/{id}/payment', [OrderController::class, 'updatePaymentStatus']);
+        });
+        
+        // User management (admin only)
+        Route::prefix('users')->group(function () {
+            Route::get('/', [UserController::class, 'index']);
+            Route::get('/statistics', [UserController::class, 'statistics']);
+            Route::get('/{id}', [UserController::class, 'show']);
+            Route::put('/{id}', [UserController::class, 'update']);
+            Route::patch('/{id}/status', [UserController::class, 'updateStatus']);
+            Route::delete('/{id}', [UserController::class, 'destroy']);
+        });
         
         // Blog posts management
         Route::prefix('posts')->group(function () {
@@ -265,6 +289,113 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/products', [PerformanceController::class, 'getProductPerformance']);
             Route::get('/content', [PerformanceController::class, 'getContentPerformance']);
             Route::get('/dashboard', [PerformanceController::class, 'getDashboardMetrics']);
+        });
+
+        // Dashboard statistics
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/statistics', [DashboardController::class, 'statistics']);
+            Route::get('/cards', [DashboardController::class, 'cards']);
+        });
+
+        // Cloudinary test endpoint
+        Route::get('/test/cloudinary', function () {
+            try {
+                $config = config('cloudinary');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Cloudinary configuration loaded',
+                    'config' => [
+                        'cloud_name' => $config['cloud_url'] ? parse_url($config['cloud_url'], PHP_URL_HOST) : 'Not set',
+                        'upload_preset' => $config['upload_preset'] ?? 'Not set',
+                        'has_api_key' => !empty(parse_url($config['cloud_url'], PHP_URL_USER)),
+                        'has_api_secret' => !empty(parse_url($config['cloud_url'], PHP_URL_PASS)),
+                    ]
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cloudinary configuration error: ' . $e->getMessage()
+                ], 500);
+            }
+        });
+
+        // Test cURL SSL connection
+        Route::get('/test/curl-ssl', function () {
+            try {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "https://api.cloudinary.com/v1_1/djmqshe6o/test");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+                
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                curl_close($ch);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'cURL SSL test completed',
+                    'data' => [
+                        'http_code' => $httpCode,
+                        'curl_error' => $curlError ?: 'None',
+                        'response_length' => strlen($response),
+                        'ssl_working' => empty($curlError)
+                    ]
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'cURL SSL test failed: ' . $e->getMessage()
+                ], 500);
+            }
+        });
+
+        // Test upload preset configuration
+        Route::get('/test/upload-preset', function () {
+            try {
+                $cloudName = env('CLOUDINARY_CLOUD_NAME');
+                $uploadPreset = env('CLOUDINARY_UPLOAD_PRESET');
+                
+                if (!$uploadPreset) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No upload preset configured'
+                    ], 400);
+                }
+
+                // Test the preset with a simple request
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "https://api.cloudinary.com/v1_1/{$cloudName}/upload_presets/{$uploadPreset}");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                curl_close($ch);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Upload preset test completed',
+                    'data' => [
+                        'preset_name' => $uploadPreset,
+                        'http_code' => $httpCode,
+                        'curl_error' => $curlError ?: 'None',
+                        'response' => json_decode($response, true),
+                        'preset_accessible' => $httpCode === 200
+                    ]
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Upload preset test failed: ' . $e->getMessage()
+                ], 500);
+            }
         });
     });
 });

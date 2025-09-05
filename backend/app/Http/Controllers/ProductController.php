@@ -19,14 +19,25 @@ class ProductController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Product::query()->with([
+            $detailed = $request->boolean('detailed', false);
+            
+            $withRelations = [
                 'category:id,name,slug', 
                 'subcategory:id,name,slug', 
-                'brand:id,name,slug', 
-                'images' => function ($query) {
-                    $query->where('is_primary', true)->limit(1);
-                }
-            ]);
+                'brand:id,name,slug'
+            ];
+            
+            if ($detailed) {
+                $withRelations[] = 'images';
+            } else {
+                $withRelations[] = [
+                    'images' => function ($query) {
+                        $query->where('is_primary', true)->limit(1);
+                    }
+                ];
+            }
+            
+            $query = Product::query()->with($withRelations);
 
             // Only apply active filter if not explicitly requesting inactive products
             if (!$request->has('include_inactive') || !$request->boolean('include_inactive')) {
@@ -44,8 +55,8 @@ class ProductController extends Controller
             $products = $query->paginate($perPage);
 
             // Transform products
-            $transformedProducts = $products->through(function ($product) {
-                return $this->transformProduct($product);
+            $transformedProducts = $products->through(function ($product) use ($detailed) {
+                return $this->transformProduct($product, $detailed);
             });
 
             return response()->json([
@@ -144,14 +155,25 @@ class ProductController extends Controller
                 ], 400);
             }
 
-            $query = Product::query()->active()->search($searchTerm)->with([
+            $detailed = $request->boolean('detailed', false);
+            
+            $withRelations = [
                 'category:id,name,slug', 
                 'subcategory:id,name,slug', 
-                'brand:id,name,slug', 
-                'images' => function ($query) {
-                    $query->where('is_primary', true)->limit(1);
-                }
-            ]);
+                'brand:id,name,slug'
+            ];
+            
+            if ($detailed) {
+                $withRelations[] = 'images';
+            } else {
+                $withRelations[] = [
+                    'images' => function ($query) {
+                        $query->where('is_primary', true)->limit(1);
+                    }
+                ];
+            }
+            
+            $query = Product::query()->active()->search($searchTerm)->with($withRelations);
 
             // Apply additional filters
             $this->applyFilters($query, $request);
@@ -164,8 +186,8 @@ class ProductController extends Controller
             $products = $query->paginate($perPage);
 
             // Transform products
-            $transformedProducts = $products->through(function ($product) {
-                return $this->transformProduct($product);
+            $transformedProducts = $products->through(function ($product) use ($detailed) {
+                return $this->transformProduct($product, $detailed);
             });
 
             return response()->json([
@@ -357,6 +379,39 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create product',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update product status only
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $product = Product::findOrFail($id);
+
+            $request->validate([
+                'is_active' => 'required|boolean',
+            ]);
+
+            $product->update([
+                'is_active' => $request->is_active,
+            ]);
+
+            // Load relationships for response
+            $product->load(['category:id,name,slug', 'subcategory:id,name,slug', 'brand:id,name,slug', 'images']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product status updated successfully',
+                'data' => $this->transformProduct($product, true)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update product status',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -595,9 +650,11 @@ class ProductController extends Controller
                 'total_sales' => $product->total_sales,
                 'images' => $product->images->map(function ($image) {
                     return [
-                        'url' => $image->image_url,
-                        'alt' => $image->alt_text,
+                        'id' => $image->id,
+                        'image_url' => $image->image_url,
+                        'alt_text' => $image->alt_text,
                         'is_primary' => $image->is_primary,
+                        'sort_order' => $image->sort_order,
                     ];
                 }),
                 'meta' => [

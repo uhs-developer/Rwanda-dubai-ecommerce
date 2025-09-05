@@ -23,13 +23,19 @@ import {
   AlertTriangle,
   CheckCircle,
   XCircle,
-  Search
+  Search,
+  Clock,
+  Truck
 } from 'lucide-react';
 import { ProductBulkService } from '../services/product-bulk';
 import { ReturnsList } from './ReturnsList';
 import { ProductService, Product as ProductApi } from '../services/product';
-
 import { PromotionService, Promotion as PromotionApi } from '../services/promotion';
+import { OrderService, Order as OrderApi, OrderStatistics } from '../services/order';
+import { UserService, User as UserApi, UserStatistics } from '../services/user';
+import { DashboardService, DashboardStatistics } from '../services/dashboard';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
@@ -40,24 +46,33 @@ interface Product {
   originalPrice?: number;
   status: 'pending' | 'under review' | 'approved' | 'rejected';
   submitted: string;
+  fullProduct?: ProductApi | null;
 }
 
 interface Order {
   id: string;
-  customer: string;
-  total: number;
-  status: 'processing' | 'shipped' | 'pending' | 'delivered';
-  date: string;
+  order_number: string;
+  customer_name: string;
+  customer_email: string;
+  total_amount: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+  is_paid: boolean;
+  payment_method?: string;
+  created_at: string;
+  fullOrder?: OrderApi | null;
 }
 
 interface Customer {
   id: string;
   name: string;
   email: string;
-  orders: number;
-  totalSpent: number;
-  status: 'active' | 'inactive';
-  joined: string;
+  phone?: string;
+  total_orders: number;
+  total_spent: number;
+  status: 'active' | 'inactive' | 'suspended';
+  created_at: string;
+  roles: Array<{ id: number; name: string; slug: string }>;
+  fullUser?: UserApi | null;
 }
 
 interface Promotion {
@@ -72,9 +87,12 @@ interface Promotion {
 }
 
 const AdminDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('product-approval');
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStatistics | null>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(false);
@@ -85,6 +103,29 @@ const AdminDashboard: React.FC = () => {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
   const [isActivatingPromotion, setIsActivatingPromotion] = useState(false);
+  
+  // Product view modal state
+  const [showProductViewModal, setShowProductViewModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductApi | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  
+  // Order management state
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [orderStatistics, setOrderStatistics] = useState<OrderStatistics | null>(null);
+  const [showOrderViewModal, setShowOrderViewModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<OrderApi | null>(null);
+  const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
+  
+  // Customer management state
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customersLoading, setCustomersLoading] = useState(false);
+  const [userStatistics, setUserStatistics] = useState<UserStatistics | null>(null);
+  const [showCustomerViewModal, setShowCustomerViewModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<UserApi | null>(null);
+  const [isUpdatingCustomer, setIsUpdatingCustomer] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState<string | null>(null);
   const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
   const [selectedPromotionProducts, setSelectedPromotionProducts] = useState<number[]>([]);
@@ -102,13 +143,19 @@ const AdminDashboard: React.FC = () => {
     endDate: ''
   });
 
-  // Fetch products from backend
+  // Fetch products from backend - all products regardless of status
   const fetchProducts = async () => {
     try {
       setProductsLoading(true);
-      const response = await ProductService.getProducts({ per_page: 50 });
+      const response = await ProductService.getProducts({ 
+        per_page: 100, // Get more products
+        include_inactive: true, // Include inactive products
+        detailed: true // Get detailed product data
+      });
+      
       if (response.success && response.data) {
-        const mappedProducts = response.data.map((p: ProductApi) => ({
+        const mappedProducts = response.data.map((p: ProductApi) => {
+          return {
           id: p.id.toString(),
           name: p.name,
           editor: 'System', // Default since we don't have editor info in API
@@ -116,18 +163,24 @@ const AdminDashboard: React.FC = () => {
           price: p.effective_price, // Use effective price (promotional or regular)
           originalPrice: p.has_promotional_price ? p.price : undefined, // Show original price if on promotion
           status: p.is_active ? 'approved' : 'pending' as 'pending' | 'under review' | 'approved' | 'rejected',
-          submitted: new Date(p.created_at || Date.now()).toLocaleDateString()
-        }));
+            submitted: new Date(p.created_at || Date.now()).toLocaleDateString(),
+            // Store full product data for modal
+            fullProduct: p
+          };
+        });
         setProducts(mappedProducts);
+      } else {
+        console.error('API response failed:', response);
+        throw new Error(response.message || 'Failed to fetch products');
       }
     } catch (error) {
       console.error('Failed to fetch products:', error);
       // Fallback to mock data if API fails
       setProducts([
-    { id: '1', name: 'MacBook Pro M3', editor: 'Sarah Wilson', category: 'Laptops', price: 1999, status: 'pending', submitted: '2 hours ago' },
-    { id: '2', name: 'Hyundai Oil Filter', editor: 'Mike Johnson', category: 'Auto Parts', price: 24.99, status: 'pending', submitted: '1 day ago' },
-    { id: '3', name: 'iPhone 15 Case', editor: 'Emily Brown', category: 'Accessories', price: 29.99, status: 'under review', submitted: '3 hours ago' },
-    { id: '4', name: 'Samsung Monitor', editor: 'Sarah Wilson', category: 'Electronics', price: 299, status: 'pending', submitted: '5 hours ago' },
+    { id: '1', name: 'MacBook Pro M3', editor: 'Sarah Wilson', category: 'Laptops', price: 1999, status: 'pending', submitted: '2 hours ago', fullProduct: null },
+    { id: '2', name: 'Hyundai Oil Filter', editor: 'Mike Johnson', category: 'Auto Parts', price: 24.99, status: 'pending', submitted: '1 day ago', fullProduct: null },
+    { id: '3', name: 'iPhone 15 Case', editor: 'Emily Brown', category: 'Accessories', price: 29.99, status: 'under review', submitted: '3 hours ago', fullProduct: null },
+    { id: '4', name: 'Samsung Monitor', editor: 'Sarah Wilson', category: 'Electronics', price: 299, status: 'pending', submitted: '5 hours ago', fullProduct: null },
       ]);
     } finally {
       setProductsLoading(false);
@@ -150,19 +203,281 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const orders: Order[] = [
-    { id: 'ORD-001', customer: 'John Doe', total: 1299, status: 'processing', date: '10 min ago' },
-    { id: 'ORD-002', customer: 'Jane Smith', total: 89.99, status: 'shipped', date: '1 hour ago' },
-    { id: 'ORD-003', customer: 'Bob Wilson', total: 549, status: 'pending', date: '2 hours ago' },
-    { id: 'ORD-004', customer: 'Alice Johnson', total: 199, status: 'delivered', date: '3 hours ago' },
-  ];
+  // Toggle product status (active/inactive)
+  const toggleProductStatus = async (productId: string, currentStatus: string) => {
+    try {
+      setIsUpdatingStatus(true);
+      const newStatus = currentStatus === 'approved' ? 'pending' : 'approved';
+      const isActive = newStatus === 'approved';
+      
+      const response = await ProductService.updateProductStatus(Number(productId), isActive);
+      
+      if (response.success) {
+        // Update local state
+        setProducts(prev => prev.map(p => 
+          p.id === productId 
+            ? { ...p, status: newStatus as 'pending' | 'under review' | 'approved' | 'rejected' }
+            : p
+        ));
+        
+        toast.success(`Product ${isActive ? 'activated' : 'deactivated'} successfully!`);
+      } else {
+        throw new Error(response.message || 'Failed to update product status');
+      }
+    } catch (error) {
+      console.error('Failed to update product status:', error);
+      toast.error('Failed to update product status. Please try again.');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
 
-  const customers: Customer[] = [
-    { id: '1', name: 'John Doe', email: 'john@example.com', orders: 12, totalSpent: 2340, status: 'active', joined: '6 months ago' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com', orders: 8, totalSpent: 1280, status: 'active', joined: '3 months ago' },
-    { id: '3', name: 'Bob Wilson', email: 'bob@example.com', orders: 3, totalSpent: 450, status: 'inactive', joined: '1 month ago' },
-    { id: '4', name: 'Alice Johnson', email: 'alice@example.com', orders: 15, totalSpent: 3200, status: 'active', joined: '1 year ago' },
-  ];
+  // Open product view modal
+  const openProductViewModal = (product: Product) => {
+    if (product.fullProduct) {
+      setSelectedProduct(product.fullProduct);
+      setShowProductViewModal(true);
+    } else {
+      toast.error('Product details not available');
+    }
+  };
+
+  // Fetch orders from backend
+  const fetchOrders = async () => {
+    try {
+      setOrdersLoading(true);
+      const response = await OrderService.getOrders({
+        per_page: 50
+      });
+
+      if (response.success && response.data) {
+        const mappedOrders = response.data.map((order: OrderApi) => ({
+          id: order.id.toString(),
+          order_number: order.order_number,
+          customer_name: order.customer_name,
+          customer_email: order.customer_email,
+          total_amount: Number(order.total_amount),
+          status: order.status,
+          is_paid: order.is_paid,
+          payment_method: order.payment_method,
+          created_at: new Date(order.created_at).toLocaleDateString(),
+          fullOrder: order
+        }));
+        setOrders(mappedOrders);
+      } else {
+        console.error('API response failed:', response);
+        throw new Error(response.message || 'Failed to fetch orders');
+      }
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      // Fallback to mock data if API fails
+      setOrders([
+        { id: '1', order_number: 'ORD-000001', customer_name: 'John Doe', customer_email: 'john@example.com', total_amount: 1299, status: 'processing', is_paid: true, payment_method: 'credit_card', created_at: '10 min ago', fullOrder: null },
+        { id: '2', order_number: 'ORD-000002', customer_name: 'Jane Smith', customer_email: 'jane@example.com', total_amount: 89.99, status: 'shipped', is_paid: false, created_at: '1 hour ago', fullOrder: null },
+        { id: '3', order_number: 'ORD-000003', customer_name: 'Bob Wilson', customer_email: 'bob@example.com', total_amount: 549, status: 'pending', is_paid: false, created_at: '2 hours ago', fullOrder: null },
+        { id: '4', order_number: 'ORD-000004', customer_name: 'Alice Brown', customer_email: 'alice@example.com', total_amount: 299, status: 'delivered', is_paid: true, payment_method: 'paypal', created_at: '1 day ago', fullOrder: null },
+      ]);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  // Fetch order statistics
+  const fetchOrderStatistics = async () => {
+    try {
+      const response = await OrderService.getStatistics();
+      if (response.success && response.data) {
+        setOrderStatistics(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch order statistics:', error);
+    }
+  };
+
+  // Update order status
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      setIsUpdatingOrder(true);
+      const response = await OrderService.updateOrderStatus(Number(orderId), newStatus);
+      
+      if (response.success) {
+        setOrders(prev => prev.map(order => 
+          order.id === orderId 
+            ? { ...order, status: newStatus as any }
+            : order
+        ));
+        toast.success(`Order status updated to ${newStatus}`);
+      } else {
+        throw new Error(response.message || 'Failed to update order status');
+      }
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      toast.error('Failed to update order status. Please try again.');
+    } finally {
+      setIsUpdatingOrder(false);
+    }
+  };
+
+  // Update payment status
+  const updatePaymentStatus = async (orderId: string, isPaid: boolean) => {
+    try {
+      setIsUpdatingOrder(true);
+      const response = await OrderService.updatePaymentStatus(Number(orderId), isPaid);
+      
+      if (response.success) {
+        setOrders(prev => prev.map(order => 
+          order.id === orderId 
+            ? { ...order, is_paid: isPaid }
+            : order
+        ));
+        toast.success(`Order payment status updated to ${isPaid ? 'paid' : 'unpaid'}`);
+      } else {
+        throw new Error(response.message || 'Failed to update payment status');
+      }
+    } catch (error) {
+      console.error('Failed to update payment status:', error);
+      toast.error('Failed to update payment status. Please try again.');
+    } finally {
+      setIsUpdatingOrder(false);
+    }
+  };
+
+  // Open order view modal
+  const openOrderViewModal = (order: Order) => {
+    if (order.fullOrder) {
+      setSelectedOrder(order.fullOrder);
+      setShowOrderViewModal(true);
+    } else {
+      toast.error('Order details not available');
+    }
+  };
+
+  // Fetch customers from backend
+  const fetchCustomers = async () => {
+    try {
+      setCustomersLoading(true);
+      const response = await UserService.getUsers({
+        per_page: 50
+      });
+
+      if (response.success && response.data) {
+        const mappedCustomers = response.data.map((user: UserApi) => ({
+          id: user.id.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          total_orders: user.total_orders,
+          total_spent: Number(user.total_spent),
+          status: user.status,
+          created_at: new Date(user.created_at).toLocaleDateString(),
+          roles: user.roles,
+          fullUser: user
+        }));
+        setCustomers(mappedCustomers);
+      } else {
+        console.error('API response failed:', response);
+        throw new Error(response.message || 'Failed to fetch customers');
+      }
+    } catch (error) {
+      console.error('Failed to fetch customers:', error);
+      toast.error('Failed to fetch customers. Please try again.');
+    } finally {
+      setCustomersLoading(false);
+    }
+  };
+
+  // Fetch user statistics
+  const fetchUserStatistics = async () => {
+    try {
+      const response = await UserService.getStatistics();
+      if (response.success && response.data) {
+        setUserStatistics(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user statistics:', error);
+    }
+  };
+
+  // Fetch dashboard statistics
+  const fetchDashboardStatistics = async () => {
+    try {
+      setDashboardLoading(true);
+      const response = await DashboardService.getStatistics();
+      if (response.success && response.data) {
+        setDashboardStats(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch dashboard statistics:', error);
+    } finally {
+      setDashboardLoading(false);
+    }
+  };
+
+  // Update customer status
+  const updateCustomerStatus = async (customerId: string, newStatus: string) => {
+    try {
+      setIsUpdatingCustomer(true);
+      const response = await UserService.updateUserStatus(Number(customerId), newStatus);
+      
+      if (response.success) {
+        setCustomers(prev => prev.map(customer => 
+          customer.id === customerId 
+            ? { ...customer, status: newStatus as any }
+            : customer
+        ));
+        toast.success(`Customer status updated to ${newStatus}`);
+      } else {
+        throw new Error(response.message || 'Failed to update customer status');
+      }
+    } catch (error) {
+      console.error('Failed to update customer status:', error);
+      toast.error('Failed to update customer status. Please try again.');
+    } finally {
+      setIsUpdatingCustomer(false);
+    }
+  };
+
+  // Open customer view modal
+  const openCustomerViewModal = (customer: Customer) => {
+    if (customer.fullUser) {
+      setSelectedCustomer(customer.fullUser);
+      setShowCustomerViewModal(true);
+    } else {
+      toast.error('Customer details not available');
+    }
+  };
+
+  // Show delete confirmation dialog
+  const showDeleteConfirmation = (customerId: string) => {
+    setCustomerToDelete(customerId);
+    setShowDeleteDialog(true);
+  };
+
+  // Delete customer
+  const deleteCustomer = async () => {
+    if (!customerToDelete) return;
+    
+    try {
+      setIsUpdatingCustomer(true);
+      const response = await UserService.deleteUser(Number(customerToDelete));
+      
+      if (response.success) {
+        setCustomers(prev => prev.filter(customer => customer.id !== customerToDelete));
+        toast.success('Customer deleted successfully');
+        setShowDeleteDialog(false);
+        setCustomerToDelete(null);
+      } else {
+        throw new Error(response.message || 'Failed to delete customer');
+      }
+    } catch (error) {
+      console.error('Failed to delete customer:', error);
+      toast.error('Failed to delete customer. Please try again.');
+    } finally {
+      setIsUpdatingCustomer(false);
+    }
+  };
+
+
 
   // Load promotions and products from API on component mount
   useEffect(() => {
@@ -186,9 +501,14 @@ const AdminDashboard: React.FC = () => {
       }
     })();
     
-    // Fetch products on mount
+    // Fetch products, orders, customers, and dashboard stats on mount
     fetchProducts();
     fetchAvailableProducts();
+    fetchOrders();
+    fetchOrderStatistics();
+    fetchCustomers();
+    fetchUserStatistics();
+    fetchDashboardStatistics();
   }, []);
 
   const handleBackClick = () => {
@@ -318,13 +638,15 @@ const AdminDashboard: React.FC = () => {
   );
 
   const filteredOrders = orders.filter(order =>
-    order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    order.customer.toLowerCase().includes(searchQuery.toLowerCase())
+    order.order_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.customer_email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const filteredCustomers = customers.filter(customer =>
     customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchQuery.toLowerCase())
+    customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (customer.phone && customer.phone.includes(searchQuery))
   );
 
   return (
@@ -360,29 +682,16 @@ const AdminDashboard: React.FC = () => {
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
 
-              {/* Desktop actions */}
-              <div className="hidden sm:flex items-center space-x-2">
-                <Button onClick={() => setShowCreatePromotion(true)} size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  <span className="hidden lg:inline">Create Promotion</span>
-                  <span className="lg:hidden">Promotion</span>
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <span className="hidden lg:inline">Filters</span>
-                  <span className="lg:hidden">Filter</span>
-                </Button>
-              </div>
 
               {/* User info - hidden on very small screens */}
               <div className="hidden sm:block text-right">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                    M
+                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Mike Admin</p>
-                    <p className="text-xs text-gray-600">admin@techbridge.com</p>
+                    <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
+                    <p className="text-xs text-gray-600">{user?.email || 'user@example.com'}</p>
                   </div>
                 </div>
               </div>
@@ -409,11 +718,11 @@ const AdminDashboard: React.FC = () => {
                 <div className="pt-2 border-t">
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      M
+                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Mike Admin</p>
-                      <p className="text-xs text-gray-600">admin@techbridge.com</p>
+                      <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
+                      <p className="text-xs text-gray-600">{user?.email || 'user@example.com'}</p>
                     </div>
                   </div>
                 </div>
@@ -424,7 +733,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Key Metrics - Matching the images exactly */}
+        {/* Key Metrics - Using real data from backend */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -432,10 +741,18 @@ const AdminDashboard: React.FC = () => {
               <FolderOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">23</div>
+              <div className="text-xl sm:text-2xl font-bold">
+                {dashboardLoading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                ) : (
+                  dashboardStats?.pending_orders || 0
+                )}
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Need attention</span>
-                <Badge className="bg-blue-100 text-blue-800 text-xs">5 new</Badge>
+                <Badge className="bg-blue-100 text-blue-800 text-xs">
+                  {dashboardLoading ? '...' : `${dashboardStats?.new_orders_today || 0} new`}
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -446,10 +763,18 @@ const AdminDashboard: React.FC = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">1,547</div>
+              <div className="text-xl sm:text-2xl font-bold">
+                {dashboardLoading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+                ) : (
+                  dashboardStats?.total_customers?.toLocaleString() || 0
+                )}
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Active users</span>
-                <Badge className="bg-blue-100 text-blue-800 text-xs">12.5%</Badge>
+                <Badge className="bg-blue-100 text-blue-800 text-xs">
+                  {dashboardLoading ? '...' : `${dashboardStats?.active_customers_percentage || 0}%`}
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -460,10 +785,18 @@ const AdminDashboard: React.FC = () => {
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">8</div>
+              <div className="text-xl sm:text-2xl font-bold">
+                {dashboardLoading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-12 rounded"></div>
+                ) : (
+                  dashboardStats?.products_pending || 0
+                )}
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Awaiting approval</span>
-                <Badge className="bg-blue-100 text-blue-800 text-xs">3 new</Badge>
+                <Badge className="bg-blue-100 text-blue-800 text-xs">
+                  {dashboardLoading ? '...' : `${dashboardStats?.new_products_this_week || 0} new`}
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -474,10 +807,18 @@ const AdminDashboard: React.FC = () => {
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">$28,450</div>
+              <div className="text-xl sm:text-2xl font-bold">
+                {dashboardLoading ? (
+                  <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+                ) : (
+                  `$${dashboardStats?.monthly_revenue?.toLocaleString() || 0}`
+                )}
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">This month</span>
-                <Badge className="bg-blue-100 text-blue-800 text-xs">8.2%</Badge>
+                <Badge className="bg-blue-100 text-blue-800 text-xs">
+                  {dashboardLoading ? '...' : `${dashboardStats?.revenue_growth_percentage || 0}%`}
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -580,13 +921,32 @@ const AdminDashboard: React.FC = () => {
                           <TableCell className="text-sm text-gray-600">{product.submitted}</TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => openProductViewModal(product)}
+                                title="View Product Details"
+                              >
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-green-600 hover:text-green-700"
+                                onClick={() => toggleProductStatus(product.id, product.status)}
+                                disabled={isUpdatingStatus}
+                                title={product.status === 'approved' ? 'Deactivate Product' : 'Activate Product'}
+                              >
                                 <CheckCircle className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => toggleProductStatus(product.id, product.status)}
+                                disabled={isUpdatingStatus}
+                                title={product.status === 'approved' ? 'Deactivate Product' : 'Activate Product'}
+                              >
                                 <XCircle className="h-4 w-4" />
                               </Button>
                             </div>
@@ -623,38 +983,92 @@ const AdminDashboard: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Order ID</TableHead>
+                        <TableHead>Order Number</TableHead>
                         <TableHead>Customer</TableHead>
                         <TableHead>Total</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Paid</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredOrders.map((order) => (
+                      {ordersLoading ? (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center py-8">
+                            <div className="flex items-center justify-center">
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                              <span className="ml-2">Loading orders...</span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        filteredOrders.map((order) => (
                         <TableRow key={order.id}>
-                          <TableCell className="font-medium">{order.id}</TableCell>
-                          <TableCell>{order.customer}</TableCell>
-                          <TableCell>${order.total}</TableCell>
+                            <TableCell className="font-medium">{order.order_number}</TableCell>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">{order.customer_name}</div>
+                                <div className="text-sm text-gray-500">{order.customer_email}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell>${Number(order.total_amount).toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge className={getStatusColor(order.status)}>
                               {order.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-sm text-gray-600">{order.date}</TableCell>
+                            <TableCell>
+                              <Badge className={order.is_paid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                                {order.is_paid ? 'Paid' : 'Unpaid'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-sm text-gray-600">{order.created_at}</TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openOrderViewModal(order)}
+                                  title="View Order Details"
+                                >
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-4 w-4" />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-blue-600 hover:text-blue-700"
+                                  onClick={() => updateOrderStatus(order.id, 'processing')}
+                                  disabled={isUpdatingOrder || order.status === 'processing'}
+                                  title="Mark as Processing"
+                                >
+                                  <Clock className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-green-600 hover:text-green-700"
+                                  onClick={() => updateOrderStatus(order.id, 'shipped')}
+                                  disabled={isUpdatingOrder || order.status === 'shipped'}
+                                  title="Mark as Shipped"
+                                >
+                                  <Truck className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-purple-600 hover:text-purple-700"
+                                  onClick={() => updatePaymentStatus(order.id, !order.is_paid)}
+                                  disabled={isUpdatingOrder}
+                                  title={order.is_paid ? 'Mark as Unpaid' : 'Mark as Paid'}
+                                >
+                                  {order.is_paid ? <XCircle className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
                               </Button>
                             </div>
                           </TableCell>
                         </TableRow>
-                      ))}
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -686,6 +1100,7 @@ const AdminDashboard: React.FC = () => {
                       <TableRow>
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
                         <TableHead>Orders</TableHead>
                         <TableHead>Total Spent</TableHead>
                         <TableHead>Status</TableHead>
@@ -694,30 +1109,74 @@ const AdminDashboard: React.FC = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCustomers.map((customer) => (
-                        <TableRow key={customer.id}>
-                          <TableCell className="font-medium">{customer.name}</TableCell>
-                          <TableCell>{customer.email}</TableCell>
-                          <TableCell>{customer.orders}</TableCell>
-                          <TableCell>${customer.totalSpent}</TableCell>
-                          <TableCell>
-                            <Badge className={getStatusColor(customer.status)}>
-                              {customer.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-sm text-gray-600">{customer.joined}</TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
+                      {customersLoading ? (
+                        <TableRow>
+                          <TableCell colSpan={8} className="text-center py-8">
+                            <div className="flex items-center justify-center">
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                              <span className="ml-2">Loading customers...</span>
                             </div>
                           </TableCell>
                         </TableRow>
-                      ))}
+                      ) : (
+                        filteredCustomers.map((customer) => (
+                          <TableRow key={customer.id}>
+                            <TableCell className="font-medium">{customer.name}</TableCell>
+                            <TableCell>{customer.email}</TableCell>
+                            <TableCell>{customer.phone || 'N/A'}</TableCell>
+                            <TableCell>{customer.total_orders}</TableCell>
+                            <TableCell>${Number(customer.total_spent).toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Badge className={getStatusColor(customer.status)}>
+                                {customer.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-sm text-gray-600">{customer.created_at}</TableCell>
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openCustomerViewModal(customer)}
+                                  title="View Customer Details"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-green-600 hover:text-green-700"
+                                  onClick={() => updateCustomerStatus(customer.id, 'active')}
+                                  disabled={isUpdatingCustomer || customer.status === 'active'}
+                                  title="Activate Customer"
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-yellow-600 hover:text-yellow-700"
+                                  onClick={() => updateCustomerStatus(customer.id, 'inactive')}
+                                  disabled={isUpdatingCustomer || customer.status === 'inactive'}
+                                  title="Deactivate Customer"
+                                >
+                                  <AlertTriangle className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700"
+                                  onClick={() => showDeleteConfirmation(customer.id)}
+                                  disabled={isUpdatingCustomer}
+                                  title="Delete Customer"
+                                >
+                                  <XCircle className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -1090,6 +1549,174 @@ const AdminDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* Product View Modal */}
+      {showProductViewModal && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Product Details</h2>
+              <Button variant="ghost" onClick={() => setShowProductViewModal(false)}>
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Product Image */}
+              <div className="space-y-4">
+                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                  {selectedProduct.primary_image ? (
+                    <img 
+                      src={selectedProduct.primary_image} 
+                      alt={selectedProduct.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      No Image Available
+                    </div>
+                  )}
+                </div>
+                
+                {/* Additional Images */}
+                {selectedProduct.images && selectedProduct.images.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {selectedProduct.images.slice(0, 4).map((img, index) => (
+                      <div key={index} className="aspect-square bg-gray-100 rounded overflow-hidden">
+                        <img 
+                          src={img.image_url} 
+                          alt={`${selectedProduct.name} ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              {/* Product Information */}
+              <div className="space-y-6">
+                {/* Basic Info */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">{selectedProduct.name}</h3>
+                  <div className="flex items-center gap-4 mb-4">
+                    <Badge className={selectedProduct.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                      {selectedProduct.is_active ? 'Active' : 'Inactive'}
+                    </Badge>
+                    <Badge variant="outline">
+                      {selectedProduct.category?.name || 'Uncategorized'}
+                    </Badge>
+                    {selectedProduct.subcategory && (
+                      <Badge variant="outline">
+                        {selectedProduct.subcategory.name}
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-2xl font-bold">${selectedProduct.effective_price}</span>
+                    {selectedProduct.has_promotional_price && (
+                      <span className="text-lg text-gray-500 line-through">${selectedProduct.price}</span>
+                    )}
+                    {selectedProduct.promotional_discount_percentage && (
+                      <Badge className="bg-red-100 text-red-800">
+                        -{selectedProduct.promotional_discount_percentage}%
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Description */}
+                <div>
+                  <h4 className="font-semibold mb-2">Description</h4>
+                  <p className="text-gray-600">
+                    {selectedProduct.description || selectedProduct.short_description || 'No description available'}
+                  </p>
+                </div>
+                
+                {/* Product Details */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold mb-1">SKU</h4>
+                    <p className="text-gray-600">{selectedProduct.sku || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Brand</h4>
+                    <p className="text-gray-600">{selectedProduct.brand?.name || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Stock Status</h4>
+                    <p className="text-gray-600">{selectedProduct.stock_status || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Stock Quantity</h4>
+                    <p className="text-gray-600">{selectedProduct.stock_quantity || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Rating</h4>
+                    <p className="text-gray-600">{selectedProduct.average_rating || 'N/A'} ({selectedProduct.total_reviews || 0} reviews)</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Weight</h4>
+                    <p className="text-gray-600">{selectedProduct.weight ? `${selectedProduct.weight} kg` : 'N/A'}</p>
+                  </div>
+                </div>
+                
+                {/* Specifications */}
+                {selectedProduct.specifications && Object.keys(selectedProduct.specifications).length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Specifications</h4>
+                    <div className="space-y-1">
+                      {Object.entries(selectedProduct.specifications).map(([key, value]) => (
+                        <div key={key} className="flex justify-between">
+                          <span className="font-medium">{key}:</span>
+                          <span className="text-gray-600">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Features */}
+                {selectedProduct.features && selectedProduct.features.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Features</h4>
+                    <ul className="list-disc list-inside space-y-1">
+                      {selectedProduct.features.map((feature, index) => (
+                        <li key={index} className="text-gray-600">{feature}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Tags */}
+                {selectedProduct.tags && selectedProduct.tags.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Tags</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.tags.map((tag, index) => (
+                        <Badge key={index} variant="outline">{tag}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Timestamps */}
+                <div className="pt-4 border-t">
+                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
+                    <div>
+                      <span className="font-medium">Created:</span> {new Date(selectedProduct.created_at || '').toLocaleDateString()}
+                    </div>
+                    <div>
+                      <span className="font-medium">Updated:</span> {new Date(selectedProduct.updated_at || '').toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Success Dialog */}
       <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <AlertDialogContent>
@@ -1125,6 +1752,308 @@ const AdminDashboard: React.FC = () => {
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setShowErrorDialog(false)}>
               OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Order View Modal */}
+      {showOrderViewModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Order Details - {selectedOrder.order_number}</h2>
+              <Button variant="ghost" onClick={() => setShowOrderViewModal(false)}>
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Order Information */}
+              <div className="space-y-6">
+                {/* Basic Info */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Order Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="font-medium">Order Number:</span>
+                      <span>{selectedOrder.order_number}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Status:</span>
+                      <Badge className={getStatusColor(selectedOrder.status)}>
+                        {selectedOrder.status}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Payment Status:</span>
+                      <Badge className={selectedOrder.is_paid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                        {selectedOrder.is_paid ? 'Paid' : 'Unpaid'}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Payment Method:</span>
+                      <span>{selectedOrder.payment_method || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Created:</span>
+                      <span>{new Date(selectedOrder.created_at).toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Information */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Customer Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="font-medium">Name:</span>
+                      <span>{selectedOrder.customer_name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Email:</span>
+                      <span>{selectedOrder.customer_email}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Phone:</span>
+                      <span>{selectedOrder.customer_phone || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Address Information */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Address Information</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="font-medium">Shipping Address:</span>
+                      <p className="text-sm text-gray-600 mt-1">{selectedOrder.shipping_address}</p>
+                    </div>
+                    {selectedOrder.billing_address && (
+                      <div>
+                        <span className="font-medium">Billing Address:</span>
+                        <p className="text-sm text-gray-600 mt-1">{selectedOrder.billing_address}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Items and Totals */}
+              <div className="space-y-6">
+                {/* Order Items */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Order Items</h3>
+                  <div className="space-y-3">
+                    {selectedOrder.items?.map((item) => (
+                      <div key={item.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-medium">{item.product_name}</h4>
+                            <p className="text-sm text-gray-600">SKU: {item.product_sku || 'N/A'}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">${Number(item.unit_price).toFixed(2)}</p>
+                            <p className="text-sm text-gray-600">x{item.quantity}</p>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center pt-2 border-t">
+                          <span className="font-medium">Total:</span>
+                          <span className="font-bold">${Number(item.total_price).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Order Totals */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Order Totals</h3>
+                                      <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span>${Number(selectedOrder.subtotal).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Tax:</span>
+                        <span>${Number(selectedOrder.tax_amount).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Shipping:</span>
+                        <span>${Number(selectedOrder.shipping_amount).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Discount:</span>
+                        <span>-${Number(selectedOrder.discount_amount).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-lg font-bold border-t pt-2">
+                        <span>Total:</span>
+                        <span>${Number(selectedOrder.total_amount).toFixed(2)}</span>
+                      </div>
+                    </div>
+                </div>
+
+                {/* Notes */}
+                {selectedOrder.notes && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Notes</h3>
+                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">{selectedOrder.notes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Customer View Modal */}
+      {showCustomerViewModal && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Customer Details - {selectedCustomer.name}</h2>
+              <Button variant="ghost" onClick={() => setShowCustomerViewModal(false)}>
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Customer Information */}
+              <div className="space-y-6">
+                {/* Basic Info */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Customer Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="font-medium">Name:</span>
+                      <span>{selectedCustomer.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Email:</span>
+                      <span>{selectedCustomer.email}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Phone:</span>
+                      <span>{selectedCustomer.phone || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Status:</span>
+                      <Badge className={getStatusColor(selectedCustomer.status)}>
+                        {selectedCustomer.status}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Member Since:</span>
+                      <span>{new Date(selectedCustomer.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Last Login:</span>
+                      <span>{selectedCustomer.last_login_at ? new Date(selectedCustomer.last_login_at).toLocaleString() : 'Never'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Roles */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Roles</h3>
+                  <div className="space-y-2">
+                    {selectedCustomer.roles.map((role) => (
+                      <Badge key={role.id} variant="outline" className="mr-2">
+                        {role.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Statistics */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Statistics</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="font-medium">Total Orders:</span>
+                      <span>{selectedCustomer.total_orders}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Total Spent:</span>
+                      <span>${Number(selectedCustomer.total_spent).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Average Order Value:</span>
+                      <span>${selectedCustomer.total_orders > 0 ? (Number(selectedCustomer.total_spent) / selectedCustomer.total_orders).toFixed(2) : '0.00'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Orders */}
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
+                  <div className="space-y-3">
+                    {selectedCustomer.orders && selectedCustomer.orders.length > 0 ? (
+                      selectedCustomer.orders.map((order) => (
+                        <div key={order.id} className="border rounded-lg p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h4 className="font-medium">{order.order_number}</h4>
+                              <p className="text-sm text-gray-600">{new Date(order.created_at).toLocaleDateString()}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium">${Number(order.total_amount).toFixed(2)}</p>
+                              <Badge className={getStatusColor(order.status)}>
+                                {order.status}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center pt-2 border-t">
+                            <span className="text-sm text-gray-600">Payment Status:</span>
+                            <Badge className={order.is_paid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                              {order.is_paid ? 'Paid' : 'Unpaid'}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">No orders found</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Customer</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this customer? This action cannot be undone.
+              {customerToDelete && (
+                <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-sm text-red-800">
+                    <strong>Note:</strong> Customers with existing orders cannot be deleted. 
+                    Please suspend them instead if you want to restrict their access.
+                  </p>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setShowDeleteDialog(false)}
+              className="bg-gray-500 hover:bg-gray-600"
+            >
+              Cancel
+            </AlertDialogAction>
+            <AlertDialogAction
+              onClick={deleteCustomer}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={isUpdatingCustomer}
+            >
+              {isUpdatingCustomer ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

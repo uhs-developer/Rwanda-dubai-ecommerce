@@ -24,11 +24,13 @@ import { postService, Post as ApiPost, CreatePostData } from '../services/post';
 import { mediaService, MediaFile as ApiMediaFile } from '../services/media';
 import { performanceService, ProductPerformanceMetrics, ContentPerformanceMetrics } from '../services/performance';
 import { categoryService, Category as ApiCategory } from '../services/category';
+import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 
 // Legacy interfaces removed - using API types instead
 
 const EditorDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('my-products');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -384,11 +386,11 @@ const EditorDashboard: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
               <div className="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white text-lg font-medium">
-                  M
+                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div className="text-right flex-1 sm:flex-none">
-                  <p className="text-sm font-medium text-gray-900">Mike Admin</p>
-                  <p className="text-xs text-gray-600">admin@techbridge.com</p>
+                  <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
+                  <p className="text-xs text-gray-600">{user?.email || 'user@example.com'}</p>
                 </div>
                 <Button variant="ghost" className="text-red-600 hover:text-red-700">
                   → Logout
@@ -405,8 +407,8 @@ const EditorDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">My Products</CardTitle>
-              <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                <Package className="h-4 w-4 text-blue-600" />
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Package className="h-4 w-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
               </div>
             </CardHeader>
             <CardContent>
@@ -424,8 +426,8 @@ const EditorDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Draft Products</CardTitle>
-              <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                <Edit className="h-4 w-4 text-orange-600" />
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Edit className="h-4 w-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
               </div>
             </CardHeader>
             <CardContent>
@@ -443,8 +445,8 @@ const EditorDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Media Library</CardTitle>
-              <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                <Image className="h-4 w-4 text-green-600" />
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Image className="h-4 w-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
               </div>
             </CardHeader>
             <CardContent>
@@ -462,8 +464,8 @@ const EditorDashboard: React.FC = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
-              <div className="w-8 h-8 bg-purple-100 rounded flex items-center justify-center">
-                <FileText className="h-4 w-4 text-purple-600" />
+              <div className="w-8 h-8 flex items-center justify-center">
+                <FileText className="h-4 w-4" style={{ color: 'hsl(var(--muted-foreground))' }} />
               </div>
             </CardHeader>
             <CardContent>

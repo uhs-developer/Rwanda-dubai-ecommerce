@@ -154,18 +154,18 @@ export function ProductListingPageAPI({
 
   const getCategoryName = () => {
     if (selectedCategoryId) {
-      return categories.find(c => c.id === selectedCategoryId)?.name;
+      return categories.find(c => c.id === selectedCategoryId)?.name || 'Unknown Category';
     }
     if (category) {
       return category.charAt(0).toUpperCase() + category.slice(1);
     }
-    return null;
+    return 'All Products';
   };
 
   const getSubcategoryName = () => {
     if (selectedSubcategoryId && selectedCategoryId) {
       const categoryObj = categories.find(c => c.id === selectedCategoryId);
-      return categoryObj?.subcategories?.find(s => s.id === selectedSubcategoryId)?.name;
+      return categoryObj?.subcategories?.find(s => s.id === selectedSubcategoryId)?.name || 'Unknown Subcategory';
     }
     if (subcategory) {
       return subcategory.charAt(0).toUpperCase() + subcategory.slice(1);
@@ -421,7 +421,7 @@ export function ProductListingPageAPI({
               </SheetTrigger>
               <SheetContent side="left" className="w-80">
                 <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
+                  <SheetTitle>Product Filters</SheetTitle>
                 </SheetHeader>
                 <div className="mt-6">
                   <FiltersContent />
@@ -446,13 +446,13 @@ export function ProductListingPageAPI({
                   setSelectedCategoryId(undefined);
                   setSelectedSubcategoryId(undefined);
                 }}>
-                {getCategoryName()} ×
+                {getCategoryName() || 'Category'} ×
               </Badge>
             )}
             {selectedSubcategoryId && (
               <Badge variant="secondary" className="cursor-pointer"
                 onClick={() => setSelectedSubcategoryId(undefined)}>
-                {getSubcategoryName()} ×
+                {getSubcategoryName() || 'Subcategory'} ×
               </Badge>
             )}
             {minRating > 0 && (

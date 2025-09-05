@@ -74,7 +74,7 @@ export function CategoryFeaturedSlider({
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold mb-2">{title}</h2>
+            <h2 className="text-1xl font-bold mb-2">{title}</h2>
             {subtitle && (
               <p className="text-muted-foreground">{subtitle}</p>
             )}

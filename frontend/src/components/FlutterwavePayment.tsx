@@ -28,22 +28,77 @@ export function FlutterwavePayment({
   onClose,
   disabled = false
 }: FlutterwavePaymentProps) {
-  const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const config: FlutterwaveConfig = flutterwaveService.createPaymentConfig(
-    email,
-    amount,
-    customerName,
-    phoneNumber,
-    undefined,
-    metadata
-  );
+  // Create a default config to avoid conditional hook usage
+  const defaultConfig: FlutterwaveConfig = {
+    public_key: 'FLWPUBK_TEST-default',
+    tx_ref: 'default-tx-ref',
+    amount: amount,
+    currency: 'USD',
+    payment_options: 'card,mobilemoney,ussd',
+    redirect_url: window.location.origin + '/checkout',
+    customer: {
+      email,
+      phone_number: phoneNumber,
+      name: customerName,
+    },
+    customizations: {
+      title: 'TechBridge - Dubai to Rwanda',
+      description: 'Payment for your order',
+      logo: window.location.origin + '/vite.svg',
+    },
+    meta: metadata || {},
+  };
 
-  const handleFlutterPayment = useFlutterwave(config);
+  let config: FlutterwaveConfig = defaultConfig;
+  let handleFlutterPayment: any = null;
+  
+  try {
+    config = flutterwaveService.createPaymentConfig(
+      email,
+      amount,
+      customerName,
+      phoneNumber,
+      undefined,
+      metadata
+    );
+  } catch (error) {
+    console.error('Flutterwave configuration error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to load payment modal. Check your internet connection and retry later.';
+    // Don't set error during render - it will be handled when button is clicked
+    config = defaultConfig;
+  }
+
+  // Always call useFlutterwave hook to avoid conditional hook usage
+  handleFlutterPayment = useFlutterwave(config);
+
+  // No useEffect needed - errors will be handled when user clicks the button
 
   const handlePayment = async () => {
     if (disabled || isProcessing) return;
+
+    // Check for configuration errors when button is clicked
+    try {
+      const validConfig = flutterwaveService.createPaymentConfig(
+        email,
+        amount,
+        customerName,
+        phoneNumber,
+        undefined,
+        metadata
+      );
+    } catch (error) {
+      console.error('Flutterwave configuration error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load payment modal. Check your internet connection and retry later.';
+      setPaymentStatus('error');
+      onError({
+        message: errorMessage,
+        code: 'CONFIG_ERROR'
+      });
+      return;
+    }
 
     setIsProcessing(true);
     setPaymentStatus('processing');

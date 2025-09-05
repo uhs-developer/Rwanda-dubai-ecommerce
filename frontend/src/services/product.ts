@@ -220,6 +220,11 @@ export class ProductService {
   static async updateProduct(id: number, data: CreateProductData): Promise<ApiResponse<Product>> {
     return await apiRequest<Product>('PUT', `/products/${id}`, data);
   }
+
+  // Update product status only
+  static async updateProductStatus(id: number, isActive: boolean): Promise<ApiResponse<Product>> {
+    return await apiRequest<Product>('PATCH', `/products/${id}/status`, { is_active: isActive });
+  }
 }
 
 // Helper functions for data transformation
@@ -231,14 +236,14 @@ export const transformProductForDisplay = (product: Product) => {
     originalPrice: product.has_promotional_price ? product.price : product.original_price, // Show original price if on promotion
     image: product.primary_image || 'https://via.placeholder.com/400x400?text=No+Image',
     images: product.images?.map(img => img.image_url) || [],
-    category: product.category.name,
-    subcategory: product.subcategory.name,
+    category: product.category?.name || 'Unknown Category',
+    subcategory: product.subcategory?.name || 'Unknown Subcategory',
     rating: product.average_rating,
     reviews: product.total_reviews,
     description: product.description || product.short_description || '',
     specifications: product.specifications || {},
     inStock: product.in_stock,
-    brand: product.brand.name,
+    brand: product.brand?.name || 'Unknown Brand',
     tags: product.tags || [],
     features: product.features || [],
     slug: product.slug,

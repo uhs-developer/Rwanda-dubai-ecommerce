@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -24,6 +24,7 @@ import { useTranslation } from "../../node_modules/react-i18next";
 import { useCart } from "../contexts/CartContext";
 import { FlutterwavePayment } from "./FlutterwavePayment";
 import { FlutterwaveResponse, FlutterwaveError } from "../services/flutterwaveService";
+import { EnvDebug } from "./EnvDebug";
 
 interface CheckoutPageProps {
   onBack: () => void;
@@ -71,7 +72,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaymentSuccess = (response: FlutterwaveResponse) => {
+  const handlePaymentSuccess = useCallback((response: FlutterwaveResponse) => {
     console.log('Payment successful:', response);
     setPaymentStatus('success');
     
@@ -92,13 +93,13 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
     setTimeout(() => {
       onPlaceOrder(orderData);
     }, 2000);
-  };
+  }, [cartItems, formData, subtotal, shipping, tax, total, onPlaceOrder]);
 
-  const handlePaymentError = (error: FlutterwaveError) => {
+  const handlePaymentError = useCallback((error: FlutterwaveError) => {
     console.error('Payment failed:', error);
     setPaymentStatus('error');
     setPaymentError(error.message);
-  };
+  }, []);
 
   const handleSubmit = () => {
     if (!formData.agreeTerms) {
@@ -187,6 +188,9 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
         ))}
       </div>
 
+      {/* Debug Environment Variables */}
+      <EnvDebug />
+      
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Main Form */}
         <div className="lg:col-span-2">

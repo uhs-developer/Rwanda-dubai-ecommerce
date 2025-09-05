@@ -100,7 +100,7 @@ export function HomepageAPI({
         {/* Categories Grid */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">{t("categories.shopByCategory")}</h2>
+            <h2 className="text-1xl font-bold">{t("categories.shopByCategory")}</h2>
             <Button variant="ghost" onClick={() => navigate('/categories')}>
               {t("common.viewAll")} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -279,23 +279,6 @@ export function HomepageAPI({
         </section>
 
         {/* Newsletter */}
-        <section className="bg-muted rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold mb-2">{t("home.newsletterTitle")}</h2>
-          <p className="text-muted-foreground mb-6">
-            {t("home.newsletterDesc")}
-          </p>
-          <div className="flex max-w-md mx-auto gap-2">
-            <input
-              type="email"
-              placeholder={t("home.emailPlaceholder")}
-              className="flex-1 px-4 py-2 rounded-md border border-input bg-background"
-            />
-            <Button>{t("footer.subscribe")}</Button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            {t("home.privacyNotice")}
-          </p>
-        </section>
       </div>
     </div>
   );

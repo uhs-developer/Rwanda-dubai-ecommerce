@@ -69,7 +69,7 @@ export class FlutterwaveService {
   private constructor() {
     this.publicKey = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || '';
     if (!this.publicKey) {
-      console.warn('Flutterwave public key not found in environment variables');
+      console.error('Flutterwave public key not found in environment variables. Please set VITE_FLUTTERWAVE_PUBLIC_KEY in your .env file');
     }
   }
 
@@ -92,7 +92,18 @@ export class FlutterwaveService {
     txRef?: string,
     metadata?: any
   ): FlutterwaveConfig {
-    return {
+    if (!this.publicKey) {
+      throw new Error('Flutterwave public key is not configured. Please set VITE_FLUTTERWAVE_PUBLIC_KEY in your .env file');
+    }
+
+    // Validate public key format
+    if (!this.publicKey.startsWith('FLWPUBK_')) {
+      throw new Error(`Invalid Flutterwave public key format. Expected to start with 'FLWPUBK_', got: ${this.publicKey.substring(0, 10)}...`);
+    }
+
+    console.log('Creating Flutterwave config with public key:', this.publicKey.substring(0, 15) + '...');
+
+    const config = {
       public_key: this.publicKey,
       tx_ref: txRef || this.generateTxRef(),
       amount: amount,
@@ -111,6 +122,9 @@ export class FlutterwaveService {
       },
       meta: metadata || {},
     };
+
+    console.log('Flutterwave config created:', { ...config, public_key: config.public_key.substring(0, 15) + '...' });
+    return config;
   }
 
   public async verifyPayment(txRef: string): Promise<boolean> {
