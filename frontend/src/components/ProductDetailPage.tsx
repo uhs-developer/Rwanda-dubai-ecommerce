@@ -377,7 +377,7 @@ export function ProductDetailPage({
                 <div>
                   <h4 className="font-medium mb-2">Shipping Information</h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Free shipping on orders over $500</li>
+                    <li>• Fast shipping from Dubai to Rwanda - $35 flat rate</li>
                     <li>• Standard shipping: 7-14 business days</li>
                     <li>• Express shipping: 3-7 business days (additional cost)</li>
                     <li>• All items shipped from Dubai, UAE</li>

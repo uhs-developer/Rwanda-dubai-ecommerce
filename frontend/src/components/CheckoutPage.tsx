@@ -4,7 +4,6 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
@@ -24,7 +23,6 @@ import { useTranslation } from "../../node_modules/react-i18next";
 import { useCart } from "../contexts/CartContext";
 import { FlutterwavePayment } from "./FlutterwavePayment";
 import { FlutterwaveResponse, FlutterwaveError } from "../services/flutterwaveService";
-import { EnvDebug } from "./EnvDebug";
 
 interface CheckoutPageProps {
   onBack: () => void;
@@ -61,12 +59,22 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
   });
 
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
-  const [paymentError, setPaymentError] = useState<string>('');
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.total_price, 0);
-  const shipping = subtotal > 500 ? 0 : 50;
+  const shipping = 35; // Fixed shipping cost
   const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
+  
+  // Debug logging for payment calculation
+  console.log('Payment calculation debug:', {
+    cartItems: cartItems.length,
+    subtotal,
+    shipping,
+    tax,
+    total,
+    totalType: typeof total,
+    isNaN: isNaN(total)
+  });
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -188,9 +196,6 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
         ))}
       </div>
 
-      {/* Debug Environment Variables */}
-      <EnvDebug />
-      
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Main Form */}
         <div className="lg:col-span-2">
@@ -362,20 +367,20 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                         Pay securely with Flutterwave. Supports Card, Mobile Money, and USSD payments.
                       </p>
                       <FlutterwavePayment
-                        email={formData.email}
-                        amount={total}
-                        customerName={`${formData.firstName} ${formData.lastName}`}
-                        phoneNumber={formData.phone}
+                        email={formData.email || ''}
+                        amount={Number(total) || 0}
+                        customerName={`${formData.firstName || ''} ${formData.lastName || ''}`.trim()}
+                        phoneNumber={formData.phone || ''}
                         metadata={{
-                          customer_name: `${formData.firstName} ${formData.lastName}`,
-                          phone: formData.phone,
-                          address: formData.address,
-                          city: formData.city,
-                          district: formData.district,
+                          customer_name: String(`${formData.firstName || ''} ${formData.lastName || ''}`.trim()),
+                          phone: String(formData.phone || ''),
+                          address: String(formData.address || ''),
+                          city: String(formData.city || ''),
+                          district: String(formData.district || ''),
                           items: cartItems.map(item => ({
-                            name: item.product.name,
-                            quantity: item.quantity,
-                            price: item.total_price
+                            name: String(item.product?.name || ''),
+                            quantity: String(Number(item.quantity) || 0),
+                            price: String(Number(item.total_price) || 0)
                           }))
                         }}
                         onSuccess={handlePaymentSuccess}
@@ -588,20 +593,20 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                   {formData.paymentMethod === 'flutterwave' ? (
                     <div className="flex-1">
                       <FlutterwavePayment
-                        email={formData.email}
-                        amount={total}
-                        customerName={`${formData.firstName} ${formData.lastName}`}
-                        phoneNumber={formData.phone}
+                        email={formData.email || ''}
+                        amount={Number(total) || 0}
+                        customerName={`${formData.firstName || ''} ${formData.lastName || ''}`.trim()}
+                        phoneNumber={formData.phone || ''}
                         metadata={{
-                          customer_name: `${formData.firstName} ${formData.lastName}`,
-                          phone: formData.phone,
-                          address: formData.address,
-                          city: formData.city,
-                          district: formData.district,
+                          customer_name: String(`${formData.firstName || ''} ${formData.lastName || ''}`.trim()),
+                          phone: String(formData.phone || ''),
+                          address: String(formData.address || ''),
+                          city: String(formData.city || ''),
+                          district: String(formData.district || ''),
                           items: cartItems.map(item => ({
-                            name: item.product.name,
-                            quantity: item.quantity,
-                            price: item.total_price
+                            name: String(item.product?.name || ''),
+                            quantity: String(Number(item.quantity) || 0),
+                            price: String(Number(item.total_price) || 0)
                           }))
                         }}
                         onSuccess={handlePaymentSuccess}
@@ -640,7 +645,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+                  <span>${shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Tax</span>

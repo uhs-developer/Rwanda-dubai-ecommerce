@@ -21,7 +21,7 @@ export function ShoppingCart({
   const { cartItems, updateCartItem, removeFromCart, totalPrice } = useCart();
   
   const subtotal = totalPrice;
-  const shipping = subtotal > 500 ? 0 : 50; // Free shipping over $500
+  const shipping = 35; // Fixed shipping cost
   const total = subtotal + shipping;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -123,13 +123,8 @@ export function ShoppingCart({
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+              <span>${shipping.toFixed(2)}</span>
             </div>
-            {subtotal < 500 && shipping > 0 && (
-              <p className="text-xs text-muted-foreground">
-                Add ${(500 - subtotal).toFixed(2)} more for free shipping
-              </p>
-            )}
           </div>
           
           <Separator />

@@ -101,7 +101,7 @@ export function Header({
       <div className="bg-primary text-primary-foreground py-1 sm:py-2">
         <div className="container mx-auto px-2 sm:px-4">
           <p className="text-center text-xs sm:text-sm truncate">
-            Free shipping from Dubai to Rwanda on orders over $500
+            Fast shipping from Dubai to Rwanda - $35 flat rate
           </p>
         </div>
       </div>

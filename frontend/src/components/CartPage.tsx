@@ -23,7 +23,7 @@ export function CartPage({
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.total_price, 0);
   const promoDiscount = appliedPromo === "SAVE10" ? subtotal * 0.1 : 0;
-  const shipping = subtotal > 500 ? 0 : 50;
+  const shipping = 35; // Fixed shipping cost
   const tax = (subtotal - promoDiscount) * 0.05; // 5% tax
   const total = subtotal - promoDiscount + shipping + tax;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -176,22 +176,13 @@ export function CartPage({
                   </div>
                   <div>
                     <p className="font-medium">
-                      {subtotal >= 500 ? "🎉 You qualify for FREE shipping!" : 
-                       `Spend $${(500 - subtotal).toFixed(2)} more for FREE shipping`}
+                      Fast shipping from Dubai to Rwanda
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Free shipping on orders over $500 to Rwanda
+                      Fast shipping from Dubai to Rwanda - $35 flat rate
                     </p>
                   </div>
                 </div>
-                {subtotal < 500 && (
-                  <div className="w-32 bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min((subtotal / 500) * 100, 100)}%` }}
-                    />
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -248,7 +239,7 @@ export function CartPage({
                 )}
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+                  <span>${shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax</span>
