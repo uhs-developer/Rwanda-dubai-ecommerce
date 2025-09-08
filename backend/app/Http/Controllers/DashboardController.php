@@ -106,35 +106,36 @@ class DashboardController extends Controller
     {
         try {
             $statistics = $this->statistics();
-            $stats = $statistics->getData()->data;
+            $payload = $statistics->getData();
+            $stats = $payload && isset($payload->data) ? $payload->data : (object)[];
 
             $cards = [
                 [
                     'title' => 'Pending Orders',
-                    'value' => $stats->pending_orders,
+                    'value' => $stats->pending_orders ?? 0,
                     'subtitle' => 'Need attention',
-                    'badge' => $stats->new_orders_today . ' new',
+                    'badge' => ($stats->new_orders_today ?? 0) . ' new',
                     'icon' => 'FolderOpen'
                 ],
                 [
                     'title' => 'Total Customers',
-                    'value' => $stats->total_customers,
+                    'value' => $stats->total_customers ?? 0,
                     'subtitle' => 'Active users',
-                    'badge' => $stats->active_customers_percentage . '%',
+                    'badge' => ($stats->active_customers_percentage ?? 0) . '%',
                     'icon' => 'Users'
                 ],
                 [
                     'title' => 'Products Pending',
-                    'value' => $stats->products_pending,
+                    'value' => $stats->products_pending ?? 0,
                     'subtitle' => 'Awaiting approval',
-                    'badge' => $stats->new_products_this_week . ' new',
+                    'badge' => ($stats->new_products_this_week ?? 0) . ' new',
                     'icon' => 'Package'
                 ],
                 [
                     'title' => 'Monthly Revenue',
-                    'value' => $stats->monthly_revenue,
+                    'value' => $stats->monthly_revenue ?? 0,
                     'subtitle' => 'This month',
-                    'badge' => $stats->revenue_growth_percentage . '%',
+                    'badge' => ($stats->revenue_growth_percentage ?? 0) . '%',
                     'icon' => 'BarChart3'
                 ]
             ];

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { UserService } from "../services/user";
+import { CustomerDashboardService } from "../services/customerDashboard";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -70,7 +70,7 @@ export function AccountSecurityPage({ onBack }: AccountSecurityPageProps) {
     }
 
     try {
-      const response = await UserService.changePassword({
+      const response = await CustomerDashboardService.changePassword({
         current_password: passwordData.current_password,
         new_password: passwordData.new_password,
         new_password_confirmation: passwordData.new_password_confirmation

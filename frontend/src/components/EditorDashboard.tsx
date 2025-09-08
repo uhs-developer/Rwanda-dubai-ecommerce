@@ -5,10 +5,10 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Input } from './ui/input';
-import { 
-  Eye, 
-  Edit, 
-  Plus, 
+import {
+  Eye,
+  Edit,
+  Plus,
   ArrowLeft,
   Search,
   Upload,
@@ -18,6 +18,7 @@ import {
   Image,
   Loader2,
   Trash2,
+  RefreshCw
 } from 'lucide-react';
 import { ProductService, Product as ApiProduct, CreateProductData, createProduct, Brand, Subcategory } from '../services/product'; // Updated interface
 import { postService, Post as ApiPost, CreatePostData } from '../services/post';
@@ -43,13 +44,13 @@ const EditorDashboard: React.FC = () => {
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [productPerformance, setProductPerformance] = useState<ProductPerformanceMetrics | null>(null);
   const [contentPerformance, setContentPerformance] = useState<ContentPerformanceMetrics | null>(null);
-  
+
   // Loading states
   const [productsLoading, setProductsLoading] = useState(false);
   const [postsLoading, setPostsLoading] = useState(false);
   const [mediaLoading, setMediaLoading] = useState(false);
   const [performanceLoading, setPerformanceLoading] = useState(false);
-  
+
   // Modal states
   const [showNewProductModal, setShowNewProductModal] = useState(false);
   const [showNewPostModal, setShowNewPostModal] = useState(false);
@@ -57,7 +58,7 @@ const EditorDashboard: React.FC = () => {
   const [showEditProductModal, setShowEditProductModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ApiProduct | null>(null);
   const [showMediaUploadModal, setShowMediaUploadModal] = useState(false);
-  
+
   // Form states
   const [newProductForm, setNewProductForm] = useState<Partial<CreateProductData>>({
     name: '',
@@ -80,7 +81,7 @@ const EditorDashboard: React.FC = () => {
     is_featured: false,
     is_digital: false
   });
-  
+
   const [editProductForm, setEditProductForm] = useState<Partial<CreateProductData>>({
     name: '',
     description: '',
@@ -102,13 +103,13 @@ const EditorDashboard: React.FC = () => {
     is_featured: false,
     is_digital: false
   });
-  
+
   const [newPostForm, setNewPostForm] = useState<Partial<CreatePostData>>({
     title: '',
     content: '',
     status: 'draft'
   });
-  
+
   const [uploadingFile, setUploadingFile] = useState(false);
   const [creatingProduct, setCreatingProduct] = useState(false);
   const [creatingPost, setCreatingPost] = useState(false);
@@ -119,7 +120,7 @@ const EditorDashboard: React.FC = () => {
   const fetchProducts = async () => {
     setProductsLoading(true);
     try {
-      const response = await ProductService.getProducts({ 
+      const response = await ProductService.getProducts({
         per_page: 50,
         include_inactive: true // Include inactive products for editors
       });
@@ -228,7 +229,7 @@ const EditorDashboard: React.FC = () => {
 
   // Handle category change to fetch subcategories
   const handleCategoryChange = (categoryId: number) => {
-    setNewProductForm({...newProductForm, category_id: categoryId, subcategory_id: undefined});
+    setNewProductForm({ ...newProductForm, category_id: categoryId, subcategory_id: undefined });
     fetchSubcategories(categoryId);
   };
 
@@ -271,7 +272,7 @@ const EditorDashboard: React.FC = () => {
 
   const handleUpdateProduct = async () => {
     if (!selectedProduct) return;
-    
+
     setCreatingProduct(true);
     try {
       await ProductService.updateProduct(selectedProduct.id, editProductForm as CreateProductData);
@@ -310,7 +311,7 @@ const EditorDashboard: React.FC = () => {
   const handleFileUpload = async (file: File) => {
     setUploadingFile(true);
     try {
-      await mediaService.uploadFile(file, { 
+      await mediaService.uploadFile(file, {
         folder: 'editor-uploads',
         product_id: selectedProductForMedia || undefined,
         usage_type: selectedUsageType
@@ -369,7 +370,7 @@ const EditorDashboard: React.FC = () => {
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between py-6 gap-4">
             {/* Left side - Back button and title */}
             <div className="flex items-center space-x-4">
-              <button 
+              <button
                 onClick={handleBackClick}
                 className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
               >
@@ -412,11 +413,10 @@ const EditorDashboard: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{products.filter(p => p.is_active).length}</div>
+              <div className="text-2xl font-bold">{products && products.filter(p => p.is_active).length ? products.filter(p => p.is_active).length : <div className="animate-pulse h-8 w-16 rounded">0</div>}</div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Published</span>
                 <Badge className="bg-blue-100 text-blue-800 text-xs">
-                  <Edit className="h-3 w-3 mr-1" />
                   {products.filter(p => p.is_active).length} active
                 </Badge>
               </div>
@@ -431,11 +431,10 @@ const EditorDashboard: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{products.filter(p => !p.is_active).length}</div>
+              <div className="text-2xl font-bold">{products && products.filter(p => !p.is_active).length ? products.filter(p => !p.is_active).length : <div className="animate-pulse h-8 w-16 rounded">0</div>}</div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">In progress</span>
                 <Badge className="bg-blue-100 text-blue-800 text-xs">
-                  <Edit className="h-3 w-3 mr-1" />
                   {products.filter(p => !p.is_active).length} inactive
                 </Badge>
               </div>
@@ -450,11 +449,10 @@ const EditorDashboard: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{mediaFiles.length}</div>
+              <div className="text-2xl font-bold">{mediaFiles && mediaFiles.length ? mediaFiles.length : <div className="animate-pulse h-8 w-16 rounded">0</div>}</div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Images & videos</span>
                 <Badge className="bg-blue-100 text-blue-800 text-xs">
-                  <Edit className="h-3 w-3 mr-1" />
                   {mediaFiles.filter(f => f.resource_type === 'image').length} images
                 </Badge>
               </div>
@@ -469,11 +467,10 @@ const EditorDashboard: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{blogPosts.filter(p => p.status === 'published').length}</div>
+              <div className="text-2xl font-bold">{blogPosts && blogPosts.filter(p => p.status === 'published').length ? blogPosts.filter(p => p.status === 'published').length : <div className="animate-pulse h-8 w-16 rounded">0</div>}</div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Published</span>
                 <Badge className="bg-blue-100 text-blue-800 text-xs">
-                  <Edit className="h-3 w-3 mr-1" />
                   {blogPosts.filter(p => p.status === 'draft').length} drafts
                 </Badge>
               </div>
@@ -505,7 +502,7 @@ const EditorDashboard: React.FC = () => {
                       className="pl-10 w-full sm:w-80"
                     />
                   </div>
-                  <Button 
+                  <Button
                     className="bg-gray-900 hover:bg-gray-800 w-full sm:w-auto"
                     onClick={() => setShowNewProductModal(true)}
                   >
@@ -532,8 +529,10 @@ const EditorDashboard: React.FC = () => {
                       {productsLoading ? (
                         <TableRow>
                           <TableCell colSpan={7} className="text-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                            <p className="mt-2 text-sm text-gray-500">Loading products...</p>
+                            <div className="flex items-center justify-center">
+                              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                              Loading products...
+                            </div>
                           </TableCell>
                         </TableRow>
                       ) : filteredProducts.length === 0 ? (
@@ -544,67 +543,67 @@ const EditorDashboard: React.FC = () => {
                         </TableRow>
                       ) : (
                         filteredProducts.map((product) => (
-                        <TableRow key={product.id}>
-                          <TableCell className="font-medium">{product.name}</TableCell>
+                          <TableRow key={product.id}>
+                            <TableCell className="font-medium">{product.name}</TableCell>
                             <TableCell>{product.category?.name || 'N/A'}</TableCell>
                             <TableCell>${product.effective_price.toFixed(2)}</TableCell>
-                          <TableCell>
+                            <TableCell>
                               <Badge className={getStatusColor(product.is_active ? 'active' : 'inactive')}>
                                 {product.is_active ? 'active' : 'inactive'}
-                            </Badge>
-                          </TableCell>
+                              </Badge>
+                            </TableCell>
                             <TableCell>{product.total_reviews || 0}</TableCell>
                             <TableCell className="text-sm text-gray-600">
                               {new Date(product.created_at || '').toLocaleDateString()}
                             </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedProduct(product);
-                                  setShowViewProductModal(true);
-                                }}
-                                title="View Product"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedProduct(product);
-                                  setEditProductForm({
-                                    name: product.name,
-                                    description: product.description,
-                                    short_description: product.short_description || '',
-                                    price: product.effective_price,
-                                    original_price: product.original_price || 0,
-                                    cost_price: product.cost_price || 0,
-                                    category_id: product.category?.id || 1,
-                                    subcategory_id: product.subcategory?.id,
-                                    brand_id: product.brand?.id,
-                                    sku: product.sku,
-                                    stock_quantity: product.stock_quantity,
-                                    min_stock_level: product.min_stock_level || 5,
-                                    weight: product.weight || 0,
-                                    dimensions: product.dimensions || '',
-                                    meta_title: product.meta_title || '',
-                                    meta_description: product.meta_description || '',
-                                    is_active: product.is_active,
-                                    is_featured: product.is_featured || false,
-                                    is_digital: product.is_digital || false
-                                  });
-                                  setShowEditProductModal(true);
-                                }}
-                                title="Edit Product"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedProduct(product);
+                                    setShowViewProductModal(true);
+                                  }}
+                                  title="View Product"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedProduct(product);
+                                    setEditProductForm({
+                                      name: product.name,
+                                      description: product.description,
+                                      short_description: product.short_description || '',
+                                      price: product.effective_price,
+                                      original_price: product.original_price || 0,
+                                      cost_price: product.cost_price || 0,
+                                      category_id: product.category?.id || 1,
+                                      subcategory_id: product.subcategory?.id,
+                                      brand_id: product.brand?.id,
+                                      sku: product.sku,
+                                      stock_quantity: product.stock_quantity,
+                                      min_stock_level: product.min_stock_level || 5,
+                                      weight: product.weight || 0,
+                                      dimensions: product.dimensions || '',
+                                      meta_title: product.meta_title || '',
+                                      meta_description: product.meta_description || '',
+                                      is_active: product.is_active,
+                                      is_featured: product.is_featured || false,
+                                      is_digital: product.is_digital || false
+                                    });
+                                    setShowEditProductModal(true);
+                                  }}
+                                  title="Edit Product"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
                         ))
                       )}
                     </TableBody>
@@ -629,7 +628,7 @@ const EditorDashboard: React.FC = () => {
                       className="pl-10 w-full sm:w-80"
                     />
                   </div>
-                  <Button 
+                  <Button
                     className="bg-gray-900 hover:bg-gray-800 w-full sm:w-auto"
                     onClick={() => setShowNewPostModal(true)}
                   >
@@ -655,8 +654,10 @@ const EditorDashboard: React.FC = () => {
                       {postsLoading ? (
                         <TableRow>
                           <TableCell colSpan={6} className="text-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                            <p className="mt-2 text-sm text-gray-500">Loading posts...</p>
+                            <div className="flex items-center justify-center">
+                              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                              Loading posts...
+                            </div>
                           </TableCell>
                         </TableRow>
                       ) : filteredBlogPosts.length === 0 ? (
@@ -667,29 +668,29 @@ const EditorDashboard: React.FC = () => {
                         </TableRow>
                       ) : (
                         filteredBlogPosts.map((post) => (
-                        <TableRow key={post.id}>
-                          <TableCell className="font-medium">{post.title}</TableCell>
-                          <TableCell>
-                            <Badge className={getStatusColor(post.status)}>
-                              {post.status}
-                            </Badge>
-                          </TableCell>
+                          <TableRow key={post.id}>
+                            <TableCell className="font-medium">{post.title}</TableCell>
+                            <TableCell>
+                              <Badge className={getStatusColor(post.status)}>
+                                {post.status}
+                              </Badge>
+                            </TableCell>
                             <TableCell>{post.views_count.toLocaleString()}</TableCell>
                             <TableCell>{post.comments_count}</TableCell>
                             <TableCell className="text-sm text-gray-600">
                               {new Date(post.updated_at).toLocaleDateString()}
                             </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                <Button variant="ghost" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
                         ))
                       )}
                     </TableBody>
@@ -714,7 +715,7 @@ const EditorDashboard: React.FC = () => {
                       className="pl-10 w-full sm:w-80"
                     />
                   </div>
-                  <Button 
+                  <Button
                     className="bg-gray-900 hover:bg-gray-800 w-full sm:w-auto"
                     onClick={() => setShowMediaUploadModal(true)}
                   >
@@ -742,8 +743,10 @@ const EditorDashboard: React.FC = () => {
                       {mediaLoading ? (
                         <TableRow>
                           <TableCell colSpan={8} className="text-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                            <p className="mt-2 text-sm text-gray-500">Loading media files...</p>
+                            <div className="flex items-center justify-center">
+                              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                              Loading media files...
+                            </div>
                           </TableCell>
                         </TableRow>
                       ) : filteredMediaFiles.length === 0 ? (
@@ -776,13 +779,13 @@ const EditorDashboard: React.FC = () => {
                             <TableCell className="text-sm text-gray-600">
                               {new Date(file.created_at).toLocaleDateString()}
                             </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                                <Button 
-                                  variant="ghost" 
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                <Button variant="ghost" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
                                   size="sm"
                                   onClick={() => {
                                     if (window.confirm('Are you sure you want to delete this file?')) {
@@ -797,10 +800,10 @@ const EditorDashboard: React.FC = () => {
                                   }}
                                 >
                                   <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
                         ))
                       )}
                     </TableBody>
@@ -814,29 +817,31 @@ const EditorDashboard: React.FC = () => {
           <TabsContent value="performance" className="space-y-6">
             {performanceLoading ? (
               <div className="flex justify-center items-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <p className="ml-2 text-gray-500">Loading performance metrics...</p>
+                <div className="flex items-center justify-center">
+                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                  Loading performance metrics...
+                </div>
               </div>
             ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Product Performance</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl">Product Performance</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Total Products</span>
                       <span className="text-2xl font-bold">{productPerformance?.total_products || 0}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
+                    </div>
+                    <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Active Products</span>
                       <span className="text-lg font-semibold text-green-600">{productPerformance?.active_products || 0}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
+                    </div>
+                    <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Total Views</span>
                       <span className="text-lg font-semibold">{productPerformance?.total_views?.toLocaleString() || 0}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
+                    </div>
+                    <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Average Rating</span>
                       <span className="text-lg font-semibold">{productPerformance?.average_rating?.toFixed(1) || 'N/A'}</span>
                     </div>
@@ -851,29 +856,29 @@ const EditorDashboard: React.FC = () => {
                             </div>
                           ))}
                         </div>
-                  </div>
+                      </div>
                     )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Content Performance</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl">Content Performance</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Total Posts</span>
                       <span className="text-2xl font-bold">{contentPerformance?.total_posts || 0}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
+                    </div>
+                    <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Published Posts</span>
                       <span className="text-lg font-semibold text-green-600">{contentPerformance?.published_posts || 0}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
+                    </div>
+                    <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Total Views</span>
                       <span className="text-lg font-semibold">{contentPerformance?.total_views?.toLocaleString() || 0}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
+                    </div>
+                    <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Total Comments</span>
                       <span className="text-lg font-semibold">{contentPerformance?.total_comments || 0}</span>
                     </div>
@@ -888,11 +893,11 @@ const EditorDashboard: React.FC = () => {
                             </div>
                           ))}
                         </div>
-                  </div>
+                      </div>
                     )}
-                </CardContent>
-              </Card>
-            </div>
+                  </CardContent>
+                </Card>
+              </div>
             )}
           </TabsContent>
         </Tabs>
@@ -924,7 +929,7 @@ const EditorDashboard: React.FC = () => {
                   <label className="block text-sm font-medium mb-1">Product Name *</label>
                   <Input
                     value={newProductForm.name}
-                    onChange={(e) => setNewProductForm({...newProductForm, name: e.target.value})}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
                     placeholder="Enter product name"
                   />
                 </div>
@@ -932,7 +937,7 @@ const EditorDashboard: React.FC = () => {
                   <label className="block text-sm font-medium mb-1">Short Description</label>
                   <Input
                     value={newProductForm.short_description}
-                    onChange={(e) => setNewProductForm({...newProductForm, short_description: e.target.value})}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, short_description: e.target.value })}
                     placeholder="Brief product description"
                   />
                 </div>
@@ -942,7 +947,7 @@ const EditorDashboard: React.FC = () => {
                     className="w-full p-2 border rounded-md"
                     rows={3}
                     value={newProductForm.description}
-                    onChange={(e) => setNewProductForm({...newProductForm, description: e.target.value})}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, description: e.target.value })}
                     placeholder="Enter detailed product description"
                   />
                 </div>
@@ -950,7 +955,7 @@ const EditorDashboard: React.FC = () => {
                   <label className="block text-sm font-medium mb-1">SKU</label>
                   <Input
                     value={newProductForm.sku}
-                    onChange={(e) => setNewProductForm({...newProductForm, sku: e.target.value})}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, sku: e.target.value })}
                     placeholder="Product SKU (optional)"
                   />
                 </div>
@@ -979,7 +984,7 @@ const EditorDashboard: React.FC = () => {
                     <select
                       className="w-full p-2 border rounded-md"
                       value={newProductForm.subcategory_id || ''}
-                      onChange={(e) => setNewProductForm({...newProductForm, subcategory_id: e.target.value ? parseInt(e.target.value) : undefined})}
+                      onChange={(e) => setNewProductForm({ ...newProductForm, subcategory_id: e.target.value ? parseInt(e.target.value) : undefined })}
                     >
                       <option value="">Select subcategory</option>
                       {subcategories.map((subcategory) => (
@@ -995,7 +1000,7 @@ const EditorDashboard: React.FC = () => {
                   <select
                     className="w-full p-2 border rounded-md"
                     value={newProductForm.brand_id || ''}
-                    onChange={(e) => setNewProductForm({...newProductForm, brand_id: e.target.value ? parseInt(e.target.value) : undefined})}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, brand_id: e.target.value ? parseInt(e.target.value) : undefined })}
                   >
                     <option value="">Select brand</option>
                     {brands.map((brand) => (
@@ -1017,7 +1022,7 @@ const EditorDashboard: React.FC = () => {
                       type="number"
                       step="0.01"
                       value={newProductForm.price}
-                      onChange={(e) => setNewProductForm({...newProductForm, price: parseFloat(e.target.value)})}
+                      onChange={(e) => setNewProductForm({ ...newProductForm, price: parseFloat(e.target.value) })}
                       placeholder="0.00"
                     />
                   </div>
@@ -1033,7 +1038,7 @@ const EditorDashboard: React.FC = () => {
                     <Input
                       type="number"
                       value={newProductForm.stock_quantity}
-                      onChange={(e) => setNewProductForm({...newProductForm, stock_quantity: parseInt(e.target.value)})}
+                      onChange={(e) => setNewProductForm({ ...newProductForm, stock_quantity: parseInt(e.target.value) })}
                       placeholder="0"
                     />
                   </div>
@@ -1042,7 +1047,7 @@ const EditorDashboard: React.FC = () => {
                     <Input
                       type="number"
                       value={newProductForm.min_stock_level}
-                      onChange={(e) => setNewProductForm({...newProductForm, min_stock_level: parseInt(e.target.value)})}
+                      onChange={(e) => setNewProductForm({ ...newProductForm, min_stock_level: parseInt(e.target.value) })}
                       placeholder="5"
                     />
                   </div>
@@ -1053,7 +1058,7 @@ const EditorDashboard: React.FC = () => {
                     type="number"
                     step="0.01"
                     value={newProductForm.weight}
-                    onChange={(e) => setNewProductForm({...newProductForm, weight: parseFloat(e.target.value)})}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, weight: parseFloat(e.target.value) })}
                     placeholder="0.00"
                   />
                 </div>
@@ -1061,7 +1066,7 @@ const EditorDashboard: React.FC = () => {
                   <label className="block text-sm font-medium mb-1">Dimensions</label>
                   <Input
                     value={newProductForm.dimensions}
-                    onChange={(e) => setNewProductForm({...newProductForm, dimensions: e.target.value})}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, dimensions: e.target.value })}
                     placeholder="L x W x H (e.g., 10x5x2)"
                   />
                 </div>
@@ -1098,7 +1103,7 @@ const EditorDashboard: React.FC = () => {
                 <label className="block text-sm font-medium mb-1">Post Title</label>
                 <Input
                   value={newPostForm.title}
-                  onChange={(e) => setNewPostForm({...newPostForm, title: e.target.value})}
+                  onChange={(e) => setNewPostForm({ ...newPostForm, title: e.target.value })}
                   placeholder="Enter post title"
                 />
               </div>
@@ -1108,7 +1113,7 @@ const EditorDashboard: React.FC = () => {
                   className="w-full p-2 border rounded-md"
                   rows={6}
                   value={newPostForm.content}
-                  onChange={(e) => setNewPostForm({...newPostForm, content: e.target.value})}
+                  onChange={(e) => setNewPostForm({ ...newPostForm, content: e.target.value })}
                   placeholder="Enter post content"
                 />
               </div>
@@ -1117,7 +1122,7 @@ const EditorDashboard: React.FC = () => {
                 <select
                   className="w-full p-2 border rounded-md"
                   value={newPostForm.status}
-                  onChange={(e) => setNewPostForm({...newPostForm, status: e.target.value as any})}
+                  onChange={(e) => setNewPostForm({ ...newPostForm, status: e.target.value as any })}
                 >
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>
@@ -1166,7 +1171,7 @@ const EditorDashboard: React.FC = () => {
                   ))}
                 </select>
               </div>
-              
+
               {/* Usage Type */}
               <div>
                 <label className="block text-sm font-medium mb-1">Usage Type</label>
@@ -1181,7 +1186,7 @@ const EditorDashboard: React.FC = () => {
                   <option value="blog_cover">Blog Cover</option>
                 </select>
               </div>
-              
+
               {/* File Upload */}
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
@@ -1234,7 +1239,7 @@ const EditorDashboard: React.FC = () => {
                 ✕
               </Button>
             </div>
-            
+
             <div className="space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
@@ -1358,7 +1363,7 @@ const EditorDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-end space-x-2 mt-6">
               <Button variant="outline" onClick={() => setShowViewProductModal(false)}>
                 Close
@@ -1381,7 +1386,7 @@ const EditorDashboard: React.FC = () => {
                   <label className="block text-sm font-medium mb-1">Product Name *</label>
                   <Input
                     value={editProductForm.name}
-                    onChange={(e) => setEditProductForm({...editProductForm, name: e.target.value})}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, name: e.target.value })}
                     placeholder="Enter product name"
                   />
                 </div>
@@ -1389,7 +1394,7 @@ const EditorDashboard: React.FC = () => {
                   <label className="block text-sm font-medium mb-1">Short Description</label>
                   <Input
                     value={editProductForm.short_description}
-                    onChange={(e) => setEditProductForm({...editProductForm, short_description: e.target.value})}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, short_description: e.target.value })}
                     placeholder="Brief product description"
                   />
                 </div>
@@ -1399,7 +1404,7 @@ const EditorDashboard: React.FC = () => {
                     className="w-full p-2 border rounded-md"
                     rows={3}
                     value={editProductForm.description}
-                    onChange={(e) => setEditProductForm({...editProductForm, description: e.target.value})}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, description: e.target.value })}
                     placeholder="Enter detailed product description"
                   />
                 </div>
@@ -1407,7 +1412,7 @@ const EditorDashboard: React.FC = () => {
                   <label className="block text-sm font-medium mb-1">SKU</label>
                   <Input
                     value={editProductForm.sku}
-                    onChange={(e) => setEditProductForm({...editProductForm, sku: e.target.value})}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, sku: e.target.value })}
                     placeholder="Product SKU (optional)"
                   />
                 </div>
@@ -1424,7 +1429,7 @@ const EditorDashboard: React.FC = () => {
                       value={editProductForm.category_id}
                       onChange={(e) => {
                         const categoryId = parseInt(e.target.value);
-                        setEditProductForm({...editProductForm, category_id: categoryId, subcategory_id: undefined});
+                        setEditProductForm({ ...editProductForm, category_id: categoryId, subcategory_id: undefined });
                         fetchSubcategories(categoryId);
                       }}
                     >
@@ -1440,7 +1445,7 @@ const EditorDashboard: React.FC = () => {
                     <select
                       className="w-full p-2 border rounded-md"
                       value={editProductForm.subcategory_id || ''}
-                      onChange={(e) => setEditProductForm({...editProductForm, subcategory_id: e.target.value ? parseInt(e.target.value) : undefined})}
+                      onChange={(e) => setEditProductForm({ ...editProductForm, subcategory_id: e.target.value ? parseInt(e.target.value) : undefined })}
                     >
                       <option value="">Select subcategory</option>
                       {subcategories.map((subcategory) => (
@@ -1456,7 +1461,7 @@ const EditorDashboard: React.FC = () => {
                   <select
                     className="w-full p-2 border rounded-md"
                     value={editProductForm.brand_id || ''}
-                    onChange={(e) => setEditProductForm({...editProductForm, brand_id: e.target.value ? parseInt(e.target.value) : undefined})}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, brand_id: e.target.value ? parseInt(e.target.value) : undefined })}
                   >
                     <option value="">Select brand</option>
                     {brands.map((brand) => (
@@ -1478,7 +1483,7 @@ const EditorDashboard: React.FC = () => {
                       type="number"
                       step="0.01"
                       value={editProductForm.price}
-                      onChange={(e) => setEditProductForm({...editProductForm, price: parseFloat(e.target.value)})}
+                      onChange={(e) => setEditProductForm({ ...editProductForm, price: parseFloat(e.target.value) })}
                       placeholder="0.00"
                     />
                   </div>
@@ -1494,7 +1499,7 @@ const EditorDashboard: React.FC = () => {
                     <Input
                       type="number"
                       value={editProductForm.stock_quantity}
-                      onChange={(e) => setEditProductForm({...editProductForm, stock_quantity: parseInt(e.target.value)})}
+                      onChange={(e) => setEditProductForm({ ...editProductForm, stock_quantity: parseInt(e.target.value) })}
                       placeholder="0"
                     />
                   </div>
@@ -1503,7 +1508,7 @@ const EditorDashboard: React.FC = () => {
                     <Input
                       type="number"
                       value={editProductForm.min_stock_level}
-                      onChange={(e) => setEditProductForm({...editProductForm, min_stock_level: parseInt(e.target.value)})}
+                      onChange={(e) => setEditProductForm({ ...editProductForm, min_stock_level: parseInt(e.target.value) })}
                       placeholder="5"
                     />
                   </div>
@@ -1514,7 +1519,7 @@ const EditorDashboard: React.FC = () => {
                     type="number"
                     step="0.01"
                     value={editProductForm.weight}
-                    onChange={(e) => setEditProductForm({...editProductForm, weight: parseFloat(e.target.value)})}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, weight: parseFloat(e.target.value) })}
                     placeholder="0.00"
                   />
                 </div>
@@ -1522,14 +1527,14 @@ const EditorDashboard: React.FC = () => {
                   <label className="block text-sm font-medium mb-1">Dimensions</label>
                   <Input
                     value={editProductForm.dimensions}
-                    onChange={(e) => setEditProductForm({...editProductForm, dimensions: e.target.value})}
+                    onChange={(e) => setEditProductForm({ ...editProductForm, dimensions: e.target.value })}
                     placeholder="L x W x H (e.g., 10x5x2)"
                   />
                 </div>
               </div>
 
             </div>
-            
+
             <div className="flex justify-end space-x-2 mt-6">
               <Button variant="outline" onClick={() => setShowEditProductModal(false)} disabled={creatingProduct}>
                 Cancel

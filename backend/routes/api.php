@@ -14,6 +14,9 @@ use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -128,6 +131,37 @@ Route::middleware('auth:sanctum')->group(function () {
                 'status' => auth()->user()->status
             ]
         ]);
+    });
+
+    // Customer Dashboard Routes
+    Route::prefix('customer')->group(function () {
+        // Dashboard data
+        Route::get('/dashboard', [CustomerController::class, 'getDashboardData']);
+        Route::get('/stats', [CustomerController::class, 'getCustomerStats']);
+        Route::get('/orders/recent', [CustomerController::class, 'getRecentOrders']);
+        Route::get('/orders', [CustomerController::class, 'getUserOrders']);
+        Route::get('/orders/{id}', [CustomerController::class, 'getOrderDetails']);
+        Route::get('/real-time-updates', [CustomerController::class, 'getRealTimeUpdates']);
+        
+        // Profile management
+        Route::put('/profile', [CustomerController::class, 'updateProfile']);
+        Route::post('/change-password', [CustomerController::class, 'changePassword']);
+        
+        // Address management
+        Route::prefix('addresses')->group(function () {
+            Route::get('/', [AddressController::class, 'getAddresses']);
+            Route::post('/', [AddressController::class, 'createAddress']);
+            Route::put('/{id}', [AddressController::class, 'updateAddress']);
+            Route::delete('/{id}', [AddressController::class, 'deleteAddress']);
+            Route::patch('/{id}/default', [AddressController::class, 'setDefaultAddress']);
+        });
+        
+        // Notifications
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'getNotifications']);
+            Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
+        });
     });
 
     // Test endpoints for different user types

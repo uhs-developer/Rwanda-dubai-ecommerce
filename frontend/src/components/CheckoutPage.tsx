@@ -1,10 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
@@ -21,8 +20,10 @@ import {
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTranslation } from "../../node_modules/react-i18next";
 import { useCart } from "../contexts/CartContext";
-import { FlutterwavePayment } from "./FlutterwavePayment";
-import { FlutterwaveResponse, FlutterwaveError } from "../services/flutterwaveService";
+import {
+    useFlutterwave,
+    closePaymentModal,
+} from "flutterwave-react-v3";
 
 interface CheckoutPageProps {
   onBack: () => void;
@@ -58,65 +59,85 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
     agreeTerms: false,
   });
 
-  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.total_price, 0);
-  const shipping = 35; // Fixed shipping cost
+    const shipping = 35; // Fixed shipping cost
   const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
-  
-  // Debug logging for payment calculation
-  console.log('Payment calculation debug:', {
-    cartItems: cartItems.length,
-    subtotal,
-    shipping,
-    tax,
-    total,
-    totalType: typeof total,
-    isNaN: isNaN(total)
-  });
+
+    const isValid = formData.firstName.trim() &&
+        formData.lastName.trim() &&
+        formData.email.trim() &&
+        formData.phone.trim() &&
+        formData.address.trim() &&
+        formData.city.trim() &&
+        formData.district.trim() &&
+        total > 0;
+
+    // Debug logging for payment calculation
+    console.log('Payment calculation debug:', {
+        cartItems: cartItems.length,
+        subtotal,
+        shipping,
+        tax,
+        total,
+        totalType: typeof total,
+        isNaN: isNaN(total)
+    });
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaymentSuccess = useCallback((response: FlutterwaveResponse) => {
-    console.log('Payment successful:', response);
-    setPaymentStatus('success');
-    
-    const orderData = {
-      items: cartItems,
-      shipping: formData,
-      payment: {
-        method: formData.paymentMethod,
-        tx_ref: response.data?.tx_ref,
-        flw_ref: response.data?.flw_ref,
-        status: 'completed'
-      },
-      totals: { subtotal, shipping, tax, total },
-      timestamp: new Date(),
+    const config: any = {
+        public_key:
+            (import.meta as any).env?.VITE_FLUTTERWAVE_PUBLIC_KEY ||
+            // fallback for quick testing — replace with your key or env
+            "FLWPUBK_TEST-xxxxxxxxxxxxxxxxxxxxx-X",
+        tx_ref: `tx-${Date.now()}`,
+        amount: total, // must be a number
+        currency: "USD", // change to your supported currency if needed
+        payment_options: "card,ussd,banktransfer,mpesa,mobilemoneyrw,mobilemoneygh,mobilemoneyuganda,mobilemoneyzambia",
+
+        customer: {
+            email: formData.email,
+            phonenumber: formData.phone,
+            name: `${formData.firstName} ${formData.lastName}`.trim(),
+        },
+        meta: {
+            address: formData.address,
+            city: formData.city,
+            district: formData.district,
+        },
+        customizations: {
+            title: "Order Payment",
+            description: "Payment for your order and shipping",
+            logo:
+                "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/flutter.svg",
+        },
     };
 
-    // Delay to show success state before proceeding
-    setTimeout(() => {
-      onPlaceOrder(orderData);
-    }, 2000);
-  }, [cartItems, formData, subtotal, shipping, tax, total, onPlaceOrder]);
+    const handleFlutterPayment = useFlutterwave(config);
 
-  const handlePaymentError = useCallback((error: FlutterwaveError) => {
-    console.error('Payment failed:', error);
-    setPaymentStatus('error');
-    setPaymentError(error.message);
-  }, []);
+
+    const onPay = () => {
+        if (!isValid) return;
+        handleFlutterPayment({
+            callback: (response) => {
+                // You should verify on your backend using response.transaction_id
+                console.log("Flutterwave response:", response);
+                alert(`Payment status: ${response.status}`);
+                closePaymentModal(); // closes the modal programmatically
+            },
+            onClose: () => {
+                console.log("Flutterwave modal closed");
+            },
+        });
+  };
 
   const handleSubmit = () => {
     if (!formData.agreeTerms) {
       alert("Please agree to the terms and conditions");
-      return;
-    }
-
-    if (formData.paymentMethod === 'flutterwave') {
-      // Payment will be handled by FlutterwavePayment component
       return;
     }
 
@@ -155,6 +176,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
     "Nyagatare", "Gatsibo", "Kayonza", "Kirehe", "Ngoma", "Bugesera"
   ];
 
+
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Header */}
@@ -173,8 +195,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
       <div className="flex items-center justify-center mb-8">
         {steps.map((step, index) => (
           <div key={step.id} className="flex items-center">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-              currentStep >= step.id 
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${currentStep >= step.id
                 ? 'bg-primary border-primary text-primary-foreground' 
                 : 'border-muted-foreground text-muted-foreground'
             }`}>
@@ -188,8 +209,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
               {step.title}
             </span>
             {index < steps.length - 1 && (
-              <div className={`w-16 h-0.5 mx-4 ${
-                currentStep > step.id ? 'bg-primary' : 'bg-muted'
+                            <div className={`w-16 h-0.5 mx-4 ${currentStep > step.id ? 'bg-primary' : 'bg-muted'
               }`} />
             )}
           </div>
@@ -341,7 +361,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                     <RadioGroupItem value="flutterwave" id="flutterwave" />
                     <Label htmlFor="flutterwave" className="flex items-center gap-2">
                       <CreditCard className="h-4 w-4" />
-                      Flutterwave (Card, Mobile Money, USSD)
+                                            Online Payment (Coming Soon)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -364,29 +384,17 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                   <div className="space-y-4 border rounded-lg p-4">
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-4">
-                        Pay securely with Flutterwave. Supports Card, Mobile Money, and USSD payments.
-                      </p>
-                      <FlutterwavePayment
-                        email={formData.email || ''}
-                        amount={Number(total) || 0}
-                        customerName={`${formData.firstName || ''} ${formData.lastName || ''}`.trim()}
-                        phoneNumber={formData.phone || ''}
-                        metadata={{
-                          customer_name: String(`${formData.firstName || ''} ${formData.lastName || ''}`.trim()),
-                          phone: String(formData.phone || ''),
-                          address: String(formData.address || ''),
-                          city: String(formData.city || ''),
-                          district: String(formData.district || ''),
-                          items: cartItems.map(item => ({
-                            name: String(item.product?.name || ''),
-                            quantity: String(Number(item.quantity) || 0),
-                            price: String(Number(item.total_price) || 0)
-                          }))
-                        }}
-                        onSuccess={handlePaymentSuccess}
-                        onError={handlePaymentError}
-                        disabled={!formData.email || !formData.firstName || !formData.lastName}
-                      />
+                                                Payment integration coming soon. This button currently does nothing.
+                                            </p>
+                                            <Button
+                                                onClick={onPay}
+                                                disabled={!isValid}
+                                                size="lg"
+                                                className="w-full"
+                                            >
+                                                <CreditCard className="h-4 w-4 mr-2" />
+                                                Pay - ${total.toFixed(2)}
+                                            </Button>
                     </div>
                   </div>
                 )}
@@ -550,7 +558,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                   <h3 className="font-semibold mb-2">Payment Method</h3>
                   <div className="text-sm text-muted-foreground">
                     {formData.paymentMethod === 'flutterwave' && (
-                      <p>Flutterwave (Card, Mobile Money, USSD)</p>
+                                            <p>Online Payment (Coming Soon)</p>
                     )}
                     {formData.paymentMethod === 'card' && (
                       <p>Credit/Debit Card ending in {formData.cardNumber.slice(-4)}</p>
@@ -586,34 +594,19 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                     variant="outline" 
                     size="lg" 
                     onClick={() => setCurrentStep(2)}
-                    disabled={paymentStatus === 'processing' || paymentStatus === 'success'}
                   >
                     Back
                   </Button>
                   {formData.paymentMethod === 'flutterwave' ? (
-                    <div className="flex-1">
-                      <FlutterwavePayment
-                        email={formData.email || ''}
-                        amount={Number(total) || 0}
-                        customerName={`${formData.firstName || ''} ${formData.lastName || ''}`.trim()}
-                        phoneNumber={formData.phone || ''}
-                        metadata={{
-                          customer_name: String(`${formData.firstName || ''} ${formData.lastName || ''}`.trim()),
-                          phone: String(formData.phone || ''),
-                          address: String(formData.address || ''),
-                          city: String(formData.city || ''),
-                          district: String(formData.district || ''),
-                          items: cartItems.map(item => ({
-                            name: String(item.product?.name || ''),
-                            quantity: String(Number(item.quantity) || 0),
-                            price: String(Number(item.total_price) || 0)
-                          }))
-                        }}
-                        onSuccess={handlePaymentSuccess}
-                        onError={handlePaymentError}
-                        disabled={!formData.agreeTerms || !formData.email || !formData.firstName || !formData.lastName}
-                      />
-                    </div>
+                                        <Button
+                                            size="lg"
+                                            className="flex-1"
+                                             onClick={onPay}
+                                            disabled={!formData.agreeTerms || !isValid}
+                                        >
+                                            <Lock className="h-4 w-4 mr-2" />
+                                            Pay - ${total.toFixed(2)}
+                                        </Button>
                   ) : (
                     <Button 
                       size="lg" 
@@ -645,7 +638,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
+                                    <span>${shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Tax</span>
@@ -678,3 +671,4 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
     </div>
   );
 }
+

@@ -8,7 +8,6 @@ import { Input } from './ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { 
   Eye, 
-  Edit, 
   Trash2, 
   Plus, 
   ArrowLeft,
@@ -743,7 +742,7 @@ const AdminDashboard: React.FC = () => {
             <CardContent>
               <div className="text-xl sm:text-2xl font-bold">
                 {dashboardLoading ? (
-                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                  <div className="animate-pulse h-8 w-16 rounded">0</div>
                 ) : (
                   dashboardStats?.pending_orders || 0
                 )}
@@ -751,7 +750,7 @@ const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Need attention</span>
                 <Badge className="bg-blue-100 text-blue-800 text-xs">
-                  {dashboardLoading ? '...' : `${dashboardStats?.new_orders_today || 0} new`}
+                  {dashboardLoading ? '0 new' : `${dashboardStats?.new_orders_today || 0} new`}
                 </Badge>
               </div>
             </CardContent>
@@ -765,7 +764,7 @@ const AdminDashboard: React.FC = () => {
             <CardContent>
               <div className="text-xl sm:text-2xl font-bold">
                 {dashboardLoading ? (
-                  <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+                  <div className="animate-pulse h-8 w-20 rounded">0</div>
                 ) : (
                   dashboardStats?.total_customers?.toLocaleString() || 0
                 )}
@@ -773,7 +772,7 @@ const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Active users</span>
                 <Badge className="bg-blue-100 text-blue-800 text-xs">
-                  {dashboardLoading ? '...' : `${dashboardStats?.active_customers_percentage || 0}%`}
+                  {dashboardLoading ? '0' : `${dashboardStats?.active_customers_percentage || 0}%`}
                 </Badge>
               </div>
             </CardContent>
@@ -787,7 +786,7 @@ const AdminDashboard: React.FC = () => {
             <CardContent>
               <div className="text-xl sm:text-2xl font-bold">
                 {dashboardLoading ? (
-                  <div className="animate-pulse bg-gray-200 h-8 w-12 rounded"></div>
+                  <div className="animate-pulse h-8 w-12 rounded">0</div>
                 ) : (
                   dashboardStats?.products_pending || 0
                 )}
@@ -795,7 +794,7 @@ const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Awaiting approval</span>
                 <Badge className="bg-blue-100 text-blue-800 text-xs">
-                  {dashboardLoading ? '...' : `${dashboardStats?.new_products_this_week || 0} new`}
+                  {dashboardLoading ? '0 new' : `${dashboardStats?.new_products_this_week || 0} new`}
                 </Badge>
               </div>
             </CardContent>
@@ -809,7 +808,7 @@ const AdminDashboard: React.FC = () => {
             <CardContent>
               <div className="text-xl sm:text-2xl font-bold">
                 {dashboardLoading ? (
-                  <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+                  <div className="animate-pulse h-8 w-24 rounded">0</div>
                 ) : (
                   `$${dashboardStats?.monthly_revenue?.toLocaleString() || 0}`
                 )}
@@ -817,7 +816,7 @@ const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">This month</span>
                 <Badge className="bg-blue-100 text-blue-800 text-xs">
-                  {dashboardLoading ? '...' : `${dashboardStats?.revenue_growth_percentage || 0}%`}
+                  {dashboardLoading ? '0' : `${dashboardStats?.revenue_growth_percentage || 0}%`}
                 </Badge>
               </div>
             </CardContent>
@@ -997,8 +996,8 @@ const AdminDashboard: React.FC = () => {
                         <TableRow>
                           <TableCell colSpan={7} className="text-center py-8">
                             <div className="flex items-center justify-center">
-                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                              <span className="ml-2">Loading orders...</span>
+                              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                              Loading orders...
                             </div>
                           </TableCell>
                         </TableRow>
@@ -1113,8 +1112,8 @@ const AdminDashboard: React.FC = () => {
                         <TableRow>
                           <TableCell colSpan={8} className="text-center py-8">
                             <div className="flex items-center justify-center">
-                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                              <span className="ml-2">Loading customers...</span>
+                              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                              Loading customers...
                             </div>
                           </TableCell>
                         </TableRow>

@@ -1,7 +1,7 @@
 export interface FlutterwaveConfig {
   public_key: string;
   tx_ref: string;
-  amount: number;
+  amount: string; // Changed from number to string to prevent val.replace errors
   currency: string;
   payment_options: string;
   redirect_url?: string;
@@ -88,9 +88,50 @@ export class FlutterwaveService {
     return `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
+  private convertMetadataToStrings(metadata: any): any {
+    if (!metadata || typeof metadata !== 'object') {
+      return {};
+    }
+
+    const converted: any = {};
+    for (const [key, value] of Object.entries(metadata)) {
+      if (value === null || value === undefined) {
+        converted[key] = '';
+      } else if (typeof value === 'object' && Array.isArray(value)) {
+        // Handle arrays (like items array)
+        converted[key] = value.map((item: any) => {
+          if (typeof item === 'object' && item !== null) {
+            const convertedItem: any = {};
+            for (const [itemKey, itemValue] of Object.entries(item)) {
+              // Ensure all values are strings and sanitize them
+              convertedItem[itemKey] = this.sanitizeString(String(itemValue || ''));
+            }
+            return convertedItem;
+          }
+          return this.sanitizeString(String(item || ''));
+        });
+      } else if (typeof value === 'object' && value !== null) {
+        // Handle nested objects
+        converted[key] = this.convertMetadataToStrings(value);
+      } else {
+        // Convert primitive values to strings and sanitize them
+        converted[key] = this.sanitizeString(String(value || ''));
+      }
+    }
+    return converted;
+  }
+
+  private sanitizeString(value: string): string {
+    // Remove any characters that might cause issues with val.replace
+    return value
+      .replace(/[^\w\s@.-]/g, '') // Keep only alphanumeric, spaces, @, ., and -
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .trim(); // Remove leading/trailing spaces
+  }
+
   public createPaymentConfig(
     email: string,
-    amount: number,
+    amount: string | number, // Accept both string and number, convert to string internally
     customerName: string,
     phoneNumber?: string,
     txRef?: string,
@@ -115,27 +156,45 @@ export class FlutterwaveService {
       phoneNumber: typeof phoneNumber, phoneNumberValue: phoneNumber
     });
 
+    // Ensure all values are properly converted to strings and sanitized
     const config = {
-      public_key: String(publicKey),
-      tx_ref: String(txRef || this.generateTxRef()),
+      public_key: this.sanitizeString(String(publicKey)),
+      tx_ref: this.sanitizeString(String(txRef || this.generateTxRef())),
       amount: String(Number(amount).toFixed(2)), // Convert to string with 2 decimal places
-      currency: 'USD', // You can change this to RWF for Rwanda
-      payment_options: 'card,mobilemoney,ussd',
-      redirect_url: String(window.location.origin + '/checkout'),
+      currency: String('USD'), // Explicitly convert to string
+      payment_options: String('card,mobilemoney,ussd'), // Explicitly convert to string
+      redirect_url: this.sanitizeString(String(window.location.origin + '/checkout')),
       customer: {
-        email: String(email || ''),
-        phone_number: phoneNumber ? String(phoneNumber) : undefined,
-        name: String(customerName || ''),
+        email: this.sanitizeString(String(email || '')),
+        phone_number: phoneNumber ? this.sanitizeString(String(phoneNumber)) : String(''), // Convert undefined to empty string
+        name: this.sanitizeString(String(customerName || '')),
       },
       customizations: {
-        title: 'TechBridge - Dubai to Rwanda',
-        description: 'Payment for your order',
-        logo: String(window.location.origin + '/vite.svg'),
+        title: this.sanitizeString(String('TechBridge - Dubai to Rwanda')),
+        description: this.sanitizeString(String('Payment for your order')),
+        logo: this.sanitizeString(String(window.location.origin + '/vite.svg')),
       },
-      meta: metadata || {},
+      meta: this.convertMetadataToStrings(metadata || {}),
     };
 
     console.log('Flutterwave config created:', { ...config, public_key: publicKey.substring(0, 15) + '...' });
+    
+    // Debug: Check all values are strings
+    console.log('String validation check:', {
+      public_key: typeof config.public_key,
+      tx_ref: typeof config.tx_ref,
+      amount: typeof config.amount,
+      currency: typeof config.currency,
+      payment_options: typeof config.payment_options,
+      redirect_url: typeof config.redirect_url,
+      customer_email: typeof config.customer.email,
+      customer_phone: typeof config.customer.phone_number,
+      customer_name: typeof config.customer.name,
+      customizations_title: typeof config.customizations.title,
+      customizations_description: typeof config.customizations.description,
+      customizations_logo: typeof config.customizations.logo,
+      meta: typeof config.meta
+    });
     
     // Validate required fields for Flutterwave
     if (!config.customer.email) {
@@ -157,6 +216,24 @@ export class FlutterwaveService {
     }
     if (typeof config.tx_ref !== 'string') {
       throw new Error('Transaction reference must be a string for Flutterwave');
+    }
+    if (typeof config.currency !== 'string') {
+      throw new Error('Currency must be a string for Flutterwave');
+    }
+    if (typeof config.payment_options !== 'string') {
+      throw new Error('Payment options must be a string for Flutterwave');
+    }
+    if (typeof config.redirect_url !== 'string') {
+      throw new Error('Redirect URL must be a string for Flutterwave');
+    }
+    if (typeof config.customer.email !== 'string') {
+      throw new Error('Customer email must be a string for Flutterwave');
+    }
+    if (typeof config.customer.name !== 'string') {
+      throw new Error('Customer name must be a string for Flutterwave');
+    }
+    if (config.customer.phone_number && typeof config.customer.phone_number !== 'string') {
+      throw new Error('Customer phone number must be a string for Flutterwave');
     }
     
     console.log('Flutterwave validation passed:', {

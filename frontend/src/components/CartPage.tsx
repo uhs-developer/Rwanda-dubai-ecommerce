@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { Badge } from "./ui/badge";
@@ -18,29 +17,13 @@ export function CartPage({
   onContinueShopping,
 }: CartPageProps) {
   const { cartItems, updateCartItem, removeFromCart } = useCart();
-  const [promoCode, setPromoCode] = useState("");
-  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.total_price, 0);
-  const promoDiscount = appliedPromo === "SAVE10" ? subtotal * 0.1 : 0;
   const shipping = 35; // Fixed shipping cost
-  const tax = (subtotal - promoDiscount) * 0.05; // 5% tax
-  const total = subtotal - promoDiscount + shipping + tax;
+  const tax = subtotal * 0.05; // 5% tax
+  const total = subtotal + shipping + tax;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const applyPromoCode = () => {
-    if (promoCode.toUpperCase() === "SAVE10") {
-      setAppliedPromo("SAVE10");
-      setPromoCode("");
-    } else {
-      // Show error toast in real app
-      alert("Invalid promo code");
-    }
-  };
-
-  const removePromoCode = () => {
-    setAppliedPromo(null);
-  };
 
   if (cartItems.length === 0) {
     return (
@@ -195,34 +178,6 @@ export function CartPage({
               <CardTitle>Order Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Promo Code */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Promo Code</label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter code"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                    disabled={!!appliedPromo}
-                  />
-                  <Button 
-                    variant="outline" 
-                    onClick={applyPromoCode}
-                    disabled={!promoCode || !!appliedPromo}
-                  >
-                    Apply
-                  </Button>
-                </div>
-                {appliedPromo && (
-                  <div className="flex items-center justify-between mt-2">
-                    <Badge variant="secondary">SAVE10 Applied</Badge>
-                    <Button variant="ghost" size="sm" onClick={removePromoCode}>
-                      Remove
-                    </Button>
-                  </div>
-                )}
-              </div>
-
               <Separator />
 
               {/* Price Breakdown */}
@@ -231,12 +186,6 @@ export function CartPage({
                   <span>Subtotal ({totalItems} items)</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
-                {promoDiscount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Promo Discount</span>
-                    <span>-${promoDiscount.toFixed(2)}</span>
-                  </div>
-                )}
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span>${shipping.toFixed(2)}</span>

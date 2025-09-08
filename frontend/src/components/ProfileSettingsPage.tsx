@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { UserService } from "../services/user";
+import { CustomerDashboardService } from "../services/customerDashboard";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -58,7 +58,7 @@ export function ProfileSettingsPage({ user, onBack, onUpdateUser }: ProfileSetti
     clearErrors();
     
     try {
-      const response = await UserService.updateProfile({
+      const response = await CustomerDashboardService.updateProfile({
         name: formData.name,
         phone: formData.phone || undefined,
         avatar: formData.avatar || undefined

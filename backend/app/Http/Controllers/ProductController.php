@@ -30,11 +30,10 @@ class ProductController extends Controller
             if ($detailed) {
                 $withRelations[] = 'images';
             } else {
-                $withRelations[] = [
-                    'images' => function ($query) {
-                        $query->where('is_primary', true)->limit(1);
-                    }
-                ];
+                // Add as keyed relation to avoid nested arrays which can trigger Eloquent errors
+                $withRelations['images'] = function ($query) {
+                    $query->where('is_primary', true)->limit(1);
+                };
             }
             
             $query = Product::query()->with($withRelations);
@@ -166,11 +165,10 @@ class ProductController extends Controller
             if ($detailed) {
                 $withRelations[] = 'images';
             } else {
-                $withRelations[] = [
-                    'images' => function ($query) {
-                        $query->where('is_primary', true)->limit(1);
-                    }
-                ];
+                // Add as keyed relation to avoid nested arrays which can trigger Eloquent errors
+                $withRelations['images'] = function ($query) {
+                    $query->where('is_primary', true)->limit(1);
+                };
             }
             
             $query = Product::query()->active()->search($searchTerm)->with($withRelations);
