@@ -36,6 +36,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
+            // Drop foreign key constraint first
+            $table->dropForeign(['author_id']);
+            
+            // Then drop the columns
             $table->dropColumn([
                 'slug', 'excerpt', 'content', 'cover_image', 'status', 
                 'published_at', 'author_id', 'meta_data', 'views_count', 'comments_count'

@@ -13,13 +13,44 @@ use Illuminate\Support\Facades\Validator;
 class CartController extends Controller
 {
     /**
+     * Resolve guest session id from header, query, or Laravel session.
+     */
+    private function resolveGuestSessionId(Request $request): ?string
+    {
+        $headerSessionId = $request->header('X-Session-Id');
+        if (!empty($headerSessionId)) {
+            return $headerSessionId;
+        }
+
+        $querySessionId = $request->query('session_id');
+        if (!empty($querySessionId)) {
+            return $querySessionId;
+        }
+
+        if ($request->hasSession()) {
+            return $request->session()->getId();
+        }
+
+        return null;
+    }
+
+    /**
      * Get cart items for authenticated user or guest session
      */
     public function index(Request $request): JsonResponse
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                $sessionId = $this->resolveGuestSessionId($request);
+                if (!$sessionId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest cart. Provide X-Session-Id header or enable cookies.'
+                    ], 400);
+                }
+            }
 
             $query = CartItem::with(['product.images', 'product.brand', 'product.category']);
 
@@ -92,7 +123,16 @@ class CartController extends Controller
             }
 
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                $sessionId = $this->resolveGuestSessionId($request);
+                if (!$sessionId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest cart. Provide X-Session-Id header or enable cookies.'
+                    ], 400);
+                }
+            }
 
             DB::beginTransaction();
 
@@ -176,7 +216,16 @@ class CartController extends Controller
             }
 
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                $sessionId = $this->resolveGuestSessionId($request);
+                if (!$sessionId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest cart. Provide X-Session-Id header or enable cookies.'
+                    ], 400);
+                }
+            }
 
             $cartItem = CartItem::where('id', $id);
 
@@ -232,17 +281,36 @@ class CartController extends Controller
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
-
-            $cartItem = CartItem::where('id', $id);
-
-            if ($userId) {
-                $cartItem->where('user_id', $userId);
-            } else {
-                $cartItem->where('session_id', $sessionId);
+            $sessionId = null;
+            if (!$userId) {
+                $sessionId = $this->resolveGuestSessionId($request);
+                if (!$sessionId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest cart. Provide X-Session-Id header or enable cookies.'
+                    ], 400);
+                }
             }
 
-            $cartItem = $cartItem->first();
+            // Try treat {id} as cart item id first
+            $cartItemQuery = CartItem::where('id', $id);
+            if ($userId) {
+                $cartItemQuery->where('user_id', $userId);
+            } else {
+                $cartItemQuery->where('session_id', $sessionId);
+            }
+            $cartItem = $cartItemQuery->first();
+
+            // If not found, fallback to treat {id} as product_id for current owner (guest/user)
+            if (!$cartItem) {
+                $cartItemQuery = CartItem::where('product_id', $id);
+                if ($userId) {
+                    $cartItemQuery->where('user_id', $userId);
+                } else {
+                    $cartItemQuery->where('session_id', $sessionId);
+                }
+                $cartItem = $cartItemQuery->first();
+            }
 
             if (!$cartItem) {
                 return response()->json([
@@ -274,7 +342,16 @@ class CartController extends Controller
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                $sessionId = $this->resolveGuestSessionId($request);
+                if (!$sessionId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest cart. Provide X-Session-Id header or enable cookies.'
+                    ], 400);
+                }
+            }
 
             $query = CartItem::query();
 
@@ -308,7 +385,17 @@ class CartController extends Controller
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                if ($request->hasSession()) {
+                    $sessionId = $request->session()->getId();
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest cart. Ensure cookies/session middleware is enabled.'
+                    ], 400);
+                }
+            }
 
             $query = CartItem::query();
 

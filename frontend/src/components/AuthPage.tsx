@@ -44,7 +44,6 @@ export function AuthPage({ onBack }: AuthPageProps) {
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
-    rememberMe: false,
   });
 
   const [registerData, setRegisterData] = useState({
@@ -260,19 +259,6 @@ export function AuthPage({ onBack }: AuthPageProps) {
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="remember"
-                        checked={loginData.rememberMe}
-                        onCheckedChange={(checked: boolean) => setLoginData(prev => ({ ...prev, rememberMe: checked as boolean }))}
-                      />
-                      <Label htmlFor="remember" className="text-sm">{t("auth.rememberMe")}</Label>
-                    </div>
-                    <Button variant="link" size="sm" className="p-0 h-auto">
-                      {t("auth.forgotPassword")}
-                    </Button>
-                  </div>
 
                   <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
                     {isLoading ? t("auth.signingIn") : t("auth.signIn")}

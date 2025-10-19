@@ -239,7 +239,7 @@ export function CategoryFeaturedSlider({
                           </div>
                           {discount > 0 && (
                             <Badge variant="outline" className="text-xs text-green-600">
-                              Save ${(originalPrice! - displayPrice).toFixed(0)}
+                              Save RWF {(originalPrice! - displayPrice).toFixed(0)}
                             </Badge>
                           )}
                         </div>

@@ -76,7 +76,7 @@ export function ShoppingCart({
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium line-clamp-2 mb-1">{item.product.name}</h4>
                   <p className="text-sm text-muted-foreground mb-2">{item.product.brand?.name || 'Unknown Brand'}</p>
-                  <p className="font-semibold">${item.price}</p>
+                  <p className="font-semibold">RWF {item.price}</p>
                 </div>
                 
                 <div className="flex flex-col items-end gap-2">
@@ -119,11 +119,11 @@ export function ShoppingCart({
           <div className="space-y-2">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>RWF {subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span>${shipping.toFixed(2)}</span>
+              <span>RWF {shipping.toFixed(2)}</span>
             </div>
           </div>
           
@@ -131,7 +131,7 @@ export function ShoppingCart({
           
           <div className="flex justify-between font-semibold text-lg">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>RWF {total.toFixed(2)}</span>
           </div>
           
           <div className="space-y-2">

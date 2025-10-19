@@ -23,7 +23,7 @@ class BlogPostsSeeder extends Seeder
         $posts = [
             [
                 'title' => 'The Future of Rwanda-Dubai Trade Relations',
-                'body' => 'The trade relationship between Rwanda and Dubai continues to strengthen, with significant growth in e-commerce and cross-border commerce. This article explores the key developments and future opportunities in this dynamic partnership.
+                'content' => 'The trade relationship between Rwanda and Dubai continues to strengthen, with significant growth in e-commerce and cross-border commerce. This article explores the key developments and future opportunities in this dynamic partnership.
 
 The partnership between Rwanda and the UAE has seen remarkable growth in recent years, particularly in the areas of technology, logistics, and cross-border e-commerce. Dubai\'s strategic location as a global trade hub combined with Rwanda\'s progressive economic policies has created unique opportunities for businesses on both sides.
 
@@ -38,7 +38,7 @@ The Rwanda-Dubai e-commerce platform represents a new frontier in African-UAE tr
             ],
             [
                 'title' => 'How Dubai Merchants Are Succeeding in Rwanda Market',
-                'body' => 'Dubai-based merchants are finding tremendous success in the Rwandan market through strategic partnerships and understanding of local consumer preferences. Here\'s how they\'re achieving remarkable results.
+                'content' => 'Dubai-based merchants are finding tremendous success in the Rwandan market through strategic partnerships and understanding of local consumer preferences. Here\'s how they\'re achieving remarkable results.
 
 Understanding the local market is crucial for success in Rwanda. Dubai merchants who have invested time in understanding Rwandan consumer behavior, preferences, and cultural nuances have seen the best results.
 
@@ -53,7 +53,7 @@ Several Dubai merchants have reported 200-300% growth in their Rwandan operation
             ],
             [
                 'title' => 'E-commerce Trends: What Rwandan Consumers Want',
-                'body' => 'Understanding consumer behavior in Rwanda is essential for successful e-commerce operations. This comprehensive analysis covers the latest trends and preferences of Rwandan online shoppers.
+                'content' => 'Understanding consumer behavior in Rwanda is essential for successful e-commerce operations. This comprehensive analysis covers the latest trends and preferences of Rwandan online shoppers.
 
 Rwandan consumers are increasingly turning to online shopping, driven by improved internet connectivity, smartphone penetration, and changing lifestyles. Key trends include:
 
@@ -79,7 +79,7 @@ Dubai merchants who adapt to these preferences and invest in mobile-optimized pl
             ],
             [
                 'title' => 'Logistics and Shipping: Connecting Dubai to Rwanda',
-                'body' => 'Efficient logistics and shipping solutions are crucial for successful cross-border e-commerce between Dubai and Rwanda. This guide covers the key aspects of international shipping and logistics.
+                'content' => 'Efficient logistics and shipping solutions are crucial for successful cross-border e-commerce between Dubai and Rwanda. This guide covers the key aspects of international shipping and logistics.
 
 The distance between Dubai and Rwanda is approximately 4,500 km, but modern logistics solutions have made shipping faster and more reliable than ever. Key logistics considerations include:
 
@@ -110,7 +110,7 @@ Successful merchants invest in reliable logistics partners and maintain transpar
             ],
             [
                 'title' => 'Building Trust: Customer Service Excellence in Rwanda',
-                'body' => 'Exceptional customer service is the foundation of successful e-commerce operations in Rwanda. Learn how to build trust and maintain strong customer relationships.
+                'content' => 'Exceptional customer service is the foundation of successful e-commerce operations in Rwanda. Learn how to build trust and maintain strong customer relationships.
 
 Building trust with Rwandan customers requires consistent effort and genuine commitment to customer satisfaction. Key elements include:
 
@@ -143,6 +143,7 @@ Dubai merchants who prioritize customer service excellence typically see higher 
         ];
 
         foreach ($posts as $postData) {
+            $postData['author_id'] = $admin->id;
             Post::create($postData);
         }
 

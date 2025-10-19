@@ -16,12 +16,14 @@ class ProductsAndCategoriesSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing data
+        // Clear existing data (in correct order due to foreign key constraints)
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         ProductImage::truncate();
         Product::truncate();
         Subcategory::truncate();
         Brand::truncate();
         Category::truncate();
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // Create Categories
         $electronics = Category::create([

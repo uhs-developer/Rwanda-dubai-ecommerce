@@ -1,61 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Input } from './ui/input';
+import { Progress } from './ui/progress';
 import { 
   Eye, 
   Edit, 
   Trash2, 
   Plus, 
-  Settings, 
   TrendingUp, 
   Users, 
   ShoppingBag, 
   Activity,
   ArrowUp,
-  ArrowDown,
   Search,
   Database,
   Zap,
   CreditCard,
   Mail,
-  Shield,
-  Key,
-  Globe,
-  DollarSign,
   ArrowLeft,
   Menu,
-  X
+  X,
+  BarChart3,
+  RefreshCw,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Clock,
+  UserCheck,
+  UserX,
+  Filter,
+  Download,
 } from 'lucide-react';
 import CreateAdminModal from './CreateAdminModal';
 import CreateUserModal from './CreateUserModal';
+import { 
+  superAdminService, 
+  DashboardOverview, 
+  AdminUser, 
+  SystemStatus, 
+  ActivityLog, 
+  AnalyticsData 
+} from '../services/superAdminService';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'Admin' | 'Editor';
-  status: 'active' | 'inactive';
-  lastLogin: string;
-}
-
-interface SystemStatus {
-  database: 'Healthy' | 'Warning' | 'Error';
-  apiServices: 'Running' | 'Stopped' | 'Warning';
-  paymentGateway: 'Connected' | 'Disconnected' | 'Warning';
-  emailService: 'Running' | 'Stopped' | 'Warning';
-}
-
-interface ActivityLog {
-  id: string;
-  action: string;
-  user: string;
-  status: 'success' | 'error' | 'warning';
-  timestamp: string;
-}
+// Types are now imported from the service
 
 const SuperAdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('user-management');
@@ -63,57 +54,166 @@ const SuperAdminDashboard: React.FC = () => {
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  // API Data States
+  const [dashboardData, setDashboardData] = useState<DashboardOverview | null>(null);
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
+  const [recentActivities, setRecentActivities] = useState<ActivityLog[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    per_page: 15,
+    total: 0,
+    from: null,
+    to: null
+  });
 
-  // Mock data
-  const users: User[] = [
-    { id: '1', name: 'John Doe', email: 'john@techbridge.com', role: 'Admin', status: 'active', lastLogin: '2 hours ago' },
-    { id: '2', name: 'Sarah Wilson', email: 'sarah@techbridge.com', role: 'Editor', status: 'active', lastLogin: '1 day ago' },
-    { id: '3', name: 'Mike Johnson', email: 'mike@techbridge.com', role: 'Admin', status: 'inactive', lastLogin: '1 week ago' },
-    { id: '4', name: 'Emily Brown', email: 'emily@techbridge.com', role: 'Editor', status: 'active', lastLogin: '3 hours ago' },
-  ];
+  // Load initial data
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
 
-  const systemStatus: SystemStatus = {
-    database: 'Healthy',
-    apiServices: 'Running',
-    paymentGateway: 'Connected',
-    emailService: 'Warning'
-  };
+  // Load data when tab changes
+  useEffect(() => {
+    switch (activeTab) {
+      case 'user-management':
+        loadAdminUsers();
+        break;
+      case 'system-monitor':
+        loadSystemData();
+        break;
+      case 'analytics':
+        loadAnalyticsData();
+        break;
+    }
+  }, [activeTab]);
 
-  const recentActivity: ActivityLog[] = [
-    { id: '1', action: 'User Login', user: 'john@techbridge.com', status: 'success', timestamp: '10:30:00 AM' },
-    { id: '2', action: 'Product Updated', user: 'sarah@techbridge.com', status: 'success', timestamp: '10:25:00 AM' },
-    { id: '3', action: 'Failed Login Attempt', user: 'unknown@email.com', status: 'error', timestamp: '10:20:00 AM' },
-    { id: '4', action: 'Order Processed', user: 'system', status: 'success', timestamp: '10:15:00 AM' },
-  ];
+  // Load admin users when search query changes
+  useEffect(() => {
+    if (activeTab === 'user-management') {
+      const timeoutId = setTimeout(() => {
+        loadAdminUsers();
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchQuery]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Healthy':
-      case 'Running':
-      case 'Connected':
-      case 'success':
-        return 'bg-green-100 text-green-800';
-      case 'Warning':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Error':
-      case 'Stopped':
-      case 'Disconnected':
-      case 'error':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  // Data loading functions
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const data = await superAdminService.getDashboardOverview();
+      setDashboardData(data);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const loadAdminUsers = async () => {
+    try {
+      const response = await superAdminService.getAdminUsers({
+        search: searchQuery || undefined,
+        per_page: 15,
+        page: pagination.current_page
+      });
+      setAdminUsers(response.data);
+      setPagination(response.pagination);
+    } catch (error) {
+      console.error('Failed to load admin users:', error);
+    }
+  };
+
+  const loadSystemData = async () => {
+    try {
+      const [statusData, activitiesData] = await Promise.all([
+        superAdminService.getSystemStatus(),
+        superAdminService.getRecentActivities({ limit: 20 })
+      ]);
+      setSystemStatus(statusData);
+      setRecentActivities(activitiesData);
+    } catch (error) {
+      console.error('Failed to load system data:', error);
+    }
+  };
+
+  const loadAnalyticsData = async () => {
+    try {
+      const data = await superAdminService.getAnalytics({ period: 30 });
+      setAnalyticsData(data);
+    } catch (error) {
+      console.error('Failed to load analytics data:', error);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await loadDashboardData();
+      switch (activeTab) {
+        case 'user-management':
+          await loadAdminUsers();
+          break;
+        case 'system-monitor':
+          await loadSystemData();
+          break;
+        case 'analytics':
+          await loadAnalyticsData();
+          break;
+      }
+    } catch (error) {
+      console.error('Failed to refresh data:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleBackClick = () => {
-    // Navigate back to previous page or home
     window.history.back();
   };
+
+  // Helper functions using the service
+  const getStatusColor = (status: string) => superAdminService.getStatusColor(status);
+  const getStatusIcon = (status: string) => {
+    const iconName = superAdminService.getStatusIcon(status);
+    switch (iconName) {
+      case 'check-circle':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'alert-triangle':
+        return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+      case 'x-circle':
+        return <XCircle className="h-4 w-4 text-red-600" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-600" />;
+    }
+  };
+  const formatCurrency = (amount: number) => superAdminService.formatCurrency(amount);
+  const formatNumber = (num: number) => superAdminService.formatNumber(num);
+  const formatLastLogin = (lastLogin: string) => superAdminService.formatLastLogin(lastLogin);
+
+  // Safely format permission values that may be strings or objects from the API
+  const formatPermission = (permission: any): string => {
+    if (typeof permission === 'string') {
+      return permission.replace(/_/g, ' ');
+    }
+    if (permission && typeof permission === 'object') {
+      const label = (permission as any).name || (permission as any).slug || (permission as any).label || (permission as any).permission;
+      return label ? String(label).replace(/_/g, ' ') : JSON.stringify(permission);
+    }
+    return String(permission);
+  };
+
+  // Filter users based on search query
+  const filteredUsers = adminUsers.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -138,6 +238,16 @@ const SuperAdminDashboard: React.FC = () => {
 
             {/* Right side - Actions and user info */}
             <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Refresh button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
+
               {/* Mobile menu button */}
               <Button
                 variant="ghost"
@@ -156,9 +266,9 @@ const SuperAdminDashboard: React.FC = () => {
                   <span className="lg:hidden">Admin</span>
                 </Button>
                 <Button variant="outline" size="sm">
-                  <Settings className="h-4 w-4 mr-2" />
-                  <span className="hidden lg:inline">Settings</span>
-                  <span className="lg:hidden">Settings</span>
+                  <Download className="h-4 w-4 mr-2" />
+                  <span className="hidden lg:inline">Export</span>
+                  <span className="lg:hidden">Export</span>
                 </Button>
               </div>
 
@@ -184,8 +294,8 @@ const SuperAdminDashboard: React.FC = () => {
                   Create Admin
                 </Button>
                 <Button variant="outline" className="justify-start">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Data
                 </Button>
                 <div className="pt-2 border-t">
                   <p className="text-sm font-medium text-gray-900">Alex SuperAdmin</p>
@@ -206,11 +316,13 @@ const SuperAdminDashboard: React.FC = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">$124,573</div>
+              <div className="text-xl sm:text-2xl font-bold">
+                {loading ? '...' : formatCurrency(dashboardData?.revenue.current || 0)}
+              </div>
               <div className="flex items-center text-xs text-muted-foreground">
                 <ArrowUp className="h-3 w-3 text-green-600 mr-1" />
-                <span className="text-green-600">12.5%</span>
-                <span className="ml-1 hidden sm:inline">All time</span>
+                <span className="text-green-600">+{dashboardData?.revenue.growth || 0}%</span>
+                <span className="ml-1 hidden sm:inline">vs last month</span>
                 <span className="ml-1 sm:hidden">vs last</span>
               </div>
             </CardContent>
@@ -222,10 +334,12 @@ const SuperAdminDashboard: React.FC = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">12,543</div>
+              <div className="text-xl sm:text-2xl font-bold">
+                {loading ? '...' : formatNumber(dashboardData?.users.total || 0)}
+              </div>
               <div className="flex items-center text-xs text-muted-foreground">
                 <ArrowUp className="h-3 w-3 text-green-600 mr-1" />
-                <span className="text-green-600">8.2%</span>
+                <span className="text-green-600">+{dashboardData?.users.growth || 0}%</span>
                 <span className="ml-1 hidden sm:inline">Active accounts</span>
                 <span className="ml-1 sm:hidden">active</span>
               </div>
@@ -238,10 +352,12 @@ const SuperAdminDashboard: React.FC = () => {
               <ShoppingBag className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">8,129</div>
+              <div className="text-xl sm:text-2xl font-bold">
+                {loading ? '...' : formatNumber(dashboardData?.orders.total || 0)}
+              </div>
               <div className="flex items-center text-xs text-muted-foreground">
                 <ArrowUp className="h-3 w-3 text-green-600 mr-1" />
-                <span className="text-green-600">15.8%</span>
+                <span className="text-green-600">+15.8%</span>
                 <span className="ml-1 hidden sm:inline">All stores</span>
                 <span className="ml-1 sm:hidden">stores</span>
               </div>
@@ -250,16 +366,16 @@ const SuperAdminDashboard: React.FC = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">System Health</CardTitle>
+              <CardTitle className="text-xs sm:text-sm font-medium">System Uptime</CardTitle>
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">99.9%</div>
+              <div className="text-xl sm:text-2xl font-bold">
+                {loading ? '...' : `${dashboardData?.performance.uptime || 0}%`}
+              </div>
               <div className="flex items-center text-xs text-muted-foreground">
-                <span className="hidden sm:inline">Uptime</span>
-                <span className="sm:hidden">Up</span>
-                <ArrowDown className="h-3 w-3 text-red-600 ml-1" />
-                <span className="text-red-600 ml-1">0.1%</span>
+                <span className="hidden sm:inline">Response time: {dashboardData?.performance.response_time || 0}ms</span>
+                <span className="sm:hidden">RT: {dashboardData?.performance.response_time || 0}ms</span>
               </div>
             </CardContent>
           </Card>
@@ -267,11 +383,10 @@ const SuperAdminDashboard: React.FC = () => {
 
         {/* Dashboard Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="user-management" className="text-xs sm:text-sm">User Management</TabsTrigger>
             <TabsTrigger value="system-monitor" className="text-xs sm:text-sm">System Monitor</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
-            <TabsTrigger value="global-settings" className="text-xs sm:text-sm">Global Settings</TabsTrigger>
           </TabsList>
 
           {/* User Management Tab */}
@@ -289,21 +404,36 @@ const SuperAdminDashboard: React.FC = () => {
                       className="pl-10 w-full sm:w-80"
                     />
                   </div>
-                  <Button onClick={() => setShowCreateUser(true)} className="w-full sm:w-auto">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add User
-                  </Button>
+                  <div className="flex space-x-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm">
+                      <Filter className="h-4 w-4 mr-2" />
+                      Filter
+                    </Button>
+                    <Button onClick={() => setShowCreateUser(true)} className="w-full sm:w-auto">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add User
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
                 {/* Mobile view - Cards instead of table */}
                 <div className="sm:hidden space-y-3">
                   {filteredUsers.map((user) => (
-                    <div key={user.id} className="border rounded-lg p-3 space-y-2">
+                    <div key={user.id} className="border rounded-lg p-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-sm">{user.name}</p>
-                          <p className="text-xs text-gray-600">{user.email}</p>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                            {user.avatar ? (
+                              <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
+                            ) : (
+                              <span className="text-sm font-medium">{user.name.charAt(0)}</span>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{user.name}</p>
+                            <p className="text-xs text-gray-600">{user.email}</p>
+                          </div>
                         </div>
                         <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'} className="text-xs">
                           {user.role}
@@ -314,9 +444,14 @@ const SuperAdminDashboard: React.FC = () => {
                           variant={user.status === 'active' ? 'default' : 'destructive'}
                           className={`text-xs ${getStatusColor(user.status)}`}
                         >
+                          {user.status === 'active' ? <UserCheck className="h-3 w-3 mr-1" /> : <UserX className="h-3 w-3 mr-1" />}
                           {user.status}
                         </Badge>
-                        <p className="text-xs text-gray-600">{user.lastLogin}</p>
+                        <p className="text-xs text-gray-600">{formatLastLogin(user.lastLogin)}</p>
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        <p>Permissions: {user.permissions.join(', ')}</p>
+                        <p>Created: {new Date(user.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="flex space-x-2 pt-2">
                         <Button variant="ghost" size="sm" className="flex-1">
@@ -341,19 +476,33 @@ const SuperAdminDashboard: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
+                        <TableHead>User</TableHead>
                         <TableHead>Role</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Permissions</TableHead>
                         <TableHead>Last Login</TableHead>
+                        <TableHead>Created</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.map((user) => (
                         <TableRow key={user.id}>
-                          <TableCell className="font-medium">{user.name}</TableCell>
-                          <TableCell>{user.email}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                {user.avatar ? (
+                                  <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
+                                ) : (
+                                  <span className="text-sm font-medium">{user.name.charAt(0)}</span>
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-medium">{user.name}</p>
+                                <p className="text-sm text-gray-600">{user.email}</p>
+                              </div>
+                            </div>
+                          </TableCell>
                           <TableCell>
                             <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>
                               {user.role}
@@ -364,10 +513,28 @@ const SuperAdminDashboard: React.FC = () => {
                               variant={user.status === 'active' ? 'default' : 'destructive'}
                               className={getStatusColor(user.status)}
                             >
+                              {user.status === 'active' ? <UserCheck className="h-3 w-3 mr-1" /> : <UserX className="h-3 w-3 mr-1" />}
                               {user.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-sm text-gray-600">{user.lastLogin}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {user.permissions.slice(0, 2).map((permission, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {formatPermission(permission)}
+                                </Badge>
+                              ))}
+                              {user.permissions.length > 2 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{user.permissions.length - 2}
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-gray-600">{formatLastLogin(user.lastLogin)}</TableCell>
+                          <TableCell className="text-sm text-gray-600">
+                            {new Date(user.createdAt).toLocaleDateString()}
+                          </TableCell>
                           <TableCell>
                             <div className="flex space-x-2">
                               <Button variant="ghost" size="sm">
@@ -395,76 +562,109 @@ const SuperAdminDashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">System Status</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl flex items-center">
+                    <Activity className="h-5 w-5 mr-2" />
+                    System Status
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Database className="h-5 w-5 text-blue-600" />
-                      <span className="text-sm sm:text-base">Database</span>
+                  {systemStatus ? Object.entries(systemStatus).map(([key, status]) => (
+                    <div key={key} className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-3">
+                        {key === 'database' && <Database className="h-5 w-5 text-blue-600" />}
+                        {key === 'apiServices' && <Zap className="h-5 w-5 text-green-600" />}
+                        {key === 'paymentGateway' && <CreditCard className="h-5 w-5 text-purple-600" />}
+                        {key === 'emailService' && <Mail className="h-5 w-5 text-orange-600" />}
+                        {key === 'cache' && <Activity className="h-5 w-5 text-indigo-600" />}
+                        {key === 'storage' && <Database className="h-5 w-5 text-teal-600" />}
+                        <span className="text-sm sm:text-base font-medium capitalize">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {getStatusIcon(status)}
+                        <Badge className={getStatusColor(status)}>
+                          {status}
+                        </Badge>
+                      </div>
                     </div>
-                    <Badge className={getStatusColor(systemStatus.database)}>
-                      {systemStatus.database}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Zap className="h-5 w-5 text-green-600" />
-                      <span className="text-sm sm:text-base">API Services</span>
-                    </div>
-                    <Badge className={getStatusColor(systemStatus.apiServices)}>
-                      {systemStatus.apiServices}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <CreditCard className="h-5 w-5 text-purple-600" />
-                      <span className="text-sm sm:text-base">Payment Gateway</span>
-                    </div>
-                    <Badge className={getStatusColor(systemStatus.paymentGateway)}>
-                      {systemStatus.paymentGateway}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-5 w-5 text-orange-600" />
-                      <span className="text-sm sm:text-base">Email Service</span>
-                    </div>
-                    <Badge className={getStatusColor(systemStatus.emailService)}>
-                      {systemStatus.emailService}
-                    </Badge>
-                  </div>
+                  )) : (
+                    <div className="text-center py-8 text-gray-500">Loading system status...</div>
+                  )}
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Recent Activity</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl flex items-center">
+                    <Clock className="h-5 w-5 mr-2" />
+                    Recent Activities
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3 min-w-0 flex-1">
-                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                          activity.status === 'success' ? 'bg-green-500' : 
-                          activity.status === 'error' ? 'bg-red-500' : 'bg-yellow-500'
-                        }`} />
-                        <div className="min-w-0 flex-1">
+                <CardContent className="space-y-4 max-h-96 overflow-y-auto">
+                  {recentActivities.length > 0 ? recentActivities.map((activity) => (
+                    <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg border">
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-2 ${
+                        activity.status === 'success' ? 'bg-green-500' : 
+                        activity.status === 'error' ? 'bg-red-500' : 'bg-yellow-500'
+                      }`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
                           <p className="text-sm font-medium truncate">{activity.action}</p>
-                          <p className="text-xs text-gray-600 truncate">{activity.user}</p>
+                          <Badge className={getStatusColor(activity.status)}>
+                            {activity.status}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 truncate">{activity.user}</p>
+                        {activity.details && (
+                          <p className="text-xs text-gray-500 mt-1">{activity.details}</p>
+                        )}
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-xs text-gray-500">{activity.timestamp}</p>
+                          {activity.ipAddress && (
+                            <p className="text-xs text-gray-500">IP: {activity.ipAddress}</p>
+                          )}
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0 ml-2">
-                        <Badge className={getStatusColor(activity.status)}>
-                          {activity.status}
-                        </Badge>
-                        <p className="text-xs text-gray-600 mt-1">{activity.timestamp}</p>
-                      </div>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="text-center py-8 text-gray-500">Loading recent activities...</div>
+                  )}
                 </CardContent>
               </Card>
             </div>
+
+            {/* Performance Metrics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl">Performance Metrics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Uptime</span>
+                      <span className="font-medium">{dashboardData?.performance.uptime || 0}%</span>
+                    </div>
+                    <Progress value={dashboardData?.performance.uptime || 0} className="h-2" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Response Time</span>
+                      <span className="font-medium">{dashboardData?.performance.response_time || 0}ms</span>
+                    </div>
+                    <Progress value={100 - ((dashboardData?.performance.response_time || 0) / 10)} className="h-2" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Error Rate</span>
+                      <span className="font-medium">{dashboardData?.performance.error_rate || 0}%</span>
+                    </div>
+                    <Progress value={100 - (dashboardData?.performance.error_rate || 0)} className="h-2" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Analytics Tab */}
@@ -472,89 +672,126 @@ const SuperAdminDashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Revenue Analytics</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2" />
+                    Revenue Analytics
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">This Month</span>
-                    <span className="text-xl sm:text-2xl font-bold">$24,573</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Current Month</span>
+                      <span className="text-xl sm:text-2xl font-bold">
+                        {loading ? '...' : formatCurrency(analyticsData?.revenue.current || 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Previous Month</span>
+                      <span className="text-lg sm:text-xl">
+                        {loading ? '...' : formatCurrency(analyticsData?.revenue.previous || 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Growth Rate</span>
+                      <span className="text-base sm:text-lg font-semibold text-green-600 flex items-center">
+                        <ArrowUp className="h-4 w-4 mr-1" />
+                        +{analyticsData?.revenue.growth || 0}%
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Last Month</span>
-                    <span className="text-lg sm:text-xl">$21,890</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Growth Rate</span>
-                    <span className="text-base sm:text-lg font-semibold text-green-600">+12.3%</span>
+                  <div className="pt-4 border-t">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">Monthly Growth</span>
+                      <span className="text-sm text-gray-600">+{analyticsData?.revenue.growth || 0}%</span>
+                    </div>
+                    <Progress value={analyticsData?.revenue.growth || 0} className="h-2" />
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">User Growth</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl flex items-center">
+                    <Users className="h-5 w-5 mr-2" />
+                    User Analytics
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">New Users (30d)</span>
-                    <span className="text-xl sm:text-2xl font-bold">1,234</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Total Users</span>
+                      <span className="text-xl sm:text-2xl font-bold">
+                        {loading ? '...' : formatNumber(analyticsData?.users.total || 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Active Users</span>
+                      <span className="text-lg sm:text-xl">
+                        {loading ? '...' : formatNumber(analyticsData?.users.active || 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">New Users (30d)</span>
+                      <span className="text-lg sm:text-xl">
+                        {loading ? '...' : formatNumber(analyticsData?.users.new || 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Growth Rate</span>
+                      <span className="text-base sm:text-lg font-semibold text-green-600 flex items-center">
+                        <ArrowUp className="h-4 w-4 mr-1" />
+                        +{analyticsData?.users.growth || 0}%
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Active Users</span>
-                    <span className="text-lg sm:text-xl">8,942</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Retention Rate</span>
-                    <span className="text-base sm:text-lg font-semibold text-green-600">87.5%</span>
+                  <div className="pt-4 border-t">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">User Growth</span>
+                      <span className="text-sm text-gray-600">+{analyticsData?.users.growth || 0}%</span>
+                    </div>
+                    <Progress value={analyticsData?.users.growth || 0} className="h-2" />
                   </div>
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
 
-          {/* Global Settings Tab */}
-          <TabsContent value="global-settings" className="space-y-4 sm:space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Payment Settings</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start h-12">
-                    <CreditCard className="h-4 w-4 mr-3" />
-                    Configure Payment Gateways
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start h-12">
-                    <DollarSign className="h-4 w-4 mr-3" />
-                    Tax Configuration
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start h-12">
-                    <Globe className="h-4 w-4 mr-3" />
-                    Currency Settings
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg sm:text-xl">Security Settings</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start h-12">
-                    <Shield className="h-4 w-4 mr-3" />
-                    Security Policies
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start h-12">
-                    <Key className="h-4 w-4 mr-3" />
-                    Two-Factor Authentication
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start h-12">
-                    <Zap className="h-4 w-4 mr-3" />
-                    API Access Control
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Order Analytics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl flex items-center">
+                  <ShoppingBag className="h-5 w-5 mr-2" />
+                  Order Analytics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 border rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {loading ? '...' : formatNumber(analyticsData?.orders.total || 0)}
+                    </div>
+                    <div className="text-sm text-gray-600">Total Orders</div>
+                  </div>
+                  <div className="text-center p-4 border rounded-lg">
+                    <div className="text-2xl font-bold text-yellow-600">
+                      {loading ? '...' : formatNumber(analyticsData?.orders.pending || 0)}
+                    </div>
+                    <div className="text-sm text-gray-600">Pending</div>
+                  </div>
+                  <div className="text-center p-4 border rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">
+                      {loading ? '...' : formatNumber(analyticsData?.orders.completed || 0)}
+                    </div>
+                    <div className="text-sm text-gray-600">Completed</div>
+                  </div>
+                  <div className="text-center p-4 border rounded-lg">
+                    <div className="text-2xl font-bold text-red-600">
+                      {loading ? '...' : formatNumber(analyticsData?.orders.cancelled || 0)}
+                    </div>
+                    <div className="text-sm text-gray-600">Cancelled</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

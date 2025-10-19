@@ -19,7 +19,17 @@ class WishlistController extends Controller
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                if ($request->hasSession()) {
+                    $sessionId = $request->session()->getId();
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest wishlist. Ensure cookies/session middleware is enabled.'
+                    ], 400);
+                }
+            }
 
             $query = WishlistItem::with(['product.images', 'product.brand', 'product.category']);
 
@@ -76,7 +86,17 @@ class WishlistController extends Controller
             }
 
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                if ($request->hasSession()) {
+                    $sessionId = $request->session()->getId();
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest wishlist. Ensure cookies/session middleware is enabled.'
+                    ], 400);
+                }
+            }
 
             // Check if item already exists in wishlist
             $existingItem = WishlistItem::where('product_id', $request->product_id);
@@ -127,7 +147,17 @@ class WishlistController extends Controller
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                if ($request->hasSession()) {
+                    $sessionId = $request->session()->getId();
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest wishlist. Ensure cookies/session middleware is enabled.'
+                    ], 400);
+                }
+            }
 
             $wishlistItem = WishlistItem::where('id', $id);
 
@@ -169,7 +199,17 @@ class WishlistController extends Controller
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                if ($request->hasSession()) {
+                    $sessionId = $request->session()->getId();
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest wishlist. Ensure cookies/session middleware is enabled.'
+                    ], 400);
+                }
+            }
 
             $wishlistItem = WishlistItem::where('product_id', $productId);
 
@@ -211,7 +251,17 @@ class WishlistController extends Controller
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                if ($request->hasSession()) {
+                    $sessionId = $request->session()->getId();
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest wishlist. Ensure cookies/session middleware is enabled.'
+                    ], 400);
+                }
+            }
 
             $query = WishlistItem::query();
 
@@ -245,7 +295,17 @@ class WishlistController extends Controller
     {
         try {
             $userId = Auth::id();
-            $sessionId = $request->session()->getId();
+            $sessionId = null;
+            if (!$userId) {
+                if ($request->hasSession()) {
+                    $sessionId = $request->session()->getId();
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Session not available for guest wishlist. Ensure cookies/session middleware is enabled.'
+                    ], 400);
+                }
+            }
 
             $wishlistItem = WishlistItem::where('product_id', $productId);
 

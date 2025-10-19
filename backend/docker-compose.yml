@@ -17,6 +17,21 @@ services:
   #   networks:
   #     - rwanda-dubai-network
 
+  mysql:
+    image: mysql:8.0
+    container_name: rwanda-dubai-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: rwanda_dubai
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: password123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rwanda-dubai-network
+
   redis:
     image: redis:7-alpine
     container_name: rwanda-dubai-redis
@@ -27,6 +42,7 @@ services:
 
 volumes:
   postgres_data:
+  mysql_data:
 
 networks:
   rwanda-dubai-network:

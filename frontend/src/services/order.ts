@@ -141,7 +141,43 @@ export class OrderService {
   static async getStatistics(): Promise<ApiResponse<OrderStatistics>> {
     return await apiRequest<OrderStatistics>('GET', '/orders/statistics');
   }
+
+  // Create new order
+  static async createOrder(orderData: CreateOrderRequest): Promise<ApiResponse<Order>> {
+    return await apiRequest<Order>('POST', '/customer/orders', orderData);
+  }
 }
+
+export interface CreateOrderRequest {
+  customer_name: string;
+  customer_email: string;
+  customer_phone?: string;
+  shipping_address: string;
+  billing_address?: string;
+  subtotal: number;
+  tax_amount: number;
+  shipping_amount: number;
+  discount_amount?: number;
+  total_amount: number;
+  currency: string;
+  payment_method: string;
+  payment_reference?: string;
+  notes?: string;
+  items: CreateOrderItemRequest[];
+}
+
+export interface CreateOrderItemRequest {
+  product_id: number;
+  product_name: string;
+  product_sku?: string;
+  unit_price: number;
+  quantity: number;
+  total_price: number;
+}
+
+
+
+
 
 
 

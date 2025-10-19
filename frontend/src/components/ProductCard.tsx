@@ -41,7 +41,7 @@ export function ProductCard({
             onClick={() => onProductClick?.(product)}
           >
             <ImageWithFallback
-              src={product.image}
+              src={isApiProduct ? (typeof product.images?.[0] === 'string' ? product.images[0] : product.images?.[0]?.image_url || '') : product.image}
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -49,12 +49,12 @@ export function ProductCard({
           
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {(discountPercentage > 0 || hasPromotionalPrice) && (
+            {((discountPercentage || 0) > 0 || hasPromotionalPrice) && (
               <Badge variant="destructive" className="text-xs">
-                -{discountPercentage}%
+                -{discountPercentage || 0}%
               </Badge>
             )}
-            {!product.inStock && (
+            {!isApiProduct && !product.inStock && (
               <Badge variant="secondary" className="text-xs">
                 Out of Stock
               </Badge>
@@ -64,29 +64,29 @@ export function ProductCard({
           {/* Wishlist button */}
           <Button
             size="sm"
-            variant={isInWishlist(parseInt(product.id)) ? "default" : "ghost"}
+            variant={isInWishlist(parseInt(String(product.id))) ? "default" : "ghost"}
             className={`absolute top-2 right-2 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity ${
-              isInWishlist(parseInt(product.id)) 
+              isInWishlist(parseInt(String(product.id))) 
                 ? 'bg-red-500 hover:bg-red-600 text-white' 
                 : 'bg-white/80 hover:bg-white'
             }`}
             onClick={async (e: { stopPropagation: () => void; }) => {
               e.stopPropagation();
-              if (isInWishlist(parseInt(product.id))) {
-                await removeByProduct(parseInt(product.id));
+              if (isInWishlist(parseInt(String(product.id)))) {
+                await removeByProduct(parseInt(String(product.id)));
               } else {
                 await addToWishlist(product);
               }
             }}
           >
-            <Heart className={`h-4 w-4 ${isInWishlist(parseInt(product.id)) ? 'fill-current' : ''}`} />
+            <Heart className={`h-4 w-4 ${isInWishlist(parseInt(String(product.id))) ? 'fill-current' : ''}`} />
           </Button>
         </div>
 
         <div className="p-4">
           {/* Brand */}
           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-            {product.brand}
+            {isApiProduct ? product.brand?.name || 'Unknown' : product.brand}
           </p>
 
           {/* Product name */}
@@ -102,17 +102,17 @@ export function ProductCard({
             <div className="flex items-center">
               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
               <span className="text-xs text-muted-foreground ml-1">
-                {product.rating} ({product.reviews})
+                {isApiProduct ? 4.5 : product.rating} ({isApiProduct ? 0 : product.reviews})
               </span>
             </div>
           </div>
 
           {/* Price */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="font-semibold text-lg">${displayPrice}</span>
+            <span className="font-semibold text-lg">RWF {displayPrice}</span>
             {(originalPrice && originalPrice > displayPrice) && (
               <span className="text-sm text-muted-foreground line-through">
-                ${originalPrice}
+                RWF {originalPrice}
               </span>
             )}
           </div>
@@ -120,11 +120,11 @@ export function ProductCard({
           {/* Add to cart button */}
           <Button
             size="sm"
-            className={`w-full ${isInCart(parseInt(product.id)) ? 'bg-green-600 hover:bg-green-700' : ''}`}
-            disabled={!product.inStock}
+            className={`w-full ${isInCart(parseInt(String(product.id))) ? 'bg-green-600 hover:bg-green-700' : ''}`}
+            disabled={!isApiProduct && !product.inStock}
             onClick={async (e: { stopPropagation: () => void; }) => {
               e.stopPropagation();
-              if (isInCart(parseInt(product.id))) {
+              if (isInCart(parseInt(String(product.id)))) {
                 // Item is already in cart, could show a message or navigate to cart
                 return;
               }
@@ -132,9 +132,9 @@ export function ProductCard({
             }}
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
-            {product.inStock 
-              ? (isInCart(parseInt(product.id)) ? 'In Cart' : 'Add to Cart')
-              : 'Out of Stock'
+            {!isApiProduct && product.inStock 
+              ? (isInCart(parseInt(String(product.id))) ? 'In Cart' : 'Add to Cart')
+              : 'Add to Cart'
             }
           </Button>
         </div>

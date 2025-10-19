@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -20,8 +21,17 @@ interface ThankYouPageProps {
   onTrackOrder: () => void;
 }
 
-export function ThankYouPage({ orderData, onContinueShopping, onTrackOrder }: ThankYouPageProps) {
-  const [orderNumber] = useState(`TB${Date.now().toString().slice(-8)}`);
+export function ThankYouPage({ orderData: propOrderData, onContinueShopping, onTrackOrder }: ThankYouPageProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Get order data from navigation state or props
+  const orderData = location.state?.orderData || propOrderData;
+  
+  const [orderNumber] = useState(() => {
+    return orderData?.order_number || `TB${Date.now().toString().slice(-8)}`;
+  });
+  
   const [estimatedDelivery] = useState(() => {
     const date = new Date();
     date.setDate(date.getDate() + Math.floor(Math.random() * 7) + 7); // 7-14 days
@@ -32,6 +42,24 @@ export function ThankYouPage({ orderData, onContinueShopping, onTrackOrder }: Th
       day: 'numeric' 
     });
   });
+
+  // Handle continue shopping navigation
+  const handleContinueShopping = () => {
+    if (onContinueShopping) {
+      onContinueShopping();
+    } else {
+      navigate('/');
+    }
+  };
+
+  // Handle track order navigation
+  const handleTrackOrder = () => {
+    if (onTrackOrder) {
+      onTrackOrder();
+    } else {
+      navigate('/orders');
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -72,29 +100,47 @@ export function ThankYouPage({ orderData, onContinueShopping, onTrackOrder }: Th
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Total Amount</span>
                 <span className="font-semibold text-lg">
-                  ${orderData?.totals?.total?.toFixed(2) || '0.00'}
+                  RWF {orderData?.totals?.total?.toFixed(2) || orderData?.total?.toFixed(2) || '0.00'}
                 </span>
               </div>
+              {orderData?.transaction_id && (
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Transaction ID</span>
+                  <Badge variant="outline" className="font-mono text-xs">
+                    {orderData.transaction_id}
+                  </Badge>
+                </div>
+              )}
+              {orderData?.payment_method && (
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Payment Method</span>
+                  <span className="capitalize">{orderData.payment_method}</span>
+                </div>
+              )}
 
               <Separator />
 
               <div className="space-y-3">
                 <h4 className="font-medium">Order Items</h4>
-                {orderData?.items?.map((item: any) => (
-                  <div key={item.id} className="flex gap-3">
+                {orderData?.items?.map((item: any, index: number) => (
+                  <div key={item.id || index} className="flex gap-3">
                     <div className="w-12 h-12 rounded overflow-hidden">
                       <ImageWithFallback
-                        src={item.image}
-                        alt={item.name}
+                        src={item.image || item.product?.image}
+                        alt={item.name || item.product?.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-sm line-clamp-1">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                      <p className="font-medium text-sm line-clamp-1">
+                        {item.name || item.product?.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Qty: {item.quantity}
+                      </p>
                     </div>
                     <span className="text-sm font-medium">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      RWF {((item.price || item.unit_price) * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -152,7 +198,7 @@ export function ThankYouPage({ orderData, onContinueShopping, onTrackOrder }: Th
               <Separator />
 
               <div className="space-y-3">
-                <Button size="lg" className="w-full" onClick={onTrackOrder}>
+                <Button size="lg" className="w-full" onClick={handleTrackOrder}>
                   Track Your Order
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -189,7 +235,7 @@ export function ThankYouPage({ orderData, onContinueShopping, onTrackOrder }: Th
 
         {/* Continue Shopping */}
         <div className="text-center mt-8">
-          <Button size="lg" onClick={onContinueShopping}>
+          <Button size="lg" onClick={handleContinueShopping}>
             Continue Shopping
           </Button>
         </div>

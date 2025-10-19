@@ -338,10 +338,10 @@ export const newArrivals = products.slice(1, 7);
 export const filterOptions = {
   brands: Array.from(new Set(products.map(p => p.brand))),
   priceRanges: [
-    { label: "Under $100", min: 0, max: 100 },
-    { label: "$100 - $500", min: 100, max: 500 },
-    { label: "$500 - $1000", min: 500, max: 1000 },
-    { label: "$1000+", min: 1000, max: Infinity }
+    { label: "Under RWF 100", min: 0, max: 100 },
+    { label: "RWF 100 - RWF 500", min: 100, max: 500 },
+    { label: "RWF 500 - RWF 1000", min: 500, max: 1000 },
+    { label: "RWF 1000+", min: 1000, max: Infinity }
   ],
   ratings: [5, 4, 3, 2, 1],
   availability: ["In Stock", "Out of Stock"]

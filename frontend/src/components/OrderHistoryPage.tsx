@@ -139,7 +139,7 @@ export function OrderHistoryPage({ onBack }: OrderHistoryPageProps) {
           </div>
           <div className="text-right">
             <div className="text-xl font-bold">
-              {order.currency} {order.total_amount.toFixed(2)}
+              RWF {order.total_amount.toFixed(2)}
             </div>
             <Badge className={getStatusColor(order.status)}>
               {getStatusIcon(order.status)}

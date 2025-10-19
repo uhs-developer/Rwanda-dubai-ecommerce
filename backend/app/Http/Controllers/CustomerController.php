@@ -133,7 +133,23 @@ class CustomerController extends Controller
                     'currency' => $order->currency ?? 'USD',
                     'created_at' => $order->created_at->toISOString(),
                     'items_count' => $order->items->count(),
-                    'tracking_number' => $order->tracking_number
+                    'tracking_number' => $order->tracking_number,
+                    'items' => $order->items->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'product_id' => $item->product_id,
+                            'product_name' => $item->product_name,
+                            'quantity' => $item->quantity,
+                            'unit_price' => (float) $item->unit_price,
+                            'total_price' => (float) $item->total_price,
+                            'product' => $item->product ? [
+                                'id' => $item->product->id,
+                                'name' => $item->product->name,
+                                'slug' => $item->product->slug ?? null,
+                                'primary_image' => $item->product->primary_image ?? null,
+                            ] : null,
+                        ];
+                    })
                 ];
             });
         } catch (\Exception $e) {
@@ -264,7 +280,23 @@ class CustomerController extends Controller
                     'currency' => $order->currency ?? 'USD',
                     'created_at' => $order->created_at->toISOString(),
                     'items_count' => $order->items->count(),
-                    'tracking_number' => $order->tracking_number
+                    'tracking_number' => $order->tracking_number,
+                    'items' => $order->items->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'product_id' => $item->product_id,
+                            'product_name' => $item->product_name,
+                            'quantity' => $item->quantity,
+                            'unit_price' => (float) $item->unit_price,
+                            'total_price' => (float) $item->total_price,
+                            'product' => $item->product ? [
+                                'id' => $item->product->id,
+                                'name' => $item->product->name,
+                                'slug' => $item->product->slug ?? null,
+                                'primary_image' => $item->product->primary_image ?? null,
+                            ] : null,
+                        ];
+                    })
                 ];
             });
             

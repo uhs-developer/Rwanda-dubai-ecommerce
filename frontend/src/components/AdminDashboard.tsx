@@ -810,7 +810,7 @@ const AdminDashboard: React.FC = () => {
                 {dashboardLoading ? (
                   <div className="animate-pulse h-8 w-24 rounded">0</div>
                 ) : (
-                  `$${dashboardStats?.monthly_revenue?.toLocaleString() || 0}`
+                  `RWF ${dashboardStats?.monthly_revenue?.toLocaleString() || 0}`
                 )}
               </div>
               <div className="flex items-center justify-between">
@@ -904,10 +904,10 @@ const AdminDashboard: React.FC = () => {
                           <TableCell>{product.category}</TableCell>
                           <TableCell>
                             <div className="flex flex-col">
-                              <span className="font-medium">${product.price}</span>
+                              <span className="font-medium">RWF {product.price}</span>
                               {product.originalPrice && (
                                 <span className="text-sm text-muted-foreground line-through">
-                                  ${product.originalPrice}
+                                  RWF {product.originalPrice}
                                 </span>
                               )}
                             </div>
@@ -1011,7 +1011,7 @@ const AdminDashboard: React.FC = () => {
                                 <div className="text-sm text-gray-500">{order.customer_email}</div>
                               </div>
                             </TableCell>
-                            <TableCell>${Number(order.total_amount).toFixed(2)}</TableCell>
+                            <TableCell>RWF {Number(order.total_amount).toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge className={getStatusColor(order.status)}>
                               {order.status}
@@ -1124,7 +1124,7 @@ const AdminDashboard: React.FC = () => {
                             <TableCell>{customer.email}</TableCell>
                             <TableCell>{customer.phone || 'N/A'}</TableCell>
                             <TableCell>{customer.total_orders}</TableCell>
-                            <TableCell>${Number(customer.total_spent).toFixed(2)}</TableCell>
+                            <TableCell>RWF {Number(customer.total_spent).toFixed(2)}</TableCell>
                             <TableCell>
                               <Badge className={getStatusColor(customer.status)}>
                                 {customer.status}
@@ -1402,7 +1402,7 @@ const AdminDashboard: React.FC = () => {
                               className="rounded border-gray-300"
                             />
                             <label htmlFor={`product-${product.id}`} className="text-sm text-gray-700 cursor-pointer flex-1">
-                              {product.name} - ${product.price} ({product.category?.name || 'No Category'})
+                              {product.name} - RWF {product.price} ({product.category?.name || 'No Category'})
                             </label>
                           </div>
                         ))}
@@ -1612,9 +1612,9 @@ const AdminDashboard: React.FC = () => {
                   </div>
                   
                   <div className="flex items-center gap-4 mb-4">
-                    <span className="text-2xl font-bold">${selectedProduct.effective_price}</span>
+                    <span className="text-2xl font-bold">RWF {selectedProduct.effective_price}</span>
                     {selectedProduct.has_promotional_price && (
-                      <span className="text-lg text-gray-500 line-through">${selectedProduct.price}</span>
+                      <span className="text-lg text-gray-500 line-through">RWF {selectedProduct.price}</span>
                     )}
                     {selectedProduct.promotional_discount_percentage && (
                       <Badge className="bg-red-100 text-red-800">
@@ -1852,13 +1852,13 @@ const AdminDashboard: React.FC = () => {
                             <p className="text-sm text-gray-600">SKU: {item.product_sku || 'N/A'}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-medium">${Number(item.unit_price).toFixed(2)}</p>
+                            <p className="font-medium">RWF {Number(item.unit_price).toFixed(2)}</p>
                             <p className="text-sm text-gray-600">x{item.quantity}</p>
                           </div>
                         </div>
                         <div className="flex justify-between items-center pt-2 border-t">
                           <span className="font-medium">Total:</span>
-                          <span className="font-bold">${Number(item.total_price).toFixed(2)}</span>
+                          <span className="font-bold">RWF {Number(item.total_price).toFixed(2)}</span>
                         </div>
                       </div>
                     ))}
@@ -1871,23 +1871,23 @@ const AdminDashboard: React.FC = () => {
                                       <div className="space-y-2">
                       <div className="flex justify-between">
                         <span>Subtotal:</span>
-                        <span>${Number(selectedOrder.subtotal).toFixed(2)}</span>
+                        <span>RWF {Number(selectedOrder.subtotal).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Tax:</span>
-                        <span>${Number(selectedOrder.tax_amount).toFixed(2)}</span>
+                        <span>RWF {Number(selectedOrder.tax_amount).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Shipping:</span>
-                        <span>${Number(selectedOrder.shipping_amount).toFixed(2)}</span>
+                        <span>RWF {Number(selectedOrder.shipping_amount).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Discount:</span>
-                        <span>-${Number(selectedOrder.discount_amount).toFixed(2)}</span>
+                        <span>-RWF {Number(selectedOrder.discount_amount).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-lg font-bold border-t pt-2">
                         <span>Total:</span>
-                        <span>${Number(selectedOrder.total_amount).toFixed(2)}</span>
+                        <span>RWF {Number(selectedOrder.total_amount).toFixed(2)}</span>
                       </div>
                     </div>
                 </div>
@@ -1974,11 +1974,11 @@ const AdminDashboard: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="font-medium">Total Spent:</span>
-                      <span>${Number(selectedCustomer.total_spent).toFixed(2)}</span>
+                      <span>RWF {Number(selectedCustomer.total_spent).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="font-medium">Average Order Value:</span>
-                      <span>${selectedCustomer.total_orders > 0 ? (Number(selectedCustomer.total_spent) / selectedCustomer.total_orders).toFixed(2) : '0.00'}</span>
+                      <span>RWF {selectedCustomer.total_orders > 0 ? (Number(selectedCustomer.total_spent) / selectedCustomer.total_orders).toFixed(2) : '0.00'}</span>
                     </div>
                   </div>
                 </div>

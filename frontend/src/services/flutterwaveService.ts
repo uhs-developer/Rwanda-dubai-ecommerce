@@ -161,7 +161,7 @@ export class FlutterwaveService {
       public_key: this.sanitizeString(String(publicKey)),
       tx_ref: this.sanitizeString(String(txRef || this.generateTxRef())),
       amount: String(Number(amount).toFixed(2)), // Convert to string with 2 decimal places
-      currency: String('USD'), // Explicitly convert to string
+      currency: String('RWF'), // Explicitly convert to string
       payment_options: String('card,mobilemoney,ussd'), // Explicitly convert to string
       redirect_url: this.sanitizeString(String(window.location.origin + '/checkout')),
       customer: {

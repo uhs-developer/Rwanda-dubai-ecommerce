@@ -17,6 +17,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,35 +27,79 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Public checkout (guest or authenticated)
+Route::post('/checkout', [OrderController::class, 'store']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
+    // Authenticated cart endpoints (token-based)
+    Route::prefix('auth/cart')->group(function () {
+        Route::get('/', [CartController::class, 'index']);
+        Route::post('/add', [CartController::class, 'add']);
+        Route::put('/update/{id}', [CartController::class, 'update']);
+        Route::delete('/remove/{id}', [CartController::class, 'remove']);
+        Route::delete('/clear', [CartController::class, 'clear']);
+        Route::get('/summary', [CartController::class, 'summary']);
+    });
+
+    // Authenticated wishlist endpoints (token-based)
+    Route::prefix('auth/wishlist')->group(function () {
+        Route::get('/', [WishlistController::class, 'index']);
+        Route::post('/add', [WishlistController::class, 'add']);
+        Route::delete('/remove/{id}', [WishlistController::class, 'remove']);
+        Route::delete('/remove-product/{productId}', [WishlistController::class, 'removeByProduct']);
+        Route::delete('/clear', [WishlistController::class, 'clear']);
+        Route::get('/check/{productId}', [WishlistController::class, 'check']);
+        Route::get('/count', [WishlistController::class, 'count']);
+    });
     // Authentication routes
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/logout-all', [AuthController::class, 'logoutAll']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
+    Route::get('/account/export', [AuthController::class, 'exportAccountData']);
+    Route::delete('/account', [AuthController::class, 'deleteAccount']);
 
-    // Role-based protected routes examples
+    // Super Admin Dashboard Routes
     Route::middleware('role:super-admin')->group(function () {
-        Route::get('/super-admin/dashboard', function () {
-            return response()->json([
-                'success' => true,
-                'message' => 'Super Admin Dashboard Access Granted',
-                'data' => [
-                    'user' => auth()->user()->name,
-                    'role' => 'Super Admin',
-                    'permissions' => auth()->user()->getAllPermissions()->pluck('name')
-                ]
-            ]);
-        });
-        
-        Route::get('/super-admin/system-backup', function () {
-            return response()->json([
-                'success' => true,
-                'message' => 'System backup functionality - Super Admin only',
-                'data' => ['backup_status' => 'available']
-            ]);
+        Route::prefix('super-admin')->group(function () {
+            // Dashboard overview
+            Route::get('/dashboard/overview', [SuperAdminController::class, 'getDashboardOverview']);
+            
+            // User management
+            Route::get('/users', [SuperAdminController::class, 'getAdminUsers']);
+            Route::post('/users', [SuperAdminController::class, 'createAdminUser']);
+            Route::put('/users/{id}', [SuperAdminController::class, 'updateAdminUser']);
+            Route::delete('/users/{id}', [SuperAdminController::class, 'deleteAdminUser']);
+            
+            // System monitoring
+            Route::get('/system/status', [SuperAdminController::class, 'getSystemStatus']);
+            Route::get('/system/activities', [SuperAdminController::class, 'getRecentActivities']);
+            
+            // Analytics
+            Route::get('/analytics', [SuperAdminController::class, 'getAnalytics']);
+            
+            // Legacy routes for backward compatibility
+            Route::get('/dashboard', function () {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Super Admin Dashboard Access Granted',
+                    'data' => [
+                        'user' => auth()->user()->name,
+                        'role' => 'Super Admin',
+                        'permissions' => auth()->user()->getAllPermissions()->pluck('name')
+                    ]
+                ]);
+            });
+            
+            Route::get('/system-backup', function () {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'System backup functionality - Super Admin only',
+                    'data' => ['backup_status' => 'available']
+                ]);
+            });
         });
     });
 
@@ -154,6 +201,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{id}', [AddressController::class, 'updateAddress']);
             Route::delete('/{id}', [AddressController::class, 'deleteAddress']);
             Route::patch('/{id}/default', [AddressController::class, 'setDefaultAddress']);
+        });
+        
+        // Order management for customers
+        Route::prefix('orders')->group(function () {
+            Route::post('/', [OrderController::class, 'store']);
         });
         
         // Notifications

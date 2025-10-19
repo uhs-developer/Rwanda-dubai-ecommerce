@@ -12,7 +12,7 @@ Route::get('/', function () {
 Route::get('/first', [FirstController::class, 'index']);
 
 // Cart routes (public - works for both authenticated users and guests)
-Route::prefix('api/cart')->group(function () {
+Route::prefix('api/cart')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])->group(function () {
     Route::get('/', [CartController::class, 'index']);
     Route::post('/add', [CartController::class, 'add']);
     Route::put('/update/{id}', [CartController::class, 'update']);
@@ -22,7 +22,7 @@ Route::prefix('api/cart')->group(function () {
 });
 
 // Wishlist routes (public - works for both authenticated users and guests)
-Route::prefix('api/wishlist')->group(function () {
+Route::prefix('api/wishlist')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])->group(function () {
     Route::get('/', [WishlistController::class, 'index']);
     Route::post('/add', [WishlistController::class, 'add']);
     Route::delete('/remove/{id}', [WishlistController::class, 'remove']);

@@ -546,7 +546,7 @@ const EditorDashboard: React.FC = () => {
                           <TableRow key={product.id}>
                             <TableCell className="font-medium">{product.name}</TableCell>
                             <TableCell>{product.category?.name || 'N/A'}</TableCell>
-                            <TableCell>${product.effective_price.toFixed(2)}</TableCell>
+                            <TableCell>RWF {product.effective_price.toFixed(2)}</TableCell>
                             <TableCell>
                               <Badge className={getStatusColor(product.is_active ? 'active' : 'inactive')}>
                                 {product.is_active ? 'active' : 'inactive'}
@@ -1289,11 +1289,11 @@ const EditorDashboard: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-600">Current Price</label>
-                    <p className="text-sm text-gray-900">${selectedProduct.effective_price.toFixed(2)}</p>
+                    <p className="text-sm text-gray-900">RWF {selectedProduct.effective_price.toFixed(2)}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600">Original Price</label>
-                    <p className="text-sm text-gray-900">${selectedProduct.original_price?.toFixed(2) || 'N/A'}</p>
+                    <p className="text-sm text-gray-900">RWF {selectedProduct.original_price?.toFixed(2) || 'N/A'}</p>
                   </div>
                 </div>
               </div>

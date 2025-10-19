@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
@@ -76,7 +75,7 @@ export function CartPage({
                       <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted">
                         <ImageWithFallback
                           src={item.product.image || ''}
-                          alt={item.name}
+                          alt={item.product.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -129,15 +128,15 @@ export function CartPage({
                           {/* Price */}
                           <div className="text-right">
                             <div className="font-semibold">
-                              ${item.total_price.toFixed(2)}
+                              RWF {item.total_price.toFixed(2)}
                             </div>
                             {item.product.original_price && (
                               <div className="text-sm text-muted-foreground line-through">
-                                ${(item.product.original_price * item.quantity).toFixed(2)}
+                                RWF {(item.product.original_price * item.quantity).toFixed(2)}
                               </div>
                             )}
                             <div className="text-xs text-muted-foreground">
-                              ${item.price} each
+                              RWF {item.price} each
                             </div>
                           </div>
                         </div>
@@ -162,7 +161,7 @@ export function CartPage({
                       Fast shipping from Dubai to Rwanda
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Fast shipping from Dubai to Rwanda - $35 flat rate
+                      Fast shipping from Dubai to Rwanda - RWF 35 flat rate
                     </p>
                   </div>
                 </div>
@@ -184,15 +183,15 @@ export function CartPage({
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal ({totalItems} items)</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>RWF {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
+                  <span>RWF {shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>RWF {tax.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -200,7 +199,7 @@ export function CartPage({
 
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>RWF {total.toFixed(2)}</span>
               </div>
 
               <Button size="lg" className="w-full" onClick={onCheckout}>

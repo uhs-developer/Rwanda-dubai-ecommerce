@@ -203,6 +203,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|max:255|unique:users,email,' . $request->user()->id,
             'phone' => 'sometimes|nullable|string|max:20',
             'avatar' => 'sometimes|nullable|string|max:255',
         ]);
@@ -216,13 +217,96 @@ class AuthController extends Controller
         }
 
         $user = $request->user();
-        $user->update($request->only(['name', 'phone', 'avatar']));
+        $user->update($request->only(['name', 'email', 'phone', 'avatar']));
 
         return response()->json([
             'success' => true,
             'message' => 'Profile updated successfully',
             'data' => $user->load('roles.permissions')
         ]);
+    }
+
+    /**
+     * Export authenticated user's account data
+     */
+    public function exportAccountData(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            $data = [
+                'user' => $user->only(['id', 'name', 'email', 'phone', 'status', 'avatar', 'created_at', 'last_login_at']),
+                'roles' => $user->roles()->with('permissions')->get(),
+                'orders' => \App\Models\Order::where('user_id', $user->id)
+                    ->with(['items.product'])
+                    ->orderBy('created_at', 'desc')
+                    ->get(),
+            ];
+
+            // Include addresses if table exists
+            if (\Illuminate\Support\Facades\DB::getSchemaBuilder()->hasTable('addresses')) {
+                $data['addresses'] = \App\Models\Address::where('user_id', $user->id)->get();
+            }
+
+            // Include cart items
+            if (\Illuminate\Support\Facades\DB::getSchemaBuilder()->hasTable('cart_items')) {
+                $data['cart'] = \App\Models\CartItem::where('user_id', $user->id)
+                    ->with('product')
+                    ->get();
+            }
+
+            // Include wishlist if exists
+            if (\Illuminate\Support\Facades\DB::getSchemaBuilder()->hasTable('wishlist_items')) {
+                $data['wishlist'] = \Illuminate\Support\Facades\DB::table('wishlist_items')
+                    ->where('user_id', $user->id)
+                    ->get();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Account data exported successfully',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to export account data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete (deactivate/anonymize) authenticated user's account
+     */
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            // Soft-delete style: anonymize personal fields, deactivate status
+            $user->update([
+                'name' => 'Deleted User #' . $user->id,
+                'email' => 'deleted+' . $user->id . '@example.invalid',
+                'phone' => null,
+                'avatar' => null,
+                'status' => 'deactivated',
+            ]);
+
+            // Revoke tokens
+            $user->tokens()->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Account deleted and anonymized successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete account',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
 

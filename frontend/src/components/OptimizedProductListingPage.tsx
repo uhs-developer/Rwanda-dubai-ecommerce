@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { useProducts } from "../contexts/ProductContext";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useOptimizedProducts } from "../contexts/OptimizedProductContext";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
@@ -9,12 +9,12 @@ import { Separator } from "./ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { Skeleton } from "./ui/skeleton";
-import { SlidersHorizontal, Grid3X3, List, Star, Filter, AlertCircle } from "lucide-react";
+import { SlidersHorizontal, Grid3X3, List, Star, Filter, AlertCircle, RefreshCw } from "lucide-react";
 import { ProductCard } from "./ProductCard";
 import { ProductFilters, transformProductForDisplay } from "../services/product";
 import { toast } from "sonner";
 
-interface ProductListingPageAPIProps {
+interface OptimizedProductListingPageProps {
   category?: string;
   subcategory?: string;
   searchQuery?: string;
@@ -25,31 +25,45 @@ interface ProductListingPageAPIProps {
 type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'rating' | 'name';
 type ViewMode = 'grid' | 'list';
 
-export function ProductListingPageAPI({
+// Debounce hook for search
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+export function OptimizedProductListingPage({
   category,
   subcategory,
   searchQuery,
   onProductClick,
   onBack,
-}: ProductListingPageAPIProps) {
+}: OptimizedProductListingPageProps) {
   const {
     products,
     categories,
     brands,
     filterOptions,
     loading,
-    slowLoading,
     error,
     currentPage,
     totalPages,
     totalProducts,
     fetchProducts,
-    fetchCategories,
-    fetchBrands,
-    fetchFilterOptions,
     searchProducts,
     setCurrentPage,
-  } = useProducts();
+    clearCache,
+  } = useOptimizedProducts();
 
   // Local state for filters
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
@@ -61,12 +75,8 @@ export function ProductListingPageAPI({
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
-  // Initialize data on component mount
-  useEffect(() => {
-    fetchCategories();
-    fetchBrands();
-    fetchFilterOptions();
-  }, [fetchCategories, fetchBrands, fetchFilterOptions]);
+  // Debounced search query
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Set initial category/subcategory from props
   useEffect(() => {
@@ -85,8 +95,8 @@ export function ProductListingPageAPI({
     }
   }, [category, subcategory, categories]);
 
-  // Fetch products when filters change
-  useEffect(() => {
+  // Optimized fetch products with debouncing
+  const fetchProductsOptimized = useCallback(async () => {
     const filters: ProductFilters = {
       category_id: selectedCategoryId,
       subcategory_id: selectedSubcategoryId,
@@ -100,10 +110,10 @@ export function ProductListingPageAPI({
       per_page: 12,
     };
 
-    if (searchQuery) {
-      searchProducts(searchQuery, filters);
+    if (debouncedSearchQuery) {
+      await searchProducts(debouncedSearchQuery, filters);
     } else {
-      fetchProducts(filters);
+      await fetchProducts(filters);
     }
   }, [
     selectedCategoryId,
@@ -114,30 +124,39 @@ export function ProductListingPageAPI({
     inStockOnly,
     sortBy,
     currentPage,
-    searchQuery,
+    debouncedSearchQuery,
     fetchProducts,
     searchProducts,
   ]);
 
-  // Transform products for display
+  // Fetch products when filters change (with debouncing)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchProductsOptimized();
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchProductsOptimized]);
+
+  // Transform products for display (memoized)
   const displayProducts = useMemo(() => {
     return products.map(transformProductForDisplay);
   }, [products]);
 
-  const handleBrandChange = (brandId: number, checked: boolean) => {
+  // Optimized handlers
+  const handleBrandChange = useCallback((brandId: number, checked: boolean) => {
     setSelectedBrands(prev =>
       checked ? [...prev, brandId] : prev.filter(id => id !== brandId)
     );
     setCurrentPage(1);
-  };
+  }, [setCurrentPage]);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-    // Scroll to top when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, [setCurrentPage]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSelectedBrands([]);
     setSelectedCategoryId(undefined);
     setSelectedSubcategoryId(undefined);
@@ -146,13 +165,19 @@ export function ProductListingPageAPI({
     setInStockOnly(false);
     setCurrentPage(1);
     toast.success('Filters cleared');
-  };
+  }, [setCurrentPage]);
 
-  const getBrandName = (brandId: number) => {
+  const handleRefresh = useCallback(() => {
+    clearCache();
+    fetchProductsOptimized();
+  }, [clearCache, fetchProductsOptimized]);
+
+  // Memoized helper functions
+  const getBrandName = useCallback((brandId: number) => {
     return brands.find(b => b.id === brandId)?.name || `Brand ${brandId}`;
-  };
+  }, [brands]);
 
-  const getCategoryName = () => {
+  const getCategoryName = useCallback(() => {
     if (selectedCategoryId) {
       return categories.find(c => c.id === selectedCategoryId)?.name || 'Unknown Category';
     }
@@ -160,9 +185,9 @@ export function ProductListingPageAPI({
       return category.charAt(0).toUpperCase() + category.slice(1);
     }
     return 'All Products';
-  };
+  }, [selectedCategoryId, categories, category]);
 
-  const getSubcategoryName = () => {
+  const getSubcategoryName = useCallback(() => {
     if (selectedSubcategoryId && selectedCategoryId) {
       const categoryObj = categories.find(c => c.id === selectedCategoryId);
       return categoryObj?.subcategories?.find(s => s.id === selectedSubcategoryId)?.name || 'Unknown Subcategory';
@@ -171,9 +196,10 @@ export function ProductListingPageAPI({
       return subcategory.charAt(0).toUpperCase() + subcategory.slice(1);
     }
     return null;
-  };
+  }, [selectedSubcategoryId, selectedCategoryId, categories, subcategory]);
 
-  const FiltersContent = () => (
+  // Memoized filter content
+  const FiltersContent = useMemo(() => (
     <div className="space-y-6">
       {/* Categories */}
       {!category && categories.length > 0 && (
@@ -328,9 +354,23 @@ export function ProductListingPageAPI({
         Clear All Filters
       </Button>
     </div>
-  );
+  ), [
+    category,
+    categories,
+    selectedCategoryId,
+    selectedSubcategoryId,
+    brands,
+    selectedBrands,
+    handleBrandChange,
+    priceRange,
+    minRating,
+    inStockOnly,
+    clearFilters,
+    setCurrentPage,
+  ]);
 
-  const LoadingSkeleton = () => (
+  // Memoized loading skeleton
+  const LoadingSkeleton = useMemo(() => (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {Array.from({ length: 8 }).map((_, i) => (
         <Card key={i} className="overflow-hidden">
@@ -343,18 +383,25 @@ export function ProductListingPageAPI({
         </Card>
       ))}
     </div>
-  );
+  ), []);
 
-  const ErrorState = () => (
+  // Memoized error state
+  const ErrorState = useMemo(() => (
     <div className="text-center py-12">
       <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
       <p className="text-lg font-medium mb-2">Failed to load products</p>
       <p className="text-muted-foreground mb-4">{error}</p>
-      <Button onClick={() => window.location.reload()}>
-        Try Again
-      </Button>
+      <div className="flex gap-2 justify-center">
+        <Button onClick={handleRefresh}>
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Try Again
+        </Button>
+        <Button variant="outline" onClick={clearCache}>
+          Clear Cache
+        </Button>
+      </div>
     </div>
-  );
+  ), [error, handleRefresh, clearCache]);
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -368,7 +415,7 @@ export function ProductListingPageAPI({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">
-              {searchQuery ? `Search results for "${searchQuery}"` :
+              {debouncedSearchQuery ? `Search results for "${debouncedSearchQuery}"` :
                 getSubcategoryName() || getCategoryName() || 'All Products'}
             </h1>
             <p className="text-muted-foreground">
@@ -377,6 +424,11 @@ export function ProductListingPageAPI({
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Refresh Button */}
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading}>
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+
             {/* View Mode Toggle */}
             <div className="flex border rounded-lg">
               <Button
@@ -424,7 +476,7 @@ export function ProductListingPageAPI({
                   <SheetTitle>Product Filters</SheetTitle>
                 </SheetHeader>
                 <div className="mt-6">
-                  <FiltersContent />
+                  {FiltersContent}
                 </div>
               </SheetContent>
             </Sheet>
@@ -482,7 +534,7 @@ export function ProductListingPageAPI({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <FiltersContent />
+              {FiltersContent}
             </CardContent>
           </Card>
         </aside>
@@ -490,9 +542,9 @@ export function ProductListingPageAPI({
         {/* Products Grid/List */}
         <main className="flex-1">
           {error ? (
-            <ErrorState />
+            ErrorState
           ) : loading ? (
-            <LoadingSkeleton />
+            LoadingSkeleton
           ) : displayProducts.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground mb-4">No products found matching your criteria.</p>

@@ -147,16 +147,16 @@ export function ProductDetailPage({
           {/* Price */}
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <span className="text-3xl font-bold">${product.price}</span>
+              <span className="text-3xl font-bold">RWF {product.price}</span>
               {product.originalPrice && (
                 <span className="text-xl text-muted-foreground line-through">
-                  ${product.originalPrice}
+                  RWF {product.originalPrice}
                 </span>
               )}
             </div>
             {discount > 0 && (
               <p className="text-sm text-green-600">
-                You save ${(product.originalPrice! - product.price).toFixed(2)}
+                You save RWF {(product.originalPrice! - product.price).toFixed(2)}
               </p>
             )}
           </div>
@@ -377,7 +377,7 @@ export function ProductDetailPage({
                 <div>
                   <h4 className="font-medium mb-2">Shipping Information</h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Fast shipping from Dubai to Rwanda - $35 flat rate</li>
+                    <li>• Fast shipping from Dubai to Rwanda - RWF 35 flat rate</li>
                     <li>• Standard shipping: 7-14 business days</li>
                     <li>• Express shipping: 3-7 business days (additional cost)</li>
                     <li>• All items shipped from Dubai, UAE</li>
@@ -415,7 +415,7 @@ export function ProductDetailPage({
                     />
                   </div>
                   <h3 className="font-medium line-clamp-2 mb-2">{relatedProduct.name}</h3>
-                  <p className="font-semibold">${relatedProduct.price}</p>
+                  <p className="font-semibold">RWF {relatedProduct.price}</p>
                 </CardContent>
               </Card>
             ))}
