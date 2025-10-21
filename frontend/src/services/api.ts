@@ -56,7 +56,7 @@ export default apiClient;
 // API Response Types
 export interface ApiResponse<T = any> {
   success: boolean;
-  message?: string;
+  message: string;
   data?: T;
   errors?: Record<string, string[]>;
 }
@@ -83,7 +83,7 @@ const getTimeoutForEndpoint = (endpoint: string): number => {
 
 // Generic API request handler with retry logic
 export const apiRequest = async <T = any>(
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   endpoint: string,
   data?: any,
   config?: AxiosRequestConfig,

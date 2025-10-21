@@ -9,7 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { SlidersHorizontal, Grid3X3, List, Star, Filter } from "lucide-react";
 import { ProductCard } from "./ProductCard";
-import { Product, products, filterOptions } from "../data/products";
+import { products, filterOptions } from "../data/products";
+import { Product as MockProduct } from "../data/products";
+import { Product as ApiProduct } from "../services/product";
+
+type Product = MockProduct | ApiProduct;
 
 interface ProductListingPageProps {
   category?: string;

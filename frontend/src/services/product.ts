@@ -102,6 +102,7 @@ export interface ProductFilters {
   in_stock?: boolean;
   is_featured?: boolean;
   include_inactive?: boolean; // Include inactive products for editors
+  detailed?: boolean; // Get detailed product data
   search?: string;
   sort_by?: 'price_asc' | 'price_desc' | 'rating' | 'newest' | 'name';
   page?: number;
@@ -113,8 +114,8 @@ export interface PaginationMeta {
   last_page: number;
   per_page: number;
   total: number;
-  from: number;
-  to: number;
+  from: number | null;
+  to: number | null;
 }
 
 export interface ProductListResponse {
@@ -154,7 +155,8 @@ export class ProductService {
     const queryString = params.toString();
     const endpoint = queryString ? `/products?${queryString}` : '/products';
     
-    return await apiRequest<ProductListResponse>('GET', endpoint);
+    const response = await apiRequest<ProductListResponse>('GET', endpoint);
+    return response.data || { success: false, message: 'No data', data: [], pagination: { current_page: 1, last_page: 1, per_page: 10, total: 0, from: null, to: null } };
   }
 
   // Get featured products
@@ -177,7 +179,8 @@ export class ProductService {
       }
     });
 
-    return await apiRequest<ProductListResponse>('GET', `/products/search?${params.toString()}`);
+    const response = await apiRequest<ProductListResponse>('GET', `/products/search?${params.toString()}`);
+    return response.data || { success: false, message: 'No data', data: [], pagination: { current_page: 1, last_page: 1, per_page: 10, total: 0, from: null, to: null } };
   }
 
   // Get single product by slug

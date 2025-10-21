@@ -130,7 +130,8 @@ export class CustomerDashboardService {
 
   // Get addresses
   static async getAddresses(): Promise<AddressListResponse> {
-    return await apiRequest<AddressListResponse>('GET', '/customer/addresses');
+    const response = await apiRequest<AddressListResponse>('GET', '/customer/addresses');
+    return response.data || { success: false, message: 'No data', data: [], meta: { total: 0, per_page: 0, current_page: 0, last_page: 0 } };
   }
 
   // Create new address

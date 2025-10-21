@@ -2,7 +2,10 @@ import { useState, useRef } from "react";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductCard } from "./ProductCard";
-import { Product } from "../data/products";
+import { Product as MockProduct } from "../data/products";
+import { Product as ApiProduct } from "../services/product";
+
+type Product = MockProduct | ApiProduct;
 
 interface ProductSliderProps {
   title: string;
@@ -37,9 +40,6 @@ export function ProductSlider({
   };
 
   const canScrollLeft = scrollPosition > 0;
-  const canScrollRight = sliderRef.current 
-    ? scrollPosition < sliderRef.current.scrollWidth - sliderRef.current.clientWidth
-    : false;
 
   return (
     <section className="py-8">

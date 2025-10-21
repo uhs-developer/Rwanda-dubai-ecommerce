@@ -299,3 +299,4 @@ export const OptimizedProductProvider: React.FC<OptimizedProductProviderProps> =
 };
 
 export default OptimizedProductProvider;
+

@@ -53,7 +53,6 @@ export function OptimizedProductListingPage({
     products,
     categories,
     brands,
-    filterOptions,
     loading,
     error,
     currentPage,
@@ -616,3 +615,4 @@ export function OptimizedProductListingPage({
     </div>
   );
 }
+

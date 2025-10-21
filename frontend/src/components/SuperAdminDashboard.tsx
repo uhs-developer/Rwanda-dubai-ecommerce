@@ -68,8 +68,8 @@ const SuperAdminDashboard: React.FC = () => {
     last_page: 1,
     per_page: 15,
     total: 0,
-    from: null,
-    to: null
+    from: null as number | null,
+    to: null as number | null
   });
 
   // Load initial data

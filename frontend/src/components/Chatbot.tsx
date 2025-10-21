@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { ScrollArea } from "./ui/scroll-area";
 import {
@@ -54,7 +54,6 @@ export function Chatbot({ onProductClick }: ChatbotProps) {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -96,11 +95,11 @@ export function Chatbot({ onProductClick }: ChatbotProps) {
         categories: categories || [],
         brands: brands || [],
         currentPage: location.pathname,
-        userLocation: user?.location || 'Rwanda',
+        userLocation: 'Rwanda',
         orderHistory: [], // Will be loaded by loadUserOrderHistory
         wishlistItems: wishlistItems,
-        browsingHistory: chatbotService.context.browsingHistory || [],
-        currentGeolocation: chatbotService.context.currentGeolocation
+        browsingHistory: [],
+        currentGeolocation: undefined
       });
 
       const response = await chatbotService.generateResponse(userMessage, products);

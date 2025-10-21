@@ -10,7 +10,7 @@ export type BulkOperation =
 
 export const ProductBulkService = {
   async update(productIds: number[], op: BulkOperation): Promise<ApiResponse<{ updated: number }>> {
-    const payload: any = { product_ids: productIds, operation: op.operation, ...op };
+    const payload: any = { product_ids: productIds, ...op };
     return await apiRequest<{ updated: number }>('POST', '/products/bulk-update', payload);
   },
 };

@@ -25,7 +25,7 @@ export const ReturnsList: React.FC<Props> = ({ onClose }) => {
     setLoading(true);
     try {
       const res = await ReturnsService.list();
-      setItems(res.data.data);
+      setItems(res.data?.data || []);
     } catch (e) {
       console.error('Failed to load returns', e);
     } finally {

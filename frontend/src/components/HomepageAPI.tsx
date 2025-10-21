@@ -7,11 +7,9 @@ import { ProductSlider } from "./ProductSlider";
 import { CategoryFeaturedSlider } from "./CategoryFeaturedSlider";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
 import { Skeleton } from "./ui/skeleton";
 import { Truck, Shield, Headphones, CreditCard, Star, ArrowRight, AlertCircle } from "lucide-react";
 import { transformProductForDisplay } from "../services/product";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTranslation } from "../../node_modules/react-i18next";
 
 interface HomepageAPIProps {
@@ -26,7 +24,6 @@ export function HomepageAPI({
   const {
     featuredProducts,
     categories,
-    brands,
     loading,
     error,
     fetchFeaturedProducts,
@@ -65,9 +62,6 @@ export function HomepageAPI({
   const displayFeaturedProducts = featuredProducts.map(transformProductForDisplay);
   
   // Get category products (first 6 products for each major category)
-  const electronicsBrand = brands.find(b => b.name.toLowerCase().includes('apple') || b.name.toLowerCase().includes('samsung'));
-  const autoBrand = brands.find(b => b.name.toLowerCase().includes('hyundai') || b.name.toLowerCase().includes('toyota'));
-  const toolsBrand = brands.find(b => b.name.toLowerCase().includes('bosch') || b.name.toLowerCase().includes('makita'));
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">

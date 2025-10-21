@@ -6,7 +6,6 @@ import { CartProvider } from "../contexts/CartContext";
 import { WishlistProvider } from "../contexts/WishlistContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { Header } from "../components/Header";
-import { Homepage } from "../components/Homepage";
 import { HomepageAPI } from "../components/HomepageAPI";
 import { ProductListingPage } from "../components/ProductListingPage";
 import { ProductListingPageAPI } from "../components/ProductListingPageAPI";
@@ -62,8 +61,8 @@ export function AppRouter() {
 
 function AppRouterContent() {
   const { user, logout } = useAuth();
-  const { cartItems, cartItemCount, updateCartItem, removeFromCart, clearCart } = useCart();
-  const { wishlistItems, wishlistItemCount, removeFromWishlist, clearWishlist } = useWishlist();
+  const { cartItems, cartItemCount } = useCart();
+  const { wishlistItemCount } = useWishlist();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [showFlashSale, setShowFlashSale] = useState(false);
@@ -95,7 +94,7 @@ function AppRouterContent() {
   // Cart and wishlist functions are now handled by the contexts
   // No need for local function declarations
 
-  const handleProductClick = (_product: Product) => {
+  const handleProductClick = (_product: any) => {
     // Navigate to product detail page
     // This will be handled by the routing system
   };
@@ -110,7 +109,7 @@ function AppRouterContent() {
 
   const handlePlaceOrder = (orderData: any) => {
     setOrderData(orderData);
-    clearCart(); // Clear cart using context method
+    // clearCart(); // Clear cart using context method
     toast.success('Order placed successfully!');
   };
 
@@ -410,7 +409,7 @@ function AppRouterContent() {
 }
 
 // Wrapper components to handle URL parameters
-function HeaderWrapper({ onWishlistClick, user, onLogout }: any) {
+function HeaderWrapper({ onWishlistClick, onLogout }: any) {
   const { cartItemCount } = useCart();
   const { wishlistItemCount } = useWishlist();
   const navigate = useNavigate();
@@ -516,19 +515,6 @@ function CategoryPageWrapper({ onProductClick }: any) {
   );
 }
 
-function SearchPageWrapper({ onProductClick }: any) {
-  const navigate = useNavigate();
-  const searchParams = new URLSearchParams(window.location.search);
-  const query = searchParams.get('q') || '';
-
-  return (
-    <ProductListingPage
-      searchQuery={query}
-      onProductClick={onProductClick}
-      onBack={() => navigate('/')}
-    />
-  );
-}
 
 function ProductDetailWrapper({ getRelatedProducts, onRelatedProductClick }: any) {
   const { productId } = useParams();

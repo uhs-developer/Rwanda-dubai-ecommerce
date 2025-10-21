@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { ArrowLeft, MessageCircle, RotateCcw, Package, CheckCircle, XCircle, Shield, Clock, FileText } from "lucide-react";
+import { ArrowLeft, RotateCcw, Package, CheckCircle, XCircle, Shield, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 interface ReturnsWarrantyPageProps {

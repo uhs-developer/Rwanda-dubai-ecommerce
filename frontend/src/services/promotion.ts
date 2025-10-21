@@ -1,4 +1,4 @@
-import apiClient, { ApiResponse, apiRequest } from './api';
+import { ApiResponse, apiRequest } from './api';
 
 export interface Promotion {
   id: number;

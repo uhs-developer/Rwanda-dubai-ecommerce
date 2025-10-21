@@ -1,9 +1,9 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { AlertTriangle, Lock, Shield } from 'lucide-react';
+import { Lock, Shield } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: ReactNode;

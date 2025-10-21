@@ -164,7 +164,7 @@ class MediaService {
   }
 
   // Helper method to get file type icon
-  getFileTypeIcon(resourceType: string, format: string): string {
+  getFileTypeIcon(resourceType: string, _format: string): string {
     if (resourceType === 'image') {
       return '🖼️';
     } else if (resourceType === 'video') {

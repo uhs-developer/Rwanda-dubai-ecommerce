@@ -66,8 +66,8 @@ export interface OrderListResponse {
     last_page: number;
     per_page: number;
     total: number;
-    from: number;
-    to: number;
+    from: number | null;
+    to: number | null;
   };
 }
 
@@ -105,7 +105,8 @@ export class OrderService {
     const queryString = params.toString();
     const endpoint = queryString ? `/orders?${queryString}` : '/orders';
     
-    return await apiRequest<OrderListResponse>('GET', endpoint);
+    const response = await apiRequest<OrderListResponse>('GET', endpoint);
+    return response.data || { success: false, message: 'No data', data: [], pagination: { current_page: 1, last_page: 1, per_page: 10, total: 0, from: null as number | null, to: null as number | null } };
   }
 
   // Get single order by ID

@@ -136,7 +136,7 @@ export function CheckoutPage({ onBack, onPlaceOrder }: CheckoutPageProps) {
         items: cartItems.map(item => ({
           product_id: item.product.id,
           product_name: item.product.name,
-          product_sku: item.product.sku || undefined,
+          product_sku: item.product.id.toString(),
           unit_price: item.price,
           quantity: item.quantity,
           total_price: item.total_price

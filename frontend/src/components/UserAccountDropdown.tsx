@@ -17,8 +17,6 @@ import {
 } from "lucide-react";
 import { User } from "../services/auth";
 import { 
-  isSuperAdmin, 
-  hasAdminAccess, 
   getPrimaryRole,
   canAccessAdminDashboard,
   canAccessSuperAdminDashboard

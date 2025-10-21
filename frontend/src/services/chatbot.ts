@@ -1,6 +1,6 @@
 import { Product } from "../data/products";
 import { ProductService, ProductFilters } from "./product";
-import { UserService } from "./user";
+// import { UserService } from "./user";
 
 export interface ChatMessage {
   id: string;
@@ -192,9 +192,13 @@ class ChatbotService {
   }
 
   private buildEnhancedPrompt(userMessage: string, products: Product[]): string {
-    const productList = products.slice(0, 15).map(p =>
-      `- ${p.name} by ${typeof p.brand === 'string' ? p.brand : p.brand?.name || 'Unknown Brand'} - $${p.price} (${typeof p.category === 'string' ? p.category : p.category?.name || 'Unknown Category'})`
-    ).join('\n');
+    const productList = products.slice(0, 15).map(p => {
+      const name = 'name' in p ? p.name : 'Unknown Product';
+      const brand = typeof p.brand === 'string' ? p.brand : (p.brand as any)?.name || 'Unknown Brand';
+      const price = 'price' in p ? p.price : 0;
+      const category = typeof p.category === 'string' ? p.category : (p.category as any)?.name || 'Unknown Category';
+      return `- ${name} by ${brand} - $${price} (${category})`;
+    }).join('\n');
 
     // Get recent conversation context (last 6 messages)
     const recentConversation = this.context.conversationHistory.slice(-6).map(msg => 
@@ -295,9 +299,13 @@ Respond naturally as if you're a real person helping a customer in a store. Be w
   }
 
   private buildSystemPrompt(products: Product[]): string {
-    const productList = products.slice(0, 15).map(p =>
-      `- ${p.name} by ${typeof p.brand === 'string' ? p.brand : p.brand?.name || 'Unknown Brand'} - $${p.price} (${typeof p.category === 'string' ? p.category : p.category?.name || 'Unknown Category'})`
-    ).join('\n');
+    const productList = products.slice(0, 15).map(p => {
+      const name = 'name' in p ? p.name : 'Unknown Product';
+      const brand = typeof p.brand === 'string' ? p.brand : (p.brand as any)?.name || 'Unknown Brand';
+      const price = 'price' in p ? p.price : 0;
+      const category = typeof p.category === 'string' ? p.category : (p.category as any)?.name || 'Unknown Category';
+      return `- ${name} by ${brand} - $${price} (${category})`;
+    }).join('\n');
 
     return `You are Manzi, a friendly shopping assistant for TechBridge, connecting Dubai with Rwanda.
 
@@ -307,7 +315,7 @@ ${productList}
 Be conversational, remember customer names from conversation history, provide personalized recommendations with specific product names and prices, and answer questions about shipping (Dubai to Rwanda: 5-7 days, free over $500). Support multiple languages and be naturally helpful like a real person named Manzi.`;
   }
 
-  private generateRuleBasedResponse(userMessage: string, products: Product[], messageId: string): ChatMessage {
+  private generateRuleBasedResponse(userMessage: string, products: Product[], _messageId: string): ChatMessage {
     const message = userMessage.toLowerCase();
 
     // Handle personal introductions and greetings
@@ -617,8 +625,8 @@ Be conversational, remember customer names from conversation history, provide pe
   async getUserOrderHistory(): Promise<any[]> {
     try {
       if (!this.context.isAuthenticated) return [];
-      const response = await UserService.getUserOrders();
-      return response.data || [];
+      // TODO: Implement getUserOrders in UserService
+      return [];
     } catch (error) {
       console.error('Order history query error:', error);
       return [];
@@ -710,7 +718,7 @@ Be conversational, remember customer names from conversation history, provide pe
                 latitude,
                 longitude
               };
-            } catch (error) {
+            } catch (_error) {
               // Fallback to default location
               this.context.currentGeolocation = {
                 country: 'Rwanda',
@@ -720,7 +728,7 @@ Be conversational, remember customer names from conversation history, provide pe
               };
             }
           },
-          (error) => {
+          (_error) => {
             // Geolocation denied or failed, use default
             this.context.currentGeolocation = {
               country: 'Rwanda',
@@ -790,7 +798,7 @@ Be conversational, remember customer names from conversation history, provide pe
   }
 
   // Price Alert System (Future Enhancement)
-  async checkPriceAlerts(products: any[]): Promise<any[]> {
+  async checkPriceAlerts(_products: any[]): Promise<any[]> {
     // TODO: Implement price alert checking
     // This would check if any products in user's price alerts have dropped in price
     return [];
@@ -803,7 +811,7 @@ Be conversational, remember customer names from conversation history, provide pe
     // Based on cart items
     if (this.context.cartItems.length > 0) {
       // Recommend complementary products
-      this.context.cartItems.forEach(cartItem => {
+      this.context.cartItems.forEach(_cartItem => {
         // Add logic to recommend accessories or related products
       });
     }
@@ -811,9 +819,9 @@ Be conversational, remember customer names from conversation history, provide pe
     // Based on browsing history
     if (this.context.browsingHistory && this.context.browsingHistory.length > 0) {
       // Recommend similar products to recently viewed
-      const recentCategories = [...new Set(
-        this.context.browsingHistory.slice(0, 5).map(item => item.category)
-      )];
+      // const _recentCategories = [...new Set(
+      //   this.context.browsingHistory.slice(0, 5).map(item => item.category)
+      // )];
       // Add logic to recommend products from these categories
     }
 

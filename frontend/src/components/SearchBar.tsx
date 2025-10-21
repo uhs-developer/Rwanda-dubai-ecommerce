@@ -5,7 +5,6 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { useProducts } from '../contexts/ProductContext';
 import { ProductService, Product } from '../services/product';
 import { getProductImageUrl, formatPrice } from '../services/product';
 

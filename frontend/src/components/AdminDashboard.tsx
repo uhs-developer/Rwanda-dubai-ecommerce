@@ -30,8 +30,8 @@ import { ProductBulkService } from '../services/product-bulk';
 import { ReturnsList } from './ReturnsList';
 import { ProductService, Product as ProductApi } from '../services/product';
 import { PromotionService, Promotion as PromotionApi } from '../services/promotion';
-import { OrderService, Order as OrderApi, OrderStatistics } from '../services/order';
-import { UserService, User as UserApi, UserStatistics } from '../services/user';
+import { OrderService, Order as OrderApi } from '../services/order';
+import { UserService, User as UserApi } from '../services/user';
 import { DashboardService, DashboardStatistics } from '../services/dashboard';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
@@ -111,7 +111,7 @@ const AdminDashboard: React.FC = () => {
   // Order management state
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
-  const [orderStatistics, setOrderStatistics] = useState<OrderStatistics | null>(null);
+  const [, setOrderStatistics] = useState<any>(null);
   const [showOrderViewModal, setShowOrderViewModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderApi | null>(null);
   const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
@@ -119,7 +119,7 @@ const AdminDashboard: React.FC = () => {
   // Customer management state
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customersLoading, setCustomersLoading] = useState(false);
-  const [userStatistics, setUserStatistics] = useState<UserStatistics | null>(null);
+  const [, setUserStatistics] = useState<any>(null);
   const [showCustomerViewModal, setShowCustomerViewModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<UserApi | null>(null);
   const [isUpdatingCustomer, setIsUpdatingCustomer] = useState(false);

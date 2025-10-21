@@ -41,8 +41,8 @@ export interface UserListResponse {
     last_page: number;
     per_page: number;
     total: number;
-    from: number;
-    to: number;
+    from: number | null;
+    to: number | null;
   };
 }
 
@@ -78,7 +78,8 @@ export class UserService {
     const queryString = params.toString();
     const endpoint = queryString ? `/users?${queryString}` : '/users';
     
-    return await apiRequest<UserListResponse>('GET', endpoint);
+    const response = await apiRequest<UserListResponse>('GET', endpoint);
+    return response.data || { success: false, message: 'No data', data: [], pagination: { current_page: 1, last_page: 1, per_page: 10, total: 0, from: null as number | null, to: null as number | null } };
   }
 
   // Get single user by ID

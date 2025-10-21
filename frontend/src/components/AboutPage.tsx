@@ -1,6 +1,5 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
 import { ArrowLeft, Users, TrendingUp, Award, CheckCircle, Truck, Clock, Shield } from "lucide-react";
 
 interface AboutPageProps {

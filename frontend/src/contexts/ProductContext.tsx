@@ -65,7 +65,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
   };
 
   const fetchProducts = useCallback(async (filters: ProductFilters = {}) => {
-    let slowLoadingTimer: NodeJS.Timeout;
+    let slowLoadingTimer: NodeJS.Timeout | undefined;
     
     try {
       setLoading(true);
@@ -99,7 +99,9 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
       handleError(error, 'Failed to fetch products');
       setProducts([]);
     } finally {
-      clearTimeout(slowLoadingTimer);
+      if (slowLoadingTimer) {
+        clearTimeout(slowLoadingTimer);
+      }
       setLoading(false);
       setSlowLoading(false);
     }

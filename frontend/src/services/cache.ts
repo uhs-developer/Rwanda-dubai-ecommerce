@@ -74,3 +74,4 @@ export const CACHE_TTL = {
   FILTER_OPTIONS: 5 * 60 * 1000, // 5 minutes for filter options
   FEATURED: 5 * 60 * 1000,       // 5 minutes for featured products
 };
+

@@ -274,7 +274,7 @@ export class FlutterwaveService {
 
   public async processPayment(
     config: FlutterwaveConfig,
-    onSuccess: (response: FlutterwaveResponse) => void,
+    _onSuccess: () => void,
     onError: (error: FlutterwaveError) => void
   ): Promise<void> {
     try {

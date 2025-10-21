@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+// import { User as UserFromService } from "../services/user";
 import { CustomerDashboardService } from "../services/customerDashboard";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Checkbox } from "./ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Alert, AlertDescription } from "./ui/alert";
 import { 
   ArrowLeft,
-  User,
+  User as UserIcon,
   Upload,
   Camera,
   AlertCircle
@@ -66,7 +65,7 @@ export function ProfileSettingsPage({ user, onBack, onUpdateUser }: ProfileSetti
 
       if (response.success && response.data) {
         // Update the auth context with new user data
-        updateUser(response.data);
+        updateUser(response.data as any);
         
         // Also call the prop callback if provided
         onUpdateUser?.(response.data);
@@ -127,7 +126,7 @@ export function ProfileSettingsPage({ user, onBack, onUpdateUser }: ProfileSetti
                         className="h-24 w-24 rounded-full object-cover"
                       />
                     ) : (
-                      <User className="h-12 w-12 text-muted-foreground" />
+                      <UserIcon className="h-12 w-12 text-muted-foreground" />
                     )}
                   </div>
                   <Button 

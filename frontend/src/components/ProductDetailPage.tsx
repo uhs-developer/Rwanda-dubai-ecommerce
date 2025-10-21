@@ -4,7 +4,6 @@ import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import {
   Star,
   Heart,
@@ -38,13 +37,12 @@ export function ProductDetailPage({
   relatedProducts = [],
   onRelatedProductClick,
 }: ProductDetailPageProps) {
-  const { addToCart, isInCart } = useCart();
-  const { addToWishlist, isInWishlist, removeByProduct } = useWishlist();
+  const { addToCart } = useCart();
+  const { addToWishlist } = useWishlist();
   const { t } = useTranslation();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState("");
 
   const images = product.images || [product.image];
   const discount = product.originalPrice 

@@ -117,12 +117,11 @@ export function CategoryFeaturedSlider({
               transform: `translateX(-${currentIndex * (showOneOnMobile ? 100 : 33.333)}%)`,
             }}
           >
-            {products.map((product, index) => {
+            {products.map((product) => {
               // Handle both mock and API product types
               const isApiProduct = 'effective_price' in product;
               const displayPrice = isApiProduct ? product.effective_price : product.price;
               const originalPrice = isApiProduct ? product.price : product.originalPrice;
-              const hasPromotionalPrice = isApiProduct ? product.has_promotional_price : false;
               const discount = isApiProduct ? product.promotional_discount_percentage : 
                 (product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0);
 
@@ -144,7 +143,7 @@ export function CategoryFeaturedSlider({
                           onClick={() => onProductClick?.(product)}
                         >
                           <ImageWithFallback
-                            src={product.image}
+                            src={isApiProduct ? product.primary_image || '' : product.image}
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                           />
@@ -152,12 +151,12 @@ export function CategoryFeaturedSlider({
 
                         {/* Badges */}
                         <div className="absolute top-3 left-3 flex flex-col gap-1">
-                          {discount > 0 && (
+                          {(discount || 0) > 0 && (
                             <Badge variant="destructive" className="text-xs">
                               -{discount}%
                             </Badge>
                           )}
-                          {!product.inStock && (
+                          {!(isApiProduct ? product.in_stock : product.inStock) && (
                             <Badge variant="secondary" className="text-xs">
                               Out of Stock
                             </Badge>
@@ -182,7 +181,7 @@ export function CategoryFeaturedSlider({
                           <Button
                             size="sm"
                             className="w-full"
-                            disabled={!product.inStock}
+                            disabled={!(isApiProduct ? product.in_stock : product.inStock)}
                             onClick={async (e: { stopPropagation: () => void; }) => {
                               e.stopPropagation();
                               await addToCart(product, 1);
@@ -197,7 +196,7 @@ export function CategoryFeaturedSlider({
                       <div className="p-4">
                         {/* Brand */}
                         <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                          {product.brand}
+                          {isApiProduct ? (typeof product.brand === 'string' ? product.brand : product.brand?.name || 'Unknown Brand') : product.brand}
                         </p>
 
                         {/* Product Name */}
@@ -215,7 +214,7 @@ export function CategoryFeaturedSlider({
                               <Star
                                 key={star}
                                 className={`h-3 w-3 ${
-                                  star <= product.rating
+                                  star <= (isApiProduct ? 0 : product.rating)
                                     ? 'fill-yellow-400 text-yellow-400'
                                     : 'text-gray-300'
                                 }`}
@@ -223,7 +222,7 @@ export function CategoryFeaturedSlider({
                             ))}
                           </div>
                           <span className="text-xs text-muted-foreground">
-                            {product.rating} ({product.reviews})
+                            {isApiProduct ? 'N/A' : `${product.rating} (${product.reviews})`}
                           </span>
                         </div>
 
@@ -237,7 +236,7 @@ export function CategoryFeaturedSlider({
                               </span>
                             )}
                           </div>
-                          {discount > 0 && (
+                          {(discount || 0) > 0 && (
                             <Badge variant="outline" className="text-xs text-green-600">
                               Save RWF {(originalPrice! - displayPrice).toFixed(0)}
                             </Badge>

@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { ArrowLeft, Heart, Bookmark, Share2, Clock, User, Eye, MessageSquare } from "lucide-react";
+import { ArrowLeft, Heart, Bookmark, Share2, Clock, User, Eye } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -54,7 +54,7 @@ const relatedArticles: RelatedArticle[] = [
   }
 ];
 
-export function BlogDetailPage({ onBack, articleId }: BlogDetailPageProps) {
+export function BlogDetailPage({ onBack: _onBack, articleId: _articleId }: BlogDetailPageProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [likes] = useState(247);

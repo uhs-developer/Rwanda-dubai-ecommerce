@@ -58,7 +58,8 @@ export class OptimizedProductService {
     const queryString = params.toString();
     const endpoint = queryString ? `/products?${queryString}` : '/products';
     
-    return await apiRequest<ProductListResponse>('GET', endpoint);
+    const response = await apiRequest<ProductListResponse>('GET', endpoint);
+    return response.data || { success: false, message: 'No data', data: [], pagination: { current_page: 1, last_page: 1, per_page: 10, total: 0, from: null, to: null } };
   }
 
   // Get featured products with caching
@@ -109,7 +110,7 @@ export class OptimizedProductService {
       apiCache.set(cacheKey, response, CACHE_TTL.PRODUCTS);
     }
     
-    return response;
+    return response.data || { success: false, message: 'No data', data: [], pagination: { current_page: 1, last_page: 1, per_page: 10, total: 0, from: null, to: null } };
   }
 
   // Get single product with caching
@@ -278,3 +279,4 @@ export class OptimizedProductService {
     }
   }
 }
+

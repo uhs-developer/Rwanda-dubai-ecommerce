@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, AuthService, LoginRequest, RegisterRequest } from '../services/auth';
 import { toast } from 'sonner';
 

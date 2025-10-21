@@ -4,7 +4,7 @@ import { ProductListingPageAPI } from './ProductListingPageAPI';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Search, ArrowLeft } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface SearchResultsPageProps {
   onProductClick?: (product: any) => void;
