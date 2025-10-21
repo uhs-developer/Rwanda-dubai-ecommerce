@@ -25,10 +25,16 @@ class CorsMiddleware
             'http://127.0.0.1:5173',
             'https://api.seba.hanohost.net',
             'https://seba.hanohost.net',
+            'https://damus-2bfi.vercel.app',
         ];
         
         // Check if origin is allowed
         $allowedOrigin = in_array($origin, $allowedOrigins) ? $origin : null;
+        
+        // Check Vercel pattern if not in allowed origins
+        if (!$allowedOrigin && $origin && preg_match('/^https:\/\/.*\.vercel\.app$/', $origin)) {
+            $allowedOrigin = $origin;
+        }
         
         // Handle preflight requests
         if ($request->isMethod('OPTIONS')) {

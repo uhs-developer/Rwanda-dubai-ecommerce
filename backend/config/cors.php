@@ -15,12 +15,14 @@ return [
 		'http://127.0.0.1:5173',
 		'https://api.seba.hanohost.net',
 		'https://seba.hanohost.net',
+		'https://damus-2bfi.vercel.app',
 	],
 
 	'allowed_origins_patterns' => [
 		'/^https?:\/\/localhost:\d+$/',
 		'/^https?:\/\/127\.0\.0\.1:\d+$/',
 		'/^https?:\/\/.*\.hanohost\.net$/',
+		'/^https?:\/\/.*\.vercel\.app$/',
 	],
 
 	// Allow any headers from the frontend

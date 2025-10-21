@@ -35,11 +35,16 @@ Route::options('/{any}', function (Request $request) {
         'http://127.0.0.1:5173',
         'https://api.seba.hanohost.net',
         'https://seba.hanohost.net',
+        'https://damus-2bfi.vercel.app',
     ];
     
     $response = response('', 200);
     
-    if (in_array($origin, $allowedOrigins)) {
+    // Check if origin is in allowed list or matches Vercel pattern
+    $isAllowed = in_array($origin, $allowedOrigins) || 
+                 ($origin && preg_match('/^https:\/\/.*\.vercel\.app$/', $origin));
+    
+    if ($isAllowed) {
         $response->header('Access-Control-Allow-Origin', $origin);
         $response->header('Access-Control-Allow-Credentials', 'true');
     }
@@ -53,11 +58,28 @@ Route::options('/{any}', function (Request $request) {
 
 // CORS test endpoint
 Route::get('/cors-test', function () {
+    $origin = request()->header('Origin', 'No origin header');
+    $allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:5173',
+        'https://api.seba.hanohost.net',
+        'https://seba.hanohost.net',
+        'https://damus-2bfi.vercel.app',
+    ];
+    
+    $isVercel = $origin && preg_match('/^https:\/\/.*\.vercel\.app$/', $origin);
+    $isAllowed = in_array($origin, $allowedOrigins) || $isVercel;
+    
     return response()->json([
         'success' => true,
         'message' => 'CORS is working!',
         'timestamp' => now(),
-        'origin' => request()->header('Origin', 'No origin header')
+        'origin' => $origin,
+        'is_allowed' => $isAllowed,
+        'is_vercel' => $isVercel,
+        'allowed_origins' => $allowedOrigins
     ]);
 });
 
