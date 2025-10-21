@@ -7,10 +7,21 @@ return [
 	// Allow all methods for now; tighten if desired
 	'allowed_methods' => ['*'],
 
-	// Allow all origins - set to wildcard for development
-	'allowed_origins' => ['*'],
+	// Allow specific origins for credentials support
+	'allowed_origins' => [
+		'http://localhost:3000',
+		'http://localhost:5173',
+		'http://127.0.0.1:3000',
+		'http://127.0.0.1:5173',
+		'https://api.seba.hanohost.net',
+		'https://seba.hanohost.net',
+	],
 
-	'allowed_origins_patterns' => [],
+	'allowed_origins_patterns' => [
+		'/^https?:\/\/localhost:\d+$/',
+		'/^https?:\/\/127\.0\.0\.1:\d+$/',
+		'/^https?:\/\/.*\.hanohost\.net$/',
+	],
 
 	// Allow any headers from the frontend
 	'allowed_headers' => ['*'],
@@ -21,8 +32,8 @@ return [
 	// No caching of preflight in dev
 	'max_age' => 0,
 
-	// Set to false when using wildcard origins
-	'supports_credentials' => false,
+	// Enable credentials support
+	'supports_credentials' => true,
 ];
 
 

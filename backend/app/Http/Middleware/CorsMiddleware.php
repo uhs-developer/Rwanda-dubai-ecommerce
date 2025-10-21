@@ -15,22 +15,47 @@ class CorsMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $origin = $request->header('Origin');
+        
+        // Define allowed origins
+        $allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:5173',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:5173',
+            'https://api.seba.hanohost.net',
+            'https://seba.hanohost.net',
+        ];
+        
+        // Check if origin is allowed
+        $allowedOrigin = in_array($origin, $allowedOrigins) ? $origin : null;
+        
         // Handle preflight requests
         if ($request->isMethod('OPTIONS')) {
-            return response('', 200)
-                ->header('Access-Control-Allow-Origin', '*')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin')
-                ->header('Access-Control-Max-Age', '86400');
+            $response = response('', 200);
+            
+            if ($allowedOrigin) {
+                $response->header('Access-Control-Allow-Origin', $allowedOrigin);
+                $response->header('Access-Control-Allow-Credentials', 'true');
+            }
+            
+            $response->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+            $response->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, X-CSRF-TOKEN');
+            $response->header('Access-Control-Max-Age', '86400');
+            
+            return $response;
         }
 
         $response = $next($request);
 
         // Add CORS headers to the response
-        $response->headers->set('Access-Control-Allow-Origin', '*');
+        if ($allowedOrigin) {
+            $response->headers->set('Access-Control-Allow-Origin', $allowedOrigin);
+            $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        }
+        
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-        $response->headers->set('Access-Control-Allow-Credentials', 'false');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, X-CSRF-TOKEN');
 
         return $response;
     }

@@ -23,13 +23,32 @@ use App\Http\Controllers\WishlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// CORS test route
-Route::options('/{any}', function () {
-    return response('', 200)
-        ->header('Access-Control-Allow-Origin', '*')
-        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin')
-        ->header('Access-Control-Max-Age', '86400');
+// CORS preflight route
+Route::options('/{any}', function (Request $request) {
+    $origin = $request->header('Origin');
+    
+    // Define allowed origins
+    $allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:5173',
+        'https://api.seba.hanohost.net',
+        'https://seba.hanohost.net',
+    ];
+    
+    $response = response('', 200);
+    
+    if (in_array($origin, $allowedOrigins)) {
+        $response->header('Access-Control-Allow-Origin', $origin);
+        $response->header('Access-Control-Allow-Credentials', 'true');
+    }
+    
+    $response->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    $response->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, X-CSRF-TOKEN');
+    $response->header('Access-Control-Max-Age', '86400');
+    
+    return $response;
 })->where('any', '.*');
 
 // CORS test endpoint
