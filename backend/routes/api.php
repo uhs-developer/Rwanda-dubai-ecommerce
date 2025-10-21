@@ -23,6 +23,25 @@ use App\Http\Controllers\WishlistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// CORS test route
+Route::options('/{any}', function () {
+    return response('', 200)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin')
+        ->header('Access-Control-Max-Age', '86400');
+})->where('any', '.*');
+
+// CORS test endpoint
+Route::get('/cors-test', function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'CORS is working!',
+        'timestamp' => now(),
+        'origin' => request()->header('Origin', 'No origin header')
+    ]);
+});
+
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

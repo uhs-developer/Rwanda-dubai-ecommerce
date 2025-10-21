@@ -17,6 +17,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \App\Http\Middleware\PermissionMiddleware::class,
             'super-admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
         ]);
+        
+        // Add CORS middleware globally
+        $middleware->append(\App\Http\Middleware\CorsMiddleware::class);
+        
+        // Also add to API routes specifically
+        $middleware->api(prepend: [
+            \App\Http\Middleware\CorsMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

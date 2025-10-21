@@ -7,25 +7,24 @@ return [
 	// Allow all methods for now; tighten if desired
 	'allowed_methods' => ['*'],
 
-	// Explicitly list frontend origins; no wildcards when credentials are used
-	'allowed_origins' => [
-		'http://localhost:3000',
-	],
+	// Allow all origins - set to wildcard for development
+	'allowed_origins' => ['*'],
 
 	'allowed_origins_patterns' => [],
 
 	// Allow any headers from the frontend
 	'allowed_headers' => ['*'],
 
-	// Expose none by default
-	'exposed_headers' => [],
+	// Expose headers that might be needed
+	'exposed_headers' => ['*'],
 
 	// No caching of preflight in dev
 	'max_age' => 0,
 
-	// Critical: allow cookies/credentials over CORS
-	'supports_credentials' => true,
+	// Set to false when using wildcard origins
+	'supports_credentials' => false,
 ];
+
 
 
 
