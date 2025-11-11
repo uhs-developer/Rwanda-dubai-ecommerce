@@ -18,6 +18,11 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             // UserSeeder::class, // Disabled - using Spatie Permission now
             ProductsAndCategoriesSeeder::class,
+            ExchangeRatesSeeder::class,
+            ShippingMethodSeeder::class,
+            ShippingRouteSeeder::class,
+            // ShippingMethodRoutePriceSeeder::class, // Empty seeder - skip for now
+            TestOrdersSeeder::class, // Creates test orders and invoices
             // RwandaDubaiCommerceSeeder::class,
             // BlogPostsSeeder::class,
         ]);

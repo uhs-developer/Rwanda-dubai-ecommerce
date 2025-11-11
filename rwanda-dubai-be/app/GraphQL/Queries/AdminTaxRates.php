@@ -2,22 +2,16 @@
 
 namespace App\GraphQL\Queries;
 
-use App\Models\Invoice;
+use App\Models\TaxRate;
 
-class AdminInvoices
+class AdminTaxRates
 {
     public function __invoke($_, array $args)
     {
-        $query = Invoice::query();
-
-        if (!empty($args['orderId'])) {
-            $query->where('order_id', $args['orderId']);
-        }
-
         $perPage = $args['perPage'] ?? 20;
         $page = $args['page'] ?? 1;
 
-        $paginator = $query->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
+        $paginator = TaxRate::orderBy('id')->paginate($perPage, ['*'], 'page', $page);
 
         return [
             'data' => $paginator->items(),
@@ -30,3 +24,4 @@ class AdminInvoices
         ];
     }
 }
+

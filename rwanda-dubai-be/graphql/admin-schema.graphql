@@ -53,9 +53,18 @@ extend type Query {
     page: Int = 1
     perPage: Int = 20
   ): AdminShipmentConnection!
+  
+  # ===== Admin Invoices =====
+  adminInvoices(
+    orderId: ID
+    page: Int = 1
+    perPage: Int = 20
+  ): AdminInvoiceConnection!
+  
   # adminShipment(id: ID!): AdminShipment  # TODO: Implement resolver
   # adminInvoice(id: ID!): AdminInvoice  # TODO: Implement resolver
   # adminCreditMemo(id: ID!): AdminCreditMemo  # TODO: Implement resolver
+  
   # ===== Admin Users & Roles =====
   adminUsers(
     q: String
@@ -205,19 +214,19 @@ type AdminCustomerConnection {
 
 type AdminOrder {
   id: ID!
-  orderNumber: String!
-  customer: AdminCustomer
+  orderNumber: String! @rename(attribute: "order_number")
+  customer: AdminCustomer @belongsTo(relation: "user")
   status: String!
-  paymentStatus: String!
-  paymentMethod: String
-  shippingMethod: String
+  paymentStatus: String! @rename(attribute: "payment_status")
+  paymentMethod: String @rename(attribute: "payment_method")
+  shippingMethod: String @rename(attribute: "shipping_method")
   subtotal: Float!
-  taxAmount: Float!
-  shippingAmount: Float!
-  discountAmount: Float!
-  grandTotal: Float!
+  taxAmount: Float! @rename(attribute: "tax_amount")
+  shippingAmount: Float! @rename(attribute: "shipping_amount")
+  discountAmount: Float! @rename(attribute: "discount_amount")
+  grandTotal: Float! @rename(attribute: "grand_total")
   currency: String!
-  createdAt: DateTime!
+  createdAt: DateTime! @rename(attribute: "created_at")
 }
 
 type AdminOrderConnection {
@@ -241,11 +250,11 @@ type AdminShipmentConnection {
 
 type AdminInvoice {
   id: ID!
-  orderId: ID!
-  invoiceNumber: String!
+  orderId: ID! @rename(attribute: "order_id")
+  invoiceNumber: String! @rename(attribute: "invoice_number")
   status: String!
-  grandTotal: Float!
-  createdAt: DateTime!
+  grandTotal: Float! @rename(attribute: "grand_total")
+  createdAt: DateTime! @rename(attribute: "created_at")
 }
 
 type AdminInvoiceConnection {

@@ -209,7 +209,7 @@ export default function AdminCategoriesPageGraphQL() {
             <div>
               <label className="block text-sm font-medium mb-1">Parent Category</label>
               <select
-                className="h-9 border rounded px-2 text-sm w-full"
+                className="h-9 border rounded px-2 text-sm w-full font-mono"
                 value={formData.parentId}
                 onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
               >
@@ -218,12 +218,12 @@ export default function AdminCategoriesPageGraphQL() {
                   .filter((c: any) => c.id !== editingId) // Prevent selecting self as parent
                   .map((c: any) => (
                     <option key={c.id} value={c.id}>
-                      {c.parent ? `${c.parent.name} > ${c.name}` : c.name}
+                      {c.parent ? `  ↳ ${c.name} (under ${c.parent.name})` : c.name}
                     </option>
                   ))}
               </select>
               <p className="text-xs text-muted-foreground mt-1">
-                Select a parent to create nested categories (e.g., Electronics → Apple → iPhone)
+                Select ONE parent category. Child categories show their location in parentheses.
               </p>
             </div>
             <div className="flex items-center gap-2">

@@ -124,7 +124,10 @@ class ShippingRouteSeeder extends Seeder
         ];
 
         foreach ($routes as $route) {
-            ShippingRoute::create($route);
+            ShippingRoute::updateOrCreate(
+                ['code' => $route['code']], // Find by unique code
+                $route // Update or create with these values
+            );
         }
 
         $this->command->info('Shipping routes seeded successfully!');

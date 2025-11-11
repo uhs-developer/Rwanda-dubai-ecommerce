@@ -89,7 +89,10 @@ class ShippingMethodSeeder extends Seeder
         ];
 
         foreach ($methods as $method) {
-            ShippingMethod::create($method);
+            ShippingMethod::updateOrCreate(
+                ['code' => $method['code']], // Find by unique code
+                $method // Update or create with these values
+            );
         }
 
         $this->command->info('Shipping methods seeded successfully!');
