@@ -4,7 +4,7 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { ProductProvider, useProducts } from "../contexts/ProductContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { AdminRoute } from "../components/ProtectedRoute";
-import { Header } from "../components/Header";
+import { HeaderDynamic } from "../components/HeaderDynamic";
 import { Homepage } from "../components/Homepage";
 import { HomepageAPI } from "../components/HomepageAPI";
 import { ProductListingPage } from "../components/ProductListingPage";
@@ -741,8 +741,12 @@ function AppRouterContent() {
 function HeaderWrapper({ cartItemCount, wishlistItemCount, onWishlistClick, user, onLogout }: any) {
   const navigate = useNavigate();
 
-  const handleCategoryClick = (categoryId: string) => {
-    navigate(`/category/${categoryId}`);
+  const handleCategoryClick = (categorySlug: string) => {
+    navigate(`/category/${categorySlug}`);
+  };
+
+  const handleSubcategoryClick = (categorySlug: string, subcategorySlug: string) => {
+    navigate(`/category/${categorySlug}/${subcategorySlug}`);
   };
 
   const handleSearch = (query: string) => {
@@ -811,13 +815,14 @@ function HeaderWrapper({ cartItemCount, wishlistItemCount, onWishlistClick, user
   };
 
   return (
-    <Header
+    <HeaderDynamic
       cartItemCount={cartItemCount}
       wishlistItemCount={wishlistItemCount}
       onCartClick={() => navigate('/cart')}
       onWishlistClick={onWishlistClick}
       onSearchClick={handleSearch}
       onCategoryClick={handleCategoryClick}
+      onSubcategoryClick={handleSubcategoryClick}
       onNavigate={handleNavigation}
       user={user}
       onLogout={onLogout}

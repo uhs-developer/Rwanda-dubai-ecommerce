@@ -7,14 +7,12 @@ use App\Models\Product as ProductModel;
 class Product
 {
     /**
-     * Get single product by slug with tenant scoping
+     * Get single product by slug
      */
     public function __invoke($_, array $args)
     {
-        $tenant = app('tenant');
-
-        return ProductModel::where('tenant_id', $tenant->id)
-            ->where('slug', $args['slug'])
+        // TODO: Add proper multi-tenancy when ready
+        return ProductModel::where('slug', $args['slug'])
             ->with(['category', 'brand', 'images'])
             ->active()
             ->firstOrFail();

@@ -115,13 +115,17 @@ export function HeaderDynamic({
 
       {/* Main header */}
       <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between gap-4">
+        {/* Desktop: Single row layout */}
+        <div className="hidden md:flex items-center justify-between gap-4">
           {/* Logo */}
-          <div
-            className="flex items-center gap-2 cursor-pointer"
+          <div 
+            className="flex items-center gap-2 cursor-pointer flex-shrink-0"
             onClick={() => onNavigate?.('home')}
           >
-            <h1 className="text-2xl font-bold text-primary">TechBridge</h1>
+            <div className="h-10 w-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
+              TB
+            </div>
+            <h1 className="text-2xl font-bold text-primary hidden lg:block">TechBridge</h1>
           </div>
 
           {/* Search bar */}
@@ -134,7 +138,7 @@ export function HeaderDynamic({
           </div>
 
           {/* Right actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {/* Language Selector */}
             <LanguageSelector />
 
@@ -198,13 +202,74 @@ export function HeaderDynamic({
               )}
             </Button>
 
-            {/* Mobile menu */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="sm:hidden">
-                  <Menu className="h-4 w-4" />
+          </div>
+        </div>
+
+        {/* Mobile: Two row layout */}
+        <div className="md:hidden space-y-3">
+          {/* Row 1: Logo + Right actions */}
+          <div className="flex items-center justify-between gap-2">
+            {/* Logo */}
+            <div 
+              className="flex items-center gap-2 cursor-pointer flex-shrink-0"
+              onClick={() => onNavigate?.('home')}
+            >
+              <div className="h-10 w-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
+                TB
+              </div>
+            </div>
+
+            {/* Right actions */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Language Selector */}
+              <LanguageSelector />
+
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
+              {/* User Account - Show dropdown if logged in, button if not */}
+              {user ? (
+                <UserAccountDropdown
+                  user={user}
+                  onLogout={onLogout!}
+                  onNavigate={onNavigate}
+                />
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-2"
+                  onClick={() => onNavigate?.('auth')}
+                >
+                  <User className="h-4 w-4" />
                 </Button>
-              </SheetTrigger>
+              )}
+
+              {/* Mini Cart */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="relative p-2"
+                onClick={onCartClick}
+              >
+                <ShoppingCart className="h-4 w-4" />
+                {cartItemCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                  >
+                    {cartItemCount > 99 ? "99+" : cartItemCount}
+                  </Badge>
+                )}
+              </Button>
+
+              {/* Mobile menu */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-2">
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
               <SheetContent>
                 <div className="flex flex-col gap-4 mt-8">
                   {/* Mobile User Account */}
@@ -298,7 +363,17 @@ export function HeaderDynamic({
                   </div>
                 </div>
               </SheetContent>
-            </Sheet>
+              </Sheet>
+            </div>
+          </div>
+
+          {/* Row 2: Search bar */}
+          <div className="w-full">
+            <SearchBar
+              onSearch={onSearchClick}
+              placeholder={t("header.search")}
+              className="w-full"
+            />
           </div>
         </div>
 

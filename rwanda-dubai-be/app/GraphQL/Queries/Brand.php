@@ -7,14 +7,12 @@ use App\Models\Brand as BrandModel;
 class Brand
 {
     /**
-     * Get single brand by slug with tenant scoping
+     * Get single brand by slug
      */
     public function __invoke($_, array $args)
     {
-        $tenant = app('tenant');
-
-        return BrandModel::where('tenant_id', $tenant->id)
-            ->where('slug', $args['slug'])
+        // TODO: Add proper multi-tenancy when ready
+        return BrandModel::where('slug', $args['slug'])
             ->firstOrFail();
     }
 }

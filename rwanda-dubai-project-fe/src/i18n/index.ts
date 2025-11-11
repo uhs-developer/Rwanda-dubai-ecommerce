@@ -733,6 +733,8 @@ const resources = {
       "product.warranty": "Garanti",
       "product.warrantyDesc": "Garanti ya motongi ezali na kati",
       "product.shippingReturns": "Kotinda na Kozongisa",
+      "product.share": "Kopartisa",
+      "product.quantity": "Moto",
 
       // Cart
       "cart.empty": "Kabo na yo ezali mpamba",
@@ -910,6 +912,8 @@ const resources = {
       "product.warranty": "Obukuumi",
       "product.warrantyDesc": "Obukuumi bwa mutongole bukwatiddwa",
       "product.shippingReturns": "Okutuma n'Okuddamu",
+      "product.share": "Ggaana",
+      "product.quantity": "Ennamba",
 
       // Cart
       "cart.empty": "Akagenda ko kaliiwo",

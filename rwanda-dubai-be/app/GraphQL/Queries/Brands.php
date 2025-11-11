@@ -11,10 +11,8 @@ class Brands
      */
     public function __invoke($_, array $args)
     {
-        $tenant = app('tenant');
-
-        return Brand::where('tenant_id', $tenant->id)
-            ->orderBy('name')
+        // TODO: Add proper multi-tenancy when ready
+        return Brand::orderBy('name')
             ->get();
     }
 }

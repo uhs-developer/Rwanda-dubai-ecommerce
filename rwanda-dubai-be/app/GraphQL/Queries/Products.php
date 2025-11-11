@@ -8,14 +8,12 @@ use Illuminate\Database\Eloquent\Builder;
 class Products
 {
     /**
-     * Get paginated products with filters and tenant scoping
+     * Get paginated products with filters
      */
     public function __invoke($_, array $args)
     {
-        $tenant = app('tenant');
-
+        // TODO: Add proper multi-tenancy when ready
         $query = Product::query()
-            ->where('tenant_id', $tenant->id)
             ->with(['category', 'brand', 'images'])
             ->active();
 

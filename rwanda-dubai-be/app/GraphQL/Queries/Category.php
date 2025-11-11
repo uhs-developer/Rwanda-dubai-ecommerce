@@ -7,14 +7,12 @@ use App\Models\Category as CategoryModel;
 class Category
 {
     /**
-     * Get single category by slug with tenant scoping
+     * Get single category by slug
      */
     public function __invoke($_, array $args)
     {
-        $tenant = app('tenant');
-
-        return CategoryModel::where('tenant_id', $tenant->id)
-            ->where('slug', $args['slug'])
+        // TODO: Add proper multi-tenancy when ready
+        return CategoryModel::where('slug', $args['slug'])
             ->with('children')
             ->firstOrFail();
     }

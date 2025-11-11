@@ -29,6 +29,24 @@ export default function AdminCategoriesPageGraphQL() {
   const paginatorInfo = categoriesResult.data?.adminCategories?.paginatorInfo;
   const loading = categoriesResult.fetching;
 
+  // Group categories by parent for display, but use all for parent selection
+  const topLevelCategories = useMemo(() => {
+    return categories.filter((cat: any) => !cat.parentId);
+  }, [categories]);
+
+  const categoriesByParent = useMemo(() => {
+    const map = new Map<string, any[]>();
+    categories.forEach((cat: any) => {
+      if (cat.parentId) {
+        if (!map.has(cat.parentId)) {
+          map.set(cat.parentId, []);
+        }
+        map.get(cat.parentId)!.push(cat);
+      }
+    });
+    return map;
+  }, [categories]);
+
   // Auto-generate slug from name when creating/editing if user hasn't edited slug
   useEffect(() => {
     if (!formData.name) return;
@@ -122,6 +140,34 @@ export default function AdminCategoriesPageGraphQL() {
     setPage(target);
   };
 
+  // Recursive function to render nested categories
+  const renderChildren = (parentId: string, level: number): JSX.Element[] => {
+    const children = categoriesByParent.get(parentId) || [];
+    const indent = level * 4;
+    const arrow = '→ '.repeat(level);
+
+    return children.flatMap((child: any) => [
+      <tr key={child.id} className="border-b hover:bg-muted/50">
+        <td className="p-3" style={{ paddingLeft: `${12 + indent * 4}px` }}>{arrow}{child.id}</td>
+        <td className="p-3" style={{ paddingLeft: `${12 + indent * 4}px` }}>{child.name}</td>
+        <td className="p-3" style={{ paddingLeft: `${12 + indent * 4}px` }}>{child.slug}</td>
+        <td className="p-3">{child.parent?.name || '-'}</td>
+        <td className="p-3">
+          <span className={`px-2 py-1 rounded text-xs ${child.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+            {child.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </td>
+        <td className="p-3">
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => handleEdit(child)}>Edit</Button>
+            <Button size="sm" variant="destructive" onClick={() => handleDelete(child.id)}>Delete</Button>
+          </div>
+        </td>
+      </tr>,
+      ...renderChildren(child.id, level + 1)
+    ]);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -163,15 +209,22 @@ export default function AdminCategoriesPageGraphQL() {
             <div>
               <label className="block text-sm font-medium mb-1">Parent Category</label>
               <select
-                className="h-9 border rounded px-2 text-sm"
+                className="h-9 border rounded px-2 text-sm w-full"
                 value={formData.parentId}
                 onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
               >
-                <option value="">None</option>
-                {categories.map((c: any) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
+                <option value="">None (Top Level)</option>
+                {categories
+                  .filter((c: any) => c.id !== editingId) // Prevent selecting self as parent
+                  .map((c: any) => (
+                    <option key={c.id} value={c.id}>
+                      {c.parent ? `${c.parent.name} > ${c.name}` : c.name}
+                    </option>
+                  ))}
               </select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Select a parent to create nested categories (e.g., Electronics → Apple → iPhone)
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -206,13 +259,13 @@ export default function AdminCategoriesPageGraphQL() {
               </tr>
             </thead>
             <tbody>
-              {categories.map((category: any) => (
+              {topLevelCategories.map((category: any) => (
                 <>
                   <tr key={category.id} className="border-b hover:bg-muted/50">
                     <td className="p-3">{category.id}</td>
                     <td className="p-3 font-medium">{category.name}</td>
                     <td className="p-3">{category.slug}</td>
-                    <td className="p-3">{category.parent?.name || '-'}</td>
+                    <td className="p-3">-</td>
                     <td className="p-3">
                       <span className={`px-2 py-1 rounded text-xs ${category.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                         {category.isActive ? 'Active' : 'Inactive'}
@@ -225,16 +278,7 @@ export default function AdminCategoriesPageGraphQL() {
                       </div>
                     </td>
                   </tr>
-                  {category.children && category.children.length > 0 && category.children.map((child: any) => (
-                    <tr key={`${category.id}-${child.id}`} className="border-b hover:bg-muted/50">
-                      <td className="p-3 pl-8">↳ {child.id}</td>
-                      <td className="p-3 pl-8">{child.name}</td>
-                      <td className="p-3 pl-8">{child.slug}</td>
-                      <td className="p-3 pl-8">{category.name}</td>
-                      <td className="p-3 pl-8">—</td>
-                      <td className="p-3"></td>
-                    </tr>
-                  ))}
+                  {renderChildren(category.id, 1)}
                 </>
               ))}
             </tbody>

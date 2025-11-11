@@ -71,4 +71,10 @@ class ShippingMethod extends Model
     {
         return $value !== null ? (bool) $value : true;
     }
+
+    // Accessor to ensure sortOrder is never null
+    public function getSortOrderAttribute($value)
+    {
+        return $value !== null ? (int) $value : 0;
+    }
 }

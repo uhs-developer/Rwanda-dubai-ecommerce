@@ -7,14 +7,13 @@ use App\Models\Category;
 class Categories
 {
     /**
-     * Get all categories for tenant (tree structure)
+     * Get all categories (tree structure)
      */
     public function __invoke($_, array $args)
     {
-        $tenant = app('tenant');
-
-        return Category::where('tenant_id', $tenant->id)
-            ->whereNull('parent_id')
+        // TODO: Add proper multi-tenancy when ready
+        // For now, use default tenant_id = 1 or null for single-tenant setup
+        return Category::whereNull('parent_id')
             ->with('children')
             ->orderBy('sort_order')
             ->get();
