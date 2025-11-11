@@ -49,9 +49,18 @@ import AdminProfilePage from "../admin/pages/AdminProfilePage";
 import CmsPagesPage from "../admin/pages/CmsPagesPage";
 import CmsBlocksPage from "../admin/pages/CmsBlocksPage";
 import AdminProductsPage from "../admin/pages/AdminProductsPage";
+import AdminProductsPageGraphQL from "../admin/pages/AdminProductsPageGraphQL";
 import AdminCategoriesPage from "../admin/pages/AdminCategoriesPage";
+import AdminCategoriesPageGraphQL from "../admin/pages/AdminCategoriesPageGraphQL";
 import AdminCustomersPage from "../admin/pages/AdminCustomersPage";
+import AdminCustomersPageGraphQL from "../admin/pages/AdminCustomersPageGraphQL";
 import AdminOrdersPage from "../admin/pages/AdminOrdersPage";
+import AdminOrdersPageGraphQL from "../admin/pages/AdminOrdersPageGraphQL";
+import AdminProductFormPage from "../admin/pages/AdminProductFormPage";
+import AdminInvoicesPage from "../admin/pages/AdminInvoicesPage";
+import AdminShipmentsPage from "../admin/pages/AdminShipmentsPage";
+import AdminUsersManagementPage from "../admin/pages/AdminUsersManagementPage";
+import AdminConfigurationPage from "../admin/pages/AdminConfigurationPage";
 
 export function AppRouter() {
   return (
@@ -278,7 +287,27 @@ function AppRouterContent() {
               element={
                 <AdminRoute>
                   <AdminLayout title="Products">
-                    <AdminProductsPage />
+                    <AdminProductsPageGraphQL />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/products/new"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Add Product">
+                    <AdminProductFormPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/products/:id/edit"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Edit Product">
+                    <AdminProductFormPage />
                   </AdminLayout>
                 </AdminRoute>
               }
@@ -288,7 +317,17 @@ function AppRouterContent() {
               element={
                 <AdminRoute>
                   <AdminLayout title="Categories">
-                    <AdminCategoriesPage />
+                    <AdminCategoriesPageGraphQL />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/customers"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Customers">
+                    <AdminCustomersPageGraphQL />
                   </AdminLayout>
                 </AdminRoute>
               }
@@ -297,8 +336,8 @@ function AppRouterContent() {
               path="/admin/users"
               element={
                 <AdminRoute>
-                  <AdminLayout title="Customers">
-                    <AdminCustomersPage />
+                  <AdminLayout title="Users">
+                    <AdminCustomersPageGraphQL />
                   </AdminLayout>
                 </AdminRoute>
               }
@@ -308,7 +347,7 @@ function AppRouterContent() {
               element={
                 <AdminRoute>
                   <AdminLayout title="Orders">
-                    <AdminOrdersPage />
+                    <AdminOrdersPageGraphQL />
                   </AdminLayout>
                 </AdminRoute>
               }
@@ -337,8 +376,38 @@ function AppRouterContent() {
               path="/admin/admin-users"
               element={
                 <AdminRoute>
-                  <AdminLayout title="Admin Users">
-                    <AdminUsersPage />
+                  <AdminLayout title="Admin Users & Roles">
+                    <AdminUsersManagementPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/invoices"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Invoices">
+                    <AdminInvoicesPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/shipments"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Shipments">
+                    <AdminShipmentsPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/configuration"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Configuration">
+                    <AdminConfigurationPage />
                   </AdminLayout>
                 </AdminRoute>
               }

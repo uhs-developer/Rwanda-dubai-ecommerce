@@ -97,6 +97,16 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_product');
+    }
+
+    public function subcategories()
+    {
+        return $this->belongsToMany(Subcategory::class, 'subcategory_product');
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
@@ -175,6 +185,36 @@ class Product extends Model
     }
 
     // Accessors
+    public function getOriginalPriceAttribute()
+    {
+        return $this->attributes['original_price'] ?? null;
+    }
+
+    public function getShortDescriptionAttribute()
+    {
+        return $this->attributes['short_description'] ?? null;
+    }
+
+    public function getStockQuantityAttribute()
+    {
+        return $this->attributes['stock_quantity'] ?? null;
+    }
+
+    public function getIsActiveAttribute()
+    {
+        return array_key_exists('is_active', $this->attributes) ? (bool) $this->attributes['is_active'] : null;
+    }
+
+    public function getIsFeaturedAttribute()
+    {
+        return array_key_exists('is_featured', $this->attributes) ? (bool) $this->attributes['is_featured'] : null;
+    }
+
+    public function getWeightAttribute()
+    {
+        return $this->attributes['weight'] ?? null;
+    }
+
     public function getPrimaryImageAttribute()
     {
         // Use the already loaded images relationship to avoid N+1 queries

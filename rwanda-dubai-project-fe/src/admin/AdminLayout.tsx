@@ -4,7 +4,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { 
-  LayoutDashboard, Package, Tags, Users, FileText, BarChart2, Settings, LogOut, ChevronDown 
+  LayoutDashboard, Package, Tags, Users, FileText, BarChart2, Settings, LogOut, ChevronDown,
+  ShoppingCart, Truck, FileCheck, Receipt, Tag, UserCircle, Megaphone, Store, RefreshCw, Shield
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -83,15 +84,28 @@ export default function AdminLayout({ children, title = "Dashboard" }: AdminLayo
           </div>
 
           <nav className="space-y-2">
-            <NavItem icon={LayoutDashboard} label="Overview" path="/admin" />
+            <NavItem icon={LayoutDashboard} label="Dashboard" path="/admin" />
 
-            <Group label="Catalog" activeMatch={/^\/admin\/(products|categories)/}>
-              <NavItem icon={Package} label="Products" path="/admin/products" />
-              <NavItem icon={Tags} label="Categories" path="/admin/categories" />
+            <Group label="Sales" activeMatch={/^\/admin\/(orders|invoices|shipments|credit-memos)/}>
+              <NavItem icon={ShoppingCart} label="Orders" path="/admin/orders" />
+              <NavItem icon={FileCheck} label="Invoices" path="/admin/invoices" />
+              <NavItem icon={Truck} label="Shipments" path="/admin/shipments" />
+              <NavItem icon={Receipt} label="Credit Memos" path="/admin/credit-memos" />
             </Group>
 
-            <Group label="Sales" activeMatch={/^\/admin\/orders/}>
-              <NavItem icon={FileText} label="Orders" path="/admin/orders" />
+            <Group label="Catalog" activeMatch={/^\/admin\/(products|categories|attributes)/}>
+              <NavItem icon={Package} label="Products" path="/admin/products" />
+              <NavItem icon={Tags} label="Categories" path="/admin/categories" />
+              <NavItem icon={Tag} label="Attributes" path="/admin/attributes" />
+            </Group>
+
+            <Group label="Customers" activeMatch={/^\/admin\/(customers|customer-groups)/}>
+              <NavItem icon={Users} label="All Customers" path="/admin/customers" />
+              <NavItem icon={UserCircle} label="Customer Groups" path="/admin/customer-groups" />
+            </Group>
+
+            <Group label="Marketing" activeMatch={/^\/admin\/promotions/}>
+              <NavItem icon={Megaphone} label="Promotions" path="/admin/promotions" />
             </Group>
 
             <Group label="Content" activeMatch={/^\/admin\/(pages|blocks)/}>
@@ -99,28 +113,17 @@ export default function AdminLayout({ children, title = "Dashboard" }: AdminLayo
               <NavItem icon={FileText} label="Blocks" path="/admin/blocks" />
             </Group>
 
-            <Group label="Customers" activeMatch={/^\/admin\/users/}>
-              <NavItem icon={Users} label="Users" path="/admin/users" />
+            <Group label="Stores" activeMatch={/^\/admin\/configuration/}>
+              <NavItem icon={Store} label="Configuration" path="/admin/configuration" />
             </Group>
 
-            <Group label="Analytics" activeMatch={/^\/admin\/analytics/} defaultOpen={false}>
-              <NavItem icon={BarChart2} label="Analytics" path="/admin/analytics" />
+            <Group label="System" activeMatch={/^\/admin\/(cache|admin-users)/}>
+              <NavItem icon={RefreshCw} label="Cache Management" path="/admin/cache" />
+              <NavItem icon={Shield} label="Admin Users" path="/admin/admin-users" />
             </Group>
 
-            <Group label="System" activeMatch={/^\/admin\/(cache)/} defaultOpen={false}>
-              <NavItem icon={Settings} label="Cache Management" path="/admin/cache" />
-            </Group>
-
-            <Group label="Users & Access" activeMatch={/^\/admin\/(admin-users)/} defaultOpen={false}>
-              <NavItem icon={Users} label="Admin Users" path="/admin/admin-users" />
-            </Group>
-
-            <Group label="Account" activeMatch={/^\/admin\/(profile|settings)/} defaultOpen={false}>
-              <NavItem icon={Settings} label="Profile & Settings" path="/admin/profile" />
-            </Group>
-
-            <Group label="Settings" activeMatch={/^\/admin\/settings/} defaultOpen={false}>
-              <NavItem icon={Settings} label="Settings" path="/admin/settings" />
+            <Group label="Account" activeMatch={/^\/admin\/profile/}>
+              <NavItem icon={Settings} label="Profile" path="/admin/profile" />
             </Group>
           </nav>
 

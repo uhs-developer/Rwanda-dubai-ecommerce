@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Enable CORS globally (for both web and API, including GraphQL)
+        $middleware->prepend(\App\Http\Middleware\Cors::class);
+        
         // Register tenant resolver globally for both web and API routes
         $middleware->appendToGroup('web', \App\Http\Middleware\TenantResolver::class);
         $middleware->appendToGroup('api', \App\Http\Middleware\TenantResolver::class);

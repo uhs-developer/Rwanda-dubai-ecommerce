@@ -1,0 +1,632 @@
+# ===========================================
+# ADMIN GRAPHQL SCHEMA - Magento-parity Admin API
+# ===========================================
+
+extend type Query {
+  # ===== Admin Products =====
+  adminProducts(
+    q: String
+    page: Int = 1
+    perPage: Int = 20
+    categoryId: ID
+    brandId: ID
+    status: String
+    sortBy: String
+    sortDir: String
+  ): AdminProductConnection!
+
+  adminProduct(id: ID!): AdminProduct @field(resolver: "App\\GraphQL\\Queries\\AdminProduct")
+
+  # ===== Admin Categories =====
+  adminCategories(
+    q: String
+    page: Int = 1
+    perPage: Int = 20
+  ): AdminCategoryConnection!
+
+  adminCategory(id: ID!): AdminCategory
+
+  # ===== Admin Customers =====
+  adminCustomers(
+    q: String
+    page: Int = 1
+    perPage: Int = 20
+    groupId: ID
+  ): AdminCustomerConnection!
+
+  adminCustomer(id: ID!): AdminCustomer
+
+  # ===== Admin Orders =====
+  adminOrders(
+    q: String
+    page: Int = 1
+    perPage: Int = 20
+    status: String
+    paymentStatus: String
+  ): AdminOrderConnection!
+
+  adminOrder(id: ID!): AdminOrder
+
+  # ===== Admin Shipments =====
+  adminShipments(
+    orderId: ID
+    page: Int = 1
+    perPage: Int = 20
+  ): AdminShipmentConnection!
+  # adminShipment(id: ID!): AdminShipment  # TODO: Implement resolver
+  # adminInvoice(id: ID!): AdminInvoice  # TODO: Implement resolver
+  # adminCreditMemo(id: ID!): AdminCreditMemo  # TODO: Implement resolver
+  # ===== Admin Users & Roles =====
+  adminUsers(
+    q: String
+    page: Int = 1
+    perPage: Int = 20
+  ): AdminUserConnection!
+  adminRoles: [AdminRole!]!
+  # ===== Admin Configuration =====
+  adminTaxRates(page: Int = 1, perPage: Int = 20): AdminTaxRateConnection!  adminShippingMethods: [AdminShippingMethod!]!  adminCoupons(page: Int = 1, perPage: Int = 20): AdminCouponConnection!
+  # ===== Admin Attributes =====
+  adminAttributes(page: Int = 1, perPage: Int = 20): AdminAttributeConnection!
+  # ===== Admin Customer Groups =====
+  adminCustomerGroups: [AdminCustomerGroup!]!
+  # ===== Admin Promotions =====
+  adminPromotions(page: Int = 1, perPage: Int = 20): AdminPromotionConnection!
+  # ===== Admin CMS =====
+  adminPages(page: Int = 1, perPage: Int = 20): AdminPageConnection!  adminBlocks(page: Int = 1, perPage: Int = 20): AdminBlockConnection!
+  # ===== Admin Stats =====
+  adminDashboardStats: AdminDashboardStats!
+
+  # ===== Exchange Rates =====
+  adminExchangeRates: [ExchangeRate!]! @field(resolver: "App\\GraphQL\\Queries\\AdminExchangeRates")
+}
+
+extend type Mutation {
+  # ===== Product CRUD =====
+  createProduct(input: CreateProductInput!): AdminProduct!
+  updateProduct(id: ID!, input: UpdateProductInput!): AdminProduct!
+  deleteProduct(id: ID!): Boolean!
+
+  # ===== Category CRUD =====
+  createCategory(input: CreateCategoryInput!): AdminCategory!  updateCategory(id: ID!, input: UpdateCategoryInput!): AdminCategory!  deleteCategory(id: ID!): Boolean!
+  # ===== Customer CRUD =====
+  createCustomer(input: CreateCustomerInput!): AdminCustomer!  updateCustomer(id: ID!, input: UpdateCustomerInput!): AdminCustomer!  deleteCustomer(id: ID!): Boolean!
+  # ===== Order Management =====
+  updateOrderStatus(id: ID!, status: String!): AdminOrder!  cancelOrder(id: ID!, reason: String): AdminOrder!
+  # ===== Shipment Management =====
+  createShipment(input: CreateShipmentInput!): AdminShipment!  updateShipment(id: ID!, input: UpdateShipmentInput!): AdminShipment!
+  # ===== Invoice Management =====
+  createInvoice(orderId: ID!): AdminInvoice!
+  # ===== Credit Memo Management =====
+  createCreditMemo(input: CreateCreditMemoInput!): AdminCreditMemo!
+  # ===== Admin User Management =====
+  createAdminUser(input: CreateAdminUserInput!): AdminUser!  updateAdminUser(id: ID!, input: UpdateAdminUserInput!): AdminUser!  deleteAdminUser(id: ID!): Boolean!
+  # ===== Tax Configuration =====
+  createTaxRate(input: CreateTaxRateInput!): AdminTaxRate!  updateTaxRate(id: ID!, input: UpdateTaxRateInput!): AdminTaxRate!  deleteTaxRate(id: ID!): Boolean!
+  # ===== Shipping Configuration =====
+  updateShippingMethod(id: ID!, input: UpdateShippingMethodInput!): AdminShippingMethod!
+  # ===== Coupon Management =====
+  createCoupon(input: CreateCouponInput!): AdminCoupon!  updateCoupon(id: ID!, input: UpdateCouponInput!): AdminCoupon!  deleteCoupon(id: ID!): Boolean!
+  # ===== Attribute Management =====
+  createAttribute(input: CreateAttributeInput!): AdminAttribute!  updateAttribute(id: ID!, input: UpdateAttributeInput!): AdminAttribute!  deleteAttribute(id: ID!): Boolean!
+  # ===== Customer Group Management =====
+  createCustomerGroup(input: CreateCustomerGroupInput!): AdminCustomerGroup!  updateCustomerGroup(id: ID!, input: UpdateCustomerGroupInput!): AdminCustomerGroup!  deleteCustomerGroup(id: ID!): Boolean!
+  # ===== Promotion Management =====
+  createPromotion(input: CreatePromotionInput!): AdminPromotion!  updatePromotion(id: ID!, input: UpdatePromotionInput!): AdminPromotion!  deletePromotion(id: ID!): Boolean!
+  # ===== CMS Management =====
+  createPage(input: CreatePageInput!): AdminPage!  updatePage(id: ID!, input: UpdatePageInput!): AdminPage!  deletePage(id: ID!): Boolean!
+  createBlock(input: CreateBlockInput!): AdminBlock!  updateBlock(id: ID!, input: UpdateBlockInput!): AdminBlock!  deleteBlock(id: ID!): Boolean!
+  # ===== Cache Management =====
+  flushCache(types: [String!]): Boolean!
+
+  # ===== Exchange Rates =====
+  createExchangeRate(input: UpsertExchangeRateInput!): ExchangeRate! @field(resolver: "App\\GraphQL\\Mutations\\CreateExchangeRate")
+  updateExchangeRate(id: ID!, input: UpsertExchangeRateInput!): ExchangeRate! @field(resolver: "App\\GraphQL\\Mutations\\UpdateExchangeRate")
+  deleteExchangeRate(id: ID!): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\DeleteExchangeRate")
+}
+
+# =========================================
+# ADMIN TYPES
+# =========================================
+
+type AdminProduct {
+  id: ID!
+  sku: String!
+  name: String!
+  slug: String!
+  price: Float!
+  originalPrice: Float
+  shortDescription: String
+  description: String
+  stockQuantity: Int
+  weight: Float
+  isActive: Boolean
+  isFeatured: Boolean
+  primaryImage: String
+  category: AdminCategory
+  categories: [AdminCategory!]!
+  subcategories: [AdminCategory!]!
+  brand: AdminBrand
+  priceUsd: Float @field(resolver: "App\\GraphQL\\Resolvers\\ProductPrice@usd")
+  priceAed: Float @field(resolver: "App\\GraphQL\\Resolvers\\ProductPrice@aed")
+  priceJpy: Float @field(resolver: "App\\GraphQL\\Resolvers\\ProductPrice@jpy")
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type AdminProductConnection {
+  data: [AdminProduct!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminCategory {
+  id: ID!
+  name: String!
+  slug: String!
+  parentId: ID
+  parent: AdminCategory @field(resolver: "App\\GraphQL\\Queries\\AdminCategoryParent")
+  children: [AdminCategory!]! @field(resolver: "App\\GraphQL\\Queries\\AdminCategoryChildren")
+  isActive: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type AdminCategoryConnection {
+  data: [AdminCategory!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminBrand {
+  id: ID!
+  name: String!
+  slug: String!
+}
+
+extend type Mutation {
+  createBrand(input: CreateBrandInput!): AdminBrand! @field(resolver: "App\\GraphQL\\Mutations\\CreateBrand")
+  updateBrand(id: ID!, input: UpdateBrandInput!): AdminBrand! @field(resolver: "App\\GraphQL\\Mutations\\UpdateBrand")
+  deleteBrand(id: ID!): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\DeleteBrand")
+}
+
+type AdminCustomer {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  status: String!
+  roles: [AdminRole!]!
+  createdAt: DateTime!
+  lastLoginAt: DateTime
+}
+
+type AdminCustomerConnection {
+  data: [AdminCustomer!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminOrder {
+  id: ID!
+  orderNumber: String!
+  customer: AdminCustomer
+  status: String!
+  paymentStatus: String!
+  paymentMethod: String
+  shippingMethod: String
+  subtotal: Float!
+  taxAmount: Float!
+  shippingAmount: Float!
+  discountAmount: Float!
+  grandTotal: Float!
+  currency: String!
+  createdAt: DateTime!
+}
+
+type AdminOrderConnection {
+  data: [AdminOrder!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminShipment {
+  id: ID!
+  orderId: ID!
+  trackingNumber: String
+  carrier: String
+  status: String!
+  createdAt: DateTime!
+}
+
+type AdminShipmentConnection {
+  data: [AdminShipment!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminInvoice {
+  id: ID!
+  orderId: ID!
+  invoiceNumber: String!
+  status: String!
+  grandTotal: Float!
+  createdAt: DateTime!
+}
+
+type AdminInvoiceConnection {
+  data: [AdminInvoice!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminCreditMemo {
+  id: ID!
+  orderId: ID!
+  creditMemoNumber: String!
+  amount: Float!
+  reason: String
+  createdAt: DateTime!
+}
+
+type AdminCreditMemoConnection {
+  data: [AdminCreditMemo!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminUser {
+  id: ID!
+  name: String!
+  email: String!
+  roles: [AdminRole!]!
+  status: String!
+  createdAt: DateTime!
+  lastLoginAt: DateTime
+}
+
+type AdminUserConnection {
+  data: [AdminUser!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminRole {
+  id: ID!
+  name: String!
+  slug: String
+  permissions: [String!]!
+}
+
+type AdminTaxRate {
+  id: ID!
+  country: String!
+  state: String
+  rate: Float!
+  isActive: Boolean
+}
+
+type AdminTaxRateConnection {
+  data: [AdminTaxRate!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminShippingMethod {
+  id: ID!
+  name: String!
+  code: String!
+  isActive: Boolean
+  baseRate: Float!
+}
+
+type AdminCoupon {
+  id: ID!
+  code: String!
+  discountType: String!
+  discountAmount: Float!
+  isActive: Boolean
+  expiresAt: DateTime
+}
+
+type AdminCouponConnection {
+  data: [AdminCoupon!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminAttribute {
+  id: ID!
+  code: String!
+  label: String!
+  type: String!
+  isRequired: Boolean!
+}
+
+type AdminAttributeConnection {
+  data: [AdminAttribute!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminCustomerGroup {
+  id: ID!
+  name: String!
+  discountPercent: Float
+}
+
+type AdminPromotion {
+  id: ID!
+  name: String!
+  description: String
+  discountType: String!
+  discountValue: Float!
+  startsAt: DateTime
+  endsAt: DateTime
+  isActive: Boolean
+}
+
+type AdminPromotionConnection {
+  data: [AdminPromotion!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminPage {
+  id: ID!
+  title: String!
+  slug: String!
+  content: String
+  isActive: Boolean
+  createdAt: DateTime!
+}
+
+type AdminPageConnection {
+  data: [AdminPage!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminBlock {
+  id: ID!
+  identifier: String!
+  title: String!
+  content: String
+  isActive: Boolean
+  createdAt: DateTime!
+}
+
+type AdminBlockConnection {
+  data: [AdminBlock!]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type AdminDashboardStats {
+  totalRevenue: Float!
+  totalOrders: Int!
+  totalCustomers: Int!
+  totalProducts: Int!
+  recentOrders: [AdminOrder!]!
+}
+
+# Exchange Rates
+type ExchangeRate {
+  id: ID!
+  codeFrom: String!
+  codeTo: String!
+  rate: Float!
+  updatedAt: DateTime
+}
+
+# =========================================
+# INPUT TYPES
+# =========================================
+
+input CreateBrandInput {
+  name: String!
+  slug: String
+}
+
+input UpdateBrandInput {
+  name: String
+  slug: String
+}
+input UpsertExchangeRateInput {
+  codeFrom: String!
+  codeTo: String!
+  rate: Float!
+}
+
+input CreateProductInput {
+  sku: String!
+  name: String!
+  price: Float!
+  slug: String
+  originalPrice: Float
+  stockQuantity: Int
+  weight: Float
+  categoryId: ID
+  categoryIds: [ID!]
+  subcategoryIds: [ID!]
+  brandId: ID
+  description: String
+  shortDescription: String
+  primaryImage: String
+  isActive: Boolean
+  isFeatured: Boolean
+}
+
+input UpdateProductInput {
+  sku: String
+  name: String
+  price: Float
+  slug: String
+  originalPrice: Float
+  stockQuantity: Int
+  weight: Float
+  categoryId: ID
+  categoryIds: [ID!]
+  subcategoryIds: [ID!]
+  brandId: ID
+  description: String
+  shortDescription: String
+  primaryImage: String
+  isActive: Boolean
+  isFeatured: Boolean
+}
+
+input CreateCategoryInput {
+  name: String!
+  slug: String
+  parentId: ID
+  isActive: Boolean
+}
+
+input UpdateCategoryInput {
+  name: String
+  slug: String
+  parentId: ID
+  isActive: Boolean
+}
+
+input CreateCustomerInput {
+  name: String!
+  email: String!
+  password: String!
+  phone: String
+}
+
+input UpdateCustomerInput {
+  name: String
+  email: String
+  phone: String
+  status: String
+}
+
+input CreateShipmentInput {
+  orderId: ID!
+  trackingNumber: String
+  carrier: String
+}
+
+input UpdateShipmentInput {
+  trackingNumber: String
+  carrier: String
+  status: String
+}
+
+input CreateCreditMemoInput {
+  orderId: ID!
+  amount: Float!
+  reason: String
+}
+
+input CreateAdminUserInput {
+  name: String!
+  email: String!
+  password: String!
+  roleIds: [ID!]!
+}
+
+input UpdateAdminUserInput {
+  name: String
+  email: String
+  password: String
+  roleIds: [ID!]
+  status: String
+}
+
+input CreateTaxRateInput {
+  country: String!
+  state: String
+  rate: Float!
+  isActive: Boolean
+}
+
+input UpdateTaxRateInput {
+  country: String
+  state: String
+  rate: Float
+  isActive: Boolean
+}
+
+input UpdateShippingMethodInput {
+  name: String
+  isActive: Boolean
+  baseRate: Float
+}
+
+input CreateCouponInput {
+  code: String!
+  discountType: String!
+  discountAmount: Float!
+  expiresAt: DateTime
+  isActive: Boolean
+}
+
+input UpdateCouponInput {
+  code: String
+  discountType: String
+  discountAmount: Float
+  expiresAt: DateTime
+  isActive: Boolean
+}
+
+input CreateAttributeInput {
+  code: String!
+  label: String!
+  type: String!
+  isRequired: Boolean
+}
+
+input UpdateAttributeInput {
+  code: String
+  label: String
+  type: String
+  isRequired: Boolean
+}
+
+input CreateCustomerGroupInput {
+  name: String!
+  discountPercent: Float
+}
+
+input UpdateCustomerGroupInput {
+  name: String
+  discountPercent: Float
+}
+
+input CreatePromotionInput {
+  name: String!
+  description: String
+  discountType: String!
+  discountValue: Float!
+  startsAt: DateTime
+  endsAt: DateTime
+  isActive: Boolean
+}
+
+input UpdatePromotionInput {
+  name: String
+  description: String
+  discountType: String
+  discountValue: Float
+  startsAt: DateTime
+  endsAt: DateTime
+  isActive: Boolean
+}
+
+input CreatePageInput {
+  title: String!
+  slug: String
+  content: String
+  isActive: Boolean
+}
+
+input UpdatePageInput {
+  title: String
+  slug: String
+  content: String
+  isActive: Boolean
+}
+
+input CreateBlockInput {
+  identifier: String!
+  title: String!
+  content: String
+  isActive: Boolean
+}
+
+input UpdateBlockInput {
+  identifier: String
+  title: String
+  content: String
+  isActive: Boolean
+}
+

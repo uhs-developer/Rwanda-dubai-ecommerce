@@ -78,4 +78,9 @@ class Category extends Model
     {
         return $this->products()->active()->count();
     }
+
+    public function getParentIdAttribute()
+    {
+        return $this->attributes['parent_id'] ?? null;
+    }
 }

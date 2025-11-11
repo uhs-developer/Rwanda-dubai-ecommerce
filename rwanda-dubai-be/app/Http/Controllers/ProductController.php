@@ -8,6 +8,7 @@ use App\Models\Subcategory;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -350,6 +351,15 @@ class ProductController extends Controller
         if ($request->has('featured') && $request->featured) {
             $query->featured();
         }
+
+        // Status filter (enabled/disabled)
+        if ($request->has('status')) {
+            if ($request->status === 'enabled') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'disabled') {
+                $query->where('is_active', false);
+            }
+        }
     }
 
     /**
@@ -400,6 +410,7 @@ class ProductController extends Controller
             'original_price' => $product->original_price ? (float) $product->original_price : null,
             'discount_percentage' => $product->discount_percentage,
             'is_on_sale' => $product->is_on_sale,
+            'is_active' => (bool) $product->is_active,
             'primary_image' => $product->primary_image,
             'stock_quantity' => $product->stock_quantity,
             'category' => $product->category ? [
@@ -474,6 +485,95 @@ class ProductController extends Controller
                 'message' => 'Failed to delete product',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Store a new product (admin)
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'sku' => 'nullable|string|max:255|unique:products,sku',
+                'price' => 'required|numeric|min:0',
+                'category_id' => 'nullable|exists:categories,id',
+                'subcategory_id' => 'nullable|exists:subcategories,id',
+                'brand_id' => 'nullable|exists:brands,id',
+                'is_active' => 'nullable|boolean',
+                'stock_quantity' => 'nullable|integer|min:0',
+                'primary_image' => 'nullable|string|max:2048',
+                'slug' => 'nullable|string|max:255|unique:products,slug',
+            ]);
+
+            $product = new Product();
+            $product->name = $validated['name'];
+            $product->slug = $validated['slug'] ?? Str::slug($validated['name']) . '-' . Str::random(6);
+            $product->sku = $validated['sku'] ?? null;
+            $product->price = $validated['price'];
+            $product->category_id = $validated['category_id'] ?? null;
+            $product->subcategory_id = $validated['subcategory_id'] ?? null;
+            $product->brand_id = $validated['brand_id'] ?? null;
+            $product->is_active = $validated['is_active'] ?? true;
+            $product->stock_quantity = $validated['stock_quantity'] ?? 0;
+            $product->primary_image = $validated['primary_image'] ?? null;
+            $product->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created',
+                'data' => $this->transformProduct($product->fresh(['category','subcategory','brand','images']), true),
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create product',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Update product (admin)
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        try {
+            $product = Product::findOrFail($id);
+            $validated = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'sku' => 'sometimes|nullable|string|max:255|unique:products,sku,' . $product->id,
+                'price' => 'sometimes|required|numeric|min:0',
+                'category_id' => 'sometimes|nullable|exists:categories,id',
+                'subcategory_id' => 'sometimes|nullable|exists:subcategories,id',
+                'brand_id' => 'sometimes|nullable|exists:brands,id',
+                'is_active' => 'sometimes|boolean',
+                'stock_quantity' => 'sometimes|integer|min:0',
+                'primary_image' => 'sometimes|nullable|string|max:2048',
+                'slug' => 'sometimes|nullable|string|max:255|unique:products,slug,' . $product->id,
+            ]);
+
+            foreach ($validated as $key => $value) {
+                if ($key === 'slug' && empty($value) && isset($validated['name'])) {
+                    $product->slug = Str::slug($validated['name']) . '-' . Str::random(6);
+                } else {
+                    $product->{$key} = $value;
+                }
+            }
+            $product->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product updated',
+                'data' => $this->transformProduct($product->fresh(['category','subcategory','brand','images']), true),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update product',
+                'error' => $e->getMessage(),
+            ], 422);
         }
     }
 }

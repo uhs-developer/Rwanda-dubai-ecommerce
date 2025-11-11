@@ -6,9 +6,11 @@ export interface Product {
   name: string;
   slug: string;
   price: number;
+  stock_quantity?: number;
   original_price?: number;
   discount_percentage?: number;
   is_on_sale: boolean;
+  is_active?: boolean;
   primary_image?: string;
   category: {
     id: number;
