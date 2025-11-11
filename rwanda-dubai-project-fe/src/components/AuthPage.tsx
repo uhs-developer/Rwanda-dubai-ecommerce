@@ -31,7 +31,7 @@ interface AuthPageProps {
 export function AuthPage({ onBack }: AuthPageProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { login, register, isAuthenticated, isLoading: authLoading, isAdmin, isSuperAdmin } = useAuth();
   const { t } = useTranslation();
   
   const [showPassword, setShowPassword] = useState(false);
@@ -78,10 +78,13 @@ export function AuthPage({ onBack }: AuthPageProps) {
         email: loginData.email,
         password: loginData.password,
       });
-      
-      // Navigate to intended page or home
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      // Role-aware post-login redirect
+      if (isSuperAdmin() || isAdmin()) {
+        navigate('/admin', { replace: true });
+      } else {
+        const from = location.state?.from?.pathname || '/';
+        navigate(from, { replace: true });
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       
@@ -195,7 +198,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
 
               {/* Login Tab */}
               <TabsContent value="login" className="space-y-4">
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4" autoComplete="on">
                   <div>
                     <Label htmlFor="login-email">{t("auth.email")}</Label>
                     <div className="relative">
@@ -203,6 +206,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                       <Input
                         id="login-email"
                         type="email"
+                        name="email"
                         placeholder="Enter your email"
                         className={`pl-10 ${validationErrors.email ? 'border-red-500' : ''}`}
                         value={loginData.email}
@@ -210,6 +214,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                           setLoginData(prev => ({ ...prev, email: e.target.value }));
                           clearErrors();
                         }}
+                        autoComplete="username email"
                         required
                       />
                     </div>
@@ -225,6 +230,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                       <Input
                         id="login-password"
                         type={showPassword ? "text" : "password"}
+                        name="password"
                         placeholder="Enter your password"
                         className={`pl-10 pr-10 ${validationErrors.password ? 'border-red-500' : ''}`}
                         value={loginData.password}
@@ -232,6 +238,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                           setLoginData(prev => ({ ...prev, password: e.target.value }));
                           clearErrors();
                         }}
+                        autoComplete="current-password"
                         required
                       />
                       <Button
@@ -299,13 +306,14 @@ export function AuthPage({ onBack }: AuthPageProps) {
 
               {/* Register Tab */}
               <TabsContent value="register" className="space-y-4">
-                <form onSubmit={handleRegister} className="space-y-4">
+                <form onSubmit={handleRegister} className="space-y-4" autoComplete="on">
                   <div>
                     <Label htmlFor="name">Full Name</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="name"
+                        name="name"
                         placeholder="Enter your full name"
                         className={`pl-10 ${validationErrors.name ? 'border-red-500' : ''}`}
                         value={registerData.name}
@@ -313,6 +321,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                           setRegisterData(prev => ({ ...prev, name: e.target.value }));
                           clearErrors();
                         }}
+                        autoComplete="name"
                         required
                       />
                     </div>
@@ -328,6 +337,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                       <Input
                         id="register-email"
                         type="email"
+                        name="email"
                         placeholder="Enter your email"
                         className={`pl-10 ${validationErrors.email ? 'border-red-500' : ''}`}
                         value={registerData.email}
@@ -335,6 +345,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                           setRegisterData(prev => ({ ...prev, email: e.target.value }));
                           clearErrors();
                         }}
+                        autoComplete="email"
                         required
                       />
                     </div>
@@ -350,6 +361,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                       <Input
                         id="phone"
                         type="tel"
+                        name="tel"
                         placeholder="+250 XXX XXX XXX"
                         className={`pl-10 ${validationErrors.phone ? 'border-red-500' : ''}`}
                         value={registerData.phone}
@@ -357,6 +369,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                           setRegisterData(prev => ({ ...prev, phone: e.target.value }));
                           clearErrors();
                         }}
+                        autoComplete="tel"
                       />
                     </div>
                     {validationErrors.phone && (
@@ -371,6 +384,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                       <Input
                         id="register-password"
                         type={showPassword ? "text" : "password"}
+                        name="new-password"
                         placeholder="Create password (min 8 characters)"
                         className={`pl-10 pr-10 ${validationErrors.password ? 'border-red-500' : ''}`}
                         value={registerData.password}
@@ -380,6 +394,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                         }}
                         required
                         minLength={8}
+                        autoComplete="new-password"
                       />
                       <Button
                         type="button"
@@ -403,6 +418,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                       <Input
                         id="confirm-password"
                         type={showConfirmPassword ? "text" : "password"}
+                        name="confirm-password"
                         placeholder="Confirm password"
                         className={`pl-10 pr-10 ${validationErrors.password_confirmation ? 'border-red-500' : ''}`}
                         value={registerData.password_confirmation}
@@ -411,6 +427,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                           clearErrors();
                         }}
                         required
+                        autoComplete="new-password"
                       />
                       <Button
                         type="button"

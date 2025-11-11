@@ -44,8 +44,8 @@ class AuthController extends Controller
                 'status' => 'active',
             ]);
 
-            // Assign default user role
-            $user->assignRole('user');
+            // Note: Customers don't need a role - only admin users have roles
+            // If needed in future, create a 'customer' role in RolesAndPermissionsSeeder
 
             $token = $user->createToken('auth_token')->plainTextToken;
 

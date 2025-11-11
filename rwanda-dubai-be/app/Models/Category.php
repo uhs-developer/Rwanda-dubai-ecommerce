@@ -12,12 +12,17 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = [
+        'tenant_id',
         'name',
         'slug',
         'description',
         'image',
+        'parent_id',
         'is_active',
-        'sort_order'
+        'sort_order',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 
     protected $casts = [
@@ -37,6 +42,16 @@ class Category extends Model
     }
 
     // Relationships
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
+    }
+
     public function subcategories(): HasMany
     {
         return $this->hasMany(Subcategory::class)->orderBy('sort_order');

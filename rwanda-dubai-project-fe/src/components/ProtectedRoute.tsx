@@ -137,7 +137,7 @@ export function ProtectedRoute({
 // Convenience components for common protection patterns
 export function AdminRoute({ children, ...props }: Omit<ProtectedRouteProps, 'requiredRoles'>) {
   return (
-    <ProtectedRoute {...props} requiredRoles={['super-admin', 'admin']}>
+    <ProtectedRoute {...props} requiredRoles={['superadmin', 'admin']}>
       {children}
     </ProtectedRoute>
   );
@@ -145,7 +145,7 @@ export function AdminRoute({ children, ...props }: Omit<ProtectedRouteProps, 're
 
 export function SuperAdminRoute({ children, ...props }: Omit<ProtectedRouteProps, 'requiredRoles'>) {
   return (
-    <ProtectedRoute {...props} requiredRoles={['super-admin']}>
+    <ProtectedRoute {...props} requiredRoles={['superadmin']}>
       {children}
     </ProtectedRoute>
   );

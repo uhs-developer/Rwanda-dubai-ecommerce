@@ -14,18 +14,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            TenantSeeder::class,
             RolesAndPermissionsSeeder::class,
-            UserSeeder::class,
+            // UserSeeder::class, // Disabled - using Spatie Permission now
             ProductsAndCategoriesSeeder::class,
-            RwandaDubaiCommerceSeeder::class,
-            BlogPostsSeeder::class,
-        ]);
-
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            // RwandaDubaiCommerceSeeder::class,
+            // BlogPostsSeeder::class,
         ]);
     }
 }

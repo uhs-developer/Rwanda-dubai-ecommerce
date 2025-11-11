@@ -165,7 +165,16 @@ export class ProductService {
 
   // Get single product by slug
   static async getProduct(slug: string): Promise<ApiResponse<Product>> {
-    return await apiRequest<Product>('GET', `/products/${slug}`);
+    const res = await apiRequest<any>('GET', `/products/${slug}`);
+    if (res?.success) {
+      const payload = res.data?.product ?? res.data; // handle { data: { product, related_products } } or { data: product }
+      return {
+        success: true,
+        message: res.message,
+        data: payload as Product,
+      };
+    }
+    return res as ApiResponse<Product>;
   }
 
   // Get filter options

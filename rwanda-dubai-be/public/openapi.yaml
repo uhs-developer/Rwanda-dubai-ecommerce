@@ -1,0 +1,147 @@
+openapi: 3.0.3
+info:
+  title: Rwanda–Dubai E-commerce API
+  description: REST API (compatibility layer) – GraphQL is the primary API.
+  version: 0.1.0
+servers:
+  - url: http://127.0.0.1:8000/api
+paths:
+  /register:
+    post:
+      summary: Register a new customer
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, format: password, minLength: 8 }
+              required: [email, password, name]
+      responses:
+        '201':
+          description: Registered
+        '422':
+          description: Validation error
+  /login:
+    post:
+      summary: Login
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+              required: [email, password]
+      responses:
+        '200':
+          description: Logged in, returns bearer token
+  /products:
+    get:
+      summary: List products
+      tags: [Products]
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1 }
+        - in: query
+          name: per_page
+          schema: { type: integer, minimum: 1, maximum: 100 }
+        - in: query
+          name: q
+          description: Full-text search
+          schema: { type: string }
+      responses:
+        '200':
+          description: Product collection
+  /products/featured:
+    get:
+      summary: Featured products
+      tags: [Products]
+      responses:
+        '200':
+          description: Featured product collection
+  /products/search:
+    get:
+      summary: Search products
+      tags: [Products]
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Search results
+  /products/filter-options:
+    get:
+      summary: Filter facets/options
+      tags: [Products]
+      responses:
+        '200':
+          description: Available filters
+  /products/{slug}:
+    get:
+      summary: Get product by slug
+      tags: [Products]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Product
+        '404':
+          description: Not found
+  /categories:
+    get:
+      summary: List categories (tree)
+      tags: [Categories]
+      responses:
+        '200':
+          description: Category tree
+  /categories/{slug}:
+    get:
+      summary: Get category by slug
+      tags: [Categories]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Category
+        '404':
+          description: Not found
+  /brands:
+    get:
+      summary: List brands
+      tags: [Brands]
+      responses:
+        '200':
+          description: Brands
+  /brands/{slug}:
+    get:
+      summary: Get brand by slug
+      tags: [Brands]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Brand
+        '404':
+          description: Not found
+components: {}
+

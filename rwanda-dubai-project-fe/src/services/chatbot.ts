@@ -225,7 +225,7 @@ class ChatbotService {
 
     const siteContext = `SITE INFORMATION:
 - Platform: TechBridge E-commerce
-- Business Model: Dubai → Rwanda cross-border trade
+- Business Model: Dubai/China/Korea → Rwanda cross-border trade
 - Available Categories: ${categoryNames || 'Loading categories...'}
 - Available Brands: ${brandNames || 'Loading brands...'}
 - Current Page: ${this.context.currentPage || 'Homepage'}
@@ -250,7 +250,7 @@ ${this.context.browsingHistory.slice(0, 5).map(item =>
 ).join(', ')}`
       : 'ORDER HISTORY:\n- No previous orders';
 
-    return `You are Manzi, a friendly and expert shopping assistant for TechBridge - an e-commerce platform connecting Dubai with Rwanda. You help customers find products, answer questions, and provide excellent customer service.
+    return `You are Manzi, a friendly and expert shopping assistant for TechBridge - an e-commerce platform connecting Dubai/China/Korea with Rwanda. You help customers find products, answer questions, and provide excellent customer service.
 
 ${userContext}
 

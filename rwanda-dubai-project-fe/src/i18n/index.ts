@@ -8,7 +8,7 @@ const resources = {
     translation: {
       // Header
       "header.logo": "TechBridge",
-      "header.subtitle": "Dubai → Rwanda",
+      "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Search for electronics, auto parts, tools...",
       "header.account": "Account",
       "header.wishlist": "Wishlist",
@@ -305,7 +305,7 @@ const resources = {
     translation: {
       // Header - Kinyarwanda
       "header.logo": "TechBridge",
-      "header.subtitle": "Dubai → Rwanda",
+      "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Shakisha ibikoresho by'ikoranabuhanga, ibice by'imodoka, ibikoresho...",
       "header.account": "Konti",
       "header.wishlist": "Ibintu nshaka",
@@ -465,7 +465,7 @@ const resources = {
     translation: {
       // Header - Kiswahili
       "header.logo": "TechBridge",
-      "header.subtitle": "Dubai → Rwanda",
+      "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Tafuta vifaa vya kielektroniki, sehemu za magari, zana...",
       "header.account": "Akaunti",
       "header.wishlist": "Orodha ya Matamanio",
@@ -634,7 +634,7 @@ const resources = {
     translation: {
       // Header - Lingala
       "header.logo": "TechBridge",
-      "header.subtitle": "Dubai → Rwanda",
+      "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Boluka bilembo ya elektroni, bilembo ya motuka, bilembo...",
       "header.account": "Konti",
       "header.wishlist": "Lisapo ya mposa",
@@ -803,7 +803,7 @@ const resources = {
     translation: {
       // Header - Luganda
       "header.logo": "TechBridge",
-      "header.subtitle": "Dubai → Rwanda",
+      "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Noonya ebyuma bya elektroni, ebitundu bya motoka, ebikozesebwa...",
       "header.account": "Akaunti",
       "header.wishlist": "Ebintu Byonna",

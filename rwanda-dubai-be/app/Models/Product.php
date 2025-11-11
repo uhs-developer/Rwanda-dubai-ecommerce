@@ -14,6 +14,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
+        'tenant_id',
         'name',
         'slug',
         'description',
@@ -145,14 +146,31 @@ class Product extends Model
 
     public function scopeSearch($query, $search): Builder
     {
-        return $query->where(function ($q) use ($search) {
-            $q->where('name', 'ILIKE', "%{$search}%")
-              ->orWhere('description', 'ILIKE', "%{$search}%")
-              ->orWhere('short_description', 'ILIKE', "%{$search}%")
-              ->orWhereRaw("tags::text ILIKE ?", ["%{$search}%"])
-              ->orWhereHas('brand', function ($brandQuery) use ($search) {
-                  $brandQuery->where('name', 'ILIKE', "%{$search}%");
-              });
+        $searchTerm = "%{$search}%";
+        $dbDriver = \DB::getDriverName();
+        
+        return $query->where(function ($q) use ($search, $searchTerm, $dbDriver) {
+            // Case-insensitive search for text fields
+            if ($dbDriver === 'mysql' || $dbDriver === 'mariadb') {
+                // MySQL/MariaDB syntax
+                $q->whereRaw('LOWER(name) LIKE ?', [strtolower($searchTerm)])
+                  ->orWhereRaw('LOWER(description) LIKE ?', [strtolower($searchTerm)])
+                  ->orWhereRaw('LOWER(short_description) LIKE ?', [strtolower($searchTerm)])
+                  // Search in JSON tags array - convert JSON to text and search
+                  ->orWhereRaw('LOWER(CAST(tags AS CHAR)) LIKE ?', [strtolower($searchTerm)])
+                  ->orWhereHas('brand', function ($brandQuery) use ($searchTerm) {
+                      $brandQuery->whereRaw('LOWER(name) LIKE ?', [strtolower($searchTerm)]);
+                  });
+            } else {
+                // PostgreSQL syntax (for future compatibility)
+                $q->where('name', 'ILIKE', $searchTerm)
+                  ->orWhere('description', 'ILIKE', $searchTerm)
+                  ->orWhere('short_description', 'ILIKE', $searchTerm)
+                  ->orWhereRaw("tags::text ILIKE ?", [$searchTerm])
+                  ->orWhereHas('brand', function ($brandQuery) use ($searchTerm) {
+                      $brandQuery->where('name', 'ILIKE', $searchTerm);
+                  });
+            }
         });
     }
 

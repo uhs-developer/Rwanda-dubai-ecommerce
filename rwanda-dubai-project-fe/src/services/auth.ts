@@ -15,7 +15,7 @@ export interface User {
 export interface Role {
   id: string;
   name: string;
-  slug: string;
+  slug?: string;
   description?: string;
   permissions: Permission[];
 }
@@ -171,13 +171,21 @@ export class AuthService {
   // Check if user has specific role
   static hasRole(user: User | null, roleSlug: string): boolean {
     if (!user || !user.roles) return false;
-    return user.roles.some(role => role.slug === roleSlug);
+    const target = (roleSlug || '').toLowerCase();
+    return user.roles.some(role => {
+      const current = (role.slug || role.name || '').toLowerCase();
+      return current === target;
+    });
   }
 
   // Check if user has any of the specified roles
   static hasAnyRole(user: User | null, roleSlugs: string[]): boolean {
     if (!user || !user.roles) return false;
-    return user.roles.some(role => roleSlugs.includes(role.slug));
+    const targets = roleSlugs.map(r => (r || '').toLowerCase());
+    return user.roles.some(role => {
+      const current = (role.slug || role.name || '').toLowerCase();
+      return targets.includes(current);
+    });
   }
 
   // Check if user has specific permission
@@ -216,12 +224,12 @@ export class AuthService {
 
   // Check if user is super admin
   static isSuperAdmin(user: User | null): boolean {
-    return this.hasRole(user, 'super-admin');
+    return this.hasRole(user, 'superadmin');
   }
 
   // Check if user is admin (super-admin or admin)
   static isAdmin(user: User | null): boolean {
-    return this.hasAnyRole(user, ['super-admin', 'admin']);
+    return this.hasAnyRole(user, ['superadmin', 'admin']);
   }
 
   // Check if user is editor

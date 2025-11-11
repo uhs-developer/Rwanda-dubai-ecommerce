@@ -63,6 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
                 'data' => ['total_users' => \App\Models\User::count()]
             ]);
         });
+
+        // Admin product management (limited)
+        Route::delete('/products/{id}', [ProductController::class, 'destroy'])->whereNumber('id');
     });
 
     Route::middleware('role:editor')->group(function () {

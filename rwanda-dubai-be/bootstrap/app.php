@@ -12,11 +12,22 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Register tenant resolver globally for both web and API routes
+        $middleware->appendToGroup('web', \App\Http\Middleware\TenantResolver::class);
+        $middleware->appendToGroup('api', \App\Http\Middleware\TenantResolver::class);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'permission' => \App\Http\Middleware\PermissionMiddleware::class,
             'super-admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+            'tenant' => \App\Http\Middleware\TenantResolver::class,
         ]);
+
+        // Rate limiting for API routes
+        $middleware->throttleApi('60,1'); // 60 requests per minute per IP
+
+        // Security headers
+        $middleware->appendToGroup('api', \App\Http\Middleware\SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { AuthProvider } from "../contexts/AuthContext";
-import { ProductProvider } from "../contexts/ProductContext";
+import { ProductProvider, useProducts } from "../contexts/ProductContext";
 import ProtectedRoute from "../components/ProtectedRoute";
+import { AdminRoute } from "../components/ProtectedRoute";
 import { Header } from "../components/Header";
 import { Homepage } from "../components/Homepage";
 import { HomepageAPI } from "../components/HomepageAPI";
@@ -36,17 +37,31 @@ import { Toaster } from "../components/ui/sonner";
 import { toast } from "sonner";
 import { Product, products } from "../data/products";
 import { WishlistItem, getWishlistFromStorage, saveWishlistToStorage } from "../data/wishlist";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 import { useAuth } from "../contexts/AuthContext";
+import { transformProductForDisplay } from "../services/product";
+import AdminLayout from "../admin/AdminLayout";
+import AdminDashboard from "../admin/AdminDashboard";
+import AdminUsersPage from "../admin/pages/AdminUsersPage";
+import CacheManagementPage from "../admin/pages/CacheManagementPage";
+import AdminProfilePage from "../admin/pages/AdminProfilePage";
+import CmsPagesPage from "../admin/pages/CmsPagesPage";
+import CmsBlocksPage from "../admin/pages/CmsBlocksPage";
+import AdminProductsPage from "../admin/pages/AdminProductsPage";
+import AdminCategoriesPage from "../admin/pages/AdminCategoriesPage";
+import AdminCustomersPage from "../admin/pages/AdminCustomersPage";
+import AdminOrdersPage from "../admin/pages/AdminOrdersPage";
 
 export function AppRouter() {
   return (
-    <AuthProvider>
-      <ProductProvider>
-        <AppRouterContent />
-      </ProductProvider>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <ProductProvider>
+          <AppRouterContent />
+        </ProductProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
@@ -162,8 +177,8 @@ function AppRouterContent() {
   };
 
   const handleProductClick = (_product: Product) => {
-    // Navigate to product detail page
-    // This will be handled by the routing system
+    const slug = (_product as any).slug ?? _product.id;
+    window.location.assign(`/product/${slug}`);
   };
 
   const handleCheckout = () => {
@@ -228,21 +243,126 @@ function AppRouterContent() {
       .slice(0, 4);
   };
 
+  const location = useLocation();
+  const isAdminPath = location.pathname.startsWith('/admin');
+
   return (
-    <Router>
       <div className="min-h-screen flex flex-col">
-        {/* Header */}
-        <HeaderWrapper
-          cartItemCount={cartItemCount}
-          wishlistItemCount={wishlistItemCount}
-          onWishlistClick={() => setIsWishlistOpen(true)}
-          user={user}
-          onLogout={handleLogout}
-        />
+        {/* Header (hide on admin routes) */}
+        {!isAdminPath && (
+          <HeaderWrapper
+            cartItemCount={cartItemCount}
+            wishlistItemCount={wishlistItemCount}
+            onWishlistClick={() => setIsWishlistOpen(true)}
+            user={user}
+            onLogout={handleLogout}
+          />
+        )}
 
         {/* Main Content */}
         <main className="flex-1">
           <Routes>
+            {/* Admin routes */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminDashboard />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/products"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Products">
+                    <AdminProductsPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/categories"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Categories">
+                    <AdminCategoriesPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Customers">
+                    <AdminCustomersPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/orders"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Orders">
+                    <AdminOrdersPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/pages"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Pages">
+                    <CmsPagesPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/blocks"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Blocks">
+                    <CmsBlocksPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/admin-users"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Admin Users">
+                    <AdminUsersPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/cache"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Cache Management">
+                    <CacheManagementPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/profile"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Profile & Settings">
+                    <AdminProfilePage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
             <Route path="/" element={
               <HomepageAPI
                 onAddToCart={addToCart}
@@ -300,7 +420,7 @@ function AppRouterContent() {
               />
             } />
 
-            <Route path="/product/:productId" element={
+            <Route path="/product/:slug" element={
               <ProductDetailWrapper
                 onAddToCart={addToCart}
                 onAddToWishlist={addToWishlist}
@@ -425,8 +545,8 @@ function AppRouterContent() {
           </Routes>
         </main>
 
-        {/* Footer */}
-        <Footer />
+        {/* Footer (hide on admin routes) */}
+        {!isAdminPath && <Footer />}
 
         {/* Shopping Cart Sidebar */}
         <ShoppingCart
@@ -459,13 +579,15 @@ function AppRouterContent() {
           />
         )}
 
-        {/* Chatbot */}
-        <Chatbot
-          onAddToCart={addToCart}
-          onProductClick={handleProductClick}
-          cartItems={cartItems}
-          wishlistItems={wishlistItems}
-        />
+        {/* Chatbot (hide on admin routes) */}
+        {!isAdminPath && (
+          <Chatbot
+            onAddToCart={addToCart}
+            onProductClick={handleProductClick}
+            cartItems={cartItems}
+            wishlistItems={wishlistItems}
+          />
+        )}
 
         {/* Offline Page Overlay */}
         {showOfflinePage && (
@@ -492,7 +614,6 @@ function AppRouterContent() {
           }}
         />
       </div>
-    </Router>
   );
 }
 
@@ -529,7 +650,12 @@ function HeaderWrapper({ cartItemCount, wishlistItemCount, onWishlistClick, user
         navigate('/auth');
         break;
       case 'account-dashboard':
-        navigate('/account');
+        {
+          const hasAdminRole = Array.isArray(user?.roles)
+            ? user.roles.some((r: any) => ['superadmin', 'admin'].includes((r?.name || '').toLowerCase()))
+            : false;
+          navigate(hasAdminRole ? '/admin' : '/account');
+        }
         break;
       case 'order-history':
         navigate('/orders');
@@ -611,24 +737,56 @@ function SearchPageWrapper({ onAddToCart, onAddToWishlist, onProductClick }: any
   );
 }
 
-function ProductDetailWrapper({ onAddToCart, onAddToWishlist, getRelatedProducts, onRelatedProductClick }: any) {
-  const { productId } = useParams();
+function ProductDetailWrapper({ onAddToCart, onAddToWishlist }: any) {
+  const { slug } = useParams();
   const navigate = useNavigate();
+  const { getProduct } = useProducts();
+  const [loading, setLoading] = useState(true);
+  const [displayProduct, setDisplayProduct] = useState<any | null>(null);
 
-  const product = products.find(p => p.id === productId);
+  useEffect(() => {
+    let isMounted = true;
+    async function load() {
+      if (!slug) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      const product = await getProduct(slug);
+      if (!isMounted) return;
+      if (product) {
+        setDisplayProduct(transformProductForDisplay(product));
+      } else {
+        setDisplayProduct(null);
+      }
+      setLoading(false);
+    }
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, [slug, getProduct]);
 
-  if (!product) {
-    return <Navigate to="/404" replace />;
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-10">
+        <div className="text-center text-muted-foreground">Loading product…</div>
+      </div>
+    );
+  }
+
+  if (!displayProduct) {
+    return <NotFoundPage />;
   }
 
   return (
     <ProductDetailPage
-      product={product}
-      onAddToCart={onAddToCart}
-      onAddToWishlist={onAddToWishlist}
+      product={displayProduct as Product}
+      onAddToCart={(p: Product, qty: number) => onAddToCart?.(p, qty)}
+      onAddToWishlist={(p: Product) => onAddToWishlist?.(p)}
       onBack={() => navigate('/')}
-      relatedProducts={getRelatedProducts(product)}
-      onRelatedProductClick={onRelatedProductClick}
+      relatedProducts={[]}
+      onRelatedProductClick={() => {}}
     />
   );
 }

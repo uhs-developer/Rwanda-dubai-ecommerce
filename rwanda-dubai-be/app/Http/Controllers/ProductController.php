@@ -394,12 +394,14 @@ class ProductController extends Controller
         $baseData = [
             'id' => $product->id,
             'name' => $product->name,
+            'sku' => $product->sku,
             'slug' => $product->slug,
             'price' => (float) $product->price,
             'original_price' => $product->original_price ? (float) $product->original_price : null,
             'discount_percentage' => $product->discount_percentage,
             'is_on_sale' => $product->is_on_sale,
             'primary_image' => $product->primary_image,
+            'stock_quantity' => $product->stock_quantity,
             'category' => $product->category ? [
                 'id' => $product->category->id,
                 'name' => $product->category->name,
@@ -452,5 +454,26 @@ class ProductController extends Controller
         }
 
         return $baseData;
+    }
+
+    /**
+     * Delete a product (admin)
+     */
+    public function destroy($id): JsonResponse
+    {
+        try {
+            $product = Product::findOrFail($id);
+            $product->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Product deleted',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete product',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

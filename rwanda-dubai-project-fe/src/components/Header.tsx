@@ -85,8 +85,16 @@ export function Header({
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       {/* Top banner */}
       <div className="bg-primary text-primary-foreground py-2">
-        <div className="container mx-auto px-4">
-          <p className="text-center text-sm">
+        <div className="container mx-auto px-4 flex items-center justify-between gap-4">
+          {/* Lanes in top bar */}
+          <div className="text-xs sm:text-sm flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Dubai → Rwanda</span>
+            <span className="opacity-70">•</span>
+            <span>China → Rwanda</span>
+            <span className="opacity-70">•</span>
+            <span>Korea → Rwanda</span>
+          </div>
+          <p className="hidden sm:block text-sm">
             Free shipping from Dubai to Rwanda on orders over $500
           </p>
         </div>
@@ -101,7 +109,6 @@ export function Header({
             onClick={() => onNavigate?.('home')}
           >
             <h1 className="text-2xl font-bold text-primary">TechBridge</h1>
-            <span className="text-sm text-muted-foreground hidden sm:inline">Dubai → Rwanda</span>
           </div>
 
           {/* Search bar */}

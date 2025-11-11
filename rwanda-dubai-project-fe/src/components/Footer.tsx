@@ -116,7 +116,11 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm">Dubai, UAE → Kigali, Rwanda</span>
+                <div className="text-sm space-y-1">
+                  <div>Dubai, UAE → Kigali, Rwanda</div>
+                  <div>China → Kigali, Rwanda</div>
+                  <div>Korea → Kigali, Rwanda</div>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4" />
