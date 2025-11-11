@@ -1,0 +1,243 @@
+# ===========================================
+# SHIPMENT & LOGISTICS GRAPHQL SCHEMA
+# Comprehensive shipping system with dynamic pricing
+# ===========================================
+
+extend type Query {
+  # Shipping Methods
+  shippingMethods(isActive: Boolean): [ShippingMethod!]! @field(resolver: "App\\GraphQL\\Queries\\ShippingMethods")
+  shippingMethod(id: ID!): ShippingMethod @field(resolver: "App\\GraphQL\\Queries\\ShippingMethod")
+
+  # Shipping Routes
+  shippingRoutes(
+    originCountry: String
+    destinationCountry: String
+    isActive: Boolean
+  ): [ShippingRoute!]! @field(resolver: "App\\GraphQL\\Queries\\ShippingRoutes")
+  shippingRoute(id: ID!): ShippingRoute @field(resolver: "App\\GraphQL\\Queries\\ShippingRoute")
+
+  # Calculate Shipping Cost
+  calculateShippingCost(input: CalculateShippingInput!): ShippingCostEstimate! @field(resolver: "App\\GraphQL\\Queries\\CalculateShippingCost")
+
+  # Available shipping options for checkout
+  availableShippingOptions(
+    destinationCountry: String!
+    weightKg: Float!
+    volumeCbm: Float
+    orderValue: Float!
+  ): [ShippingOption!]! @field(resolver: "App\\GraphQL\\Queries\\AvailableShippingOptions")
+}
+
+extend type Mutation {
+  # Admin: Create/Update Shipping Methods
+  createShippingMethod(input: CreateShippingMethodInput!): ShippingMethod! @field(resolver: "App\\GraphQL\\Mutations\\CreateShippingMethod")
+  updateShippingMethod(id: ID!, input: UpdateShippingMethodInput!): ShippingMethod! @field(resolver: "App\\GraphQL\\Mutations\\UpdateShippingMethod")
+  deleteShippingMethod(id: ID!): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\DeleteShippingMethod")
+
+  # Admin: Create/Update Shipping Routes
+  createShippingRoute(input: CreateShippingRouteInput!): ShippingRoute! @field(resolver: "App\\GraphQL\\Mutations\\CreateShippingRoute")
+  updateShippingRoute(id: ID!, input: UpdateShippingRouteInput!): ShippingRoute! @field(resolver: "App\\GraphQL\\Mutations\\UpdateShippingRoute")
+  deleteShippingRoute(id: ID!): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\DeleteShippingRoute")
+
+  # Admin: Configure Method-Route Pricing
+  setMethodRoutePrice(input: SetMethodRoutePriceInput!): ShippingMethodRoutePrice! @field(resolver: "App\\GraphQL\\Mutations\\SetMethodRoutePrice")
+  updateMethodRoutePrice(id: ID!, input: UpdateMethodRoutePriceInput!): ShippingMethodRoutePrice! @field(resolver: "App\\GraphQL\\Mutations\\UpdateMethodRoutePrice")
+  deleteMethodRoutePrice(id: ID!): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\DeleteMethodRoutePrice")
+}
+
+# =========================================
+# SHIPPING TYPES
+# =========================================
+
+type ShippingMethod {
+  id: ID!
+  name: String!
+  code: String!
+  description: String
+  carrier: String
+  type: ShippingMethodType!
+  basePrice: Float!
+  estimatedDaysMin: Int
+  estimatedDaysMax: Int
+  isActive: Boolean!
+  sortOrder: Int!
+  routes: [ShippingRoute!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ShippingMethodType {
+  air
+  sea
+  land
+  express
+}
+
+type ShippingRoute {
+  id: ID!
+  name: String!
+  code: String!
+  originCountry: String!
+  originCity: String
+  destinationCountry: String!
+  destinationCity: String
+  transitPoints: [String!]
+  description: String
+  isActive: Boolean!
+  sortOrder: Int!
+  methods: [ShippingMethod!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ShippingMethodRoutePrice {
+  id: ID!
+  shippingMethod: ShippingMethod!
+  shippingRoute: ShippingRoute!
+  pricePerKg: Float!
+  pricePerCbm: Float!
+  minWeightKg: Float
+  maxWeightKg: Float
+  minVolumeCbm: Float
+  maxVolumeCbm: Float
+  flatRate: Float
+  handlingFee: Float!
+  fuelSurchargePercentage: Float!
+  insurancePercentage: Float!
+  customsClearanceFee: Float!
+  customsDutyPercentage: Float!
+  customsVatPercentage: Float!
+  estimatedDaysMin: Int
+  estimatedDaysMax: Int
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ShippingCostEstimate {
+  shippingMethod: ShippingMethod!
+  shippingRoute: ShippingRoute!
+  baseCost: Float!
+  handlingFee: Float!
+  fuelSurcharge: Float!
+  insurance: Float!
+  customsClearance: Float!
+  customsDuty: Float!
+  customsVat: Float!
+  totalCost: Float!
+  estimatedDaysMin: Int
+  estimatedDaysMax: Int
+}
+
+type ShippingOption {
+  id: ID!
+  method: ShippingMethod!
+  route: ShippingRoute!
+  cost: Float!
+  estimatedDays: String
+  description: String
+}
+
+# =========================================
+# INPUT TYPES
+# =========================================
+
+input CalculateShippingInput {
+  shippingMethodId: ID!
+  shippingRouteId: ID!
+  weightKg: Float!
+  volumeCbm: Float
+  orderValue: Float!
+}
+
+input CreateShippingMethodInput {
+  name: String!
+  code: String!
+  description: String
+  carrier: String
+  type: ShippingMethodType!
+  basePrice: Float!
+  estimatedDaysMin: Int
+  estimatedDaysMax: Int
+  isActive: Boolean
+  sortOrder: Int
+}
+
+input UpdateShippingMethodInput {
+  name: String
+  code: String
+  description: String
+  carrier: String
+  type: ShippingMethodType
+  basePrice: Float
+  estimatedDaysMin: Int
+  estimatedDaysMax: Int
+  isActive: Boolean
+  sortOrder: Int
+}
+
+input CreateShippingRouteInput {
+  name: String!
+  code: String!
+  originCountry: String!
+  originCity: String
+  destinationCountry: String!
+  destinationCity: String
+  transitPoints: [String!]
+  description: String
+  isActive: Boolean
+  sortOrder: Int
+}
+
+input UpdateShippingRouteInput {
+  name: String
+  code: String
+  originCountry: String
+  originCity: String
+  destinationCountry: String
+  destinationCity: String
+  transitPoints: [String!]
+  description: String
+  isActive: Boolean
+  sortOrder: Int
+}
+
+input SetMethodRoutePriceInput {
+  shippingMethodId: ID!
+  shippingRouteId: ID!
+  pricePerKg: Float!
+  pricePerCbm: Float!
+  minWeightKg: Float
+  maxWeightKg: Float
+  minVolumeCbm: Float
+  maxVolumeCbm: Float
+  flatRate: Float
+  handlingFee: Float
+  fuelSurchargePercentage: Float
+  insurancePercentage: Float
+  customsClearanceFee: Float
+  customsDutyPercentage: Float
+  customsVatPercentage: Float
+  estimatedDaysMin: Int
+  estimatedDaysMax: Int
+  isActive: Boolean
+}
+
+input UpdateMethodRoutePriceInput {
+  pricePerKg: Float
+  pricePerCbm: Float
+  minWeightKg: Float
+  maxWeightKg: Float
+  minVolumeCbm: Float
+  maxVolumeCbm: Float
+  flatRate: Float
+  handlingFee: Float
+  fuelSurchargePercentage: Float
+  insurancePercentage: Float
+  customsClearanceFee: Float
+  customsDutyPercentage: Float
+  customsVatPercentage: Float
+  estimatedDaysMin: Int
+  estimatedDaysMax: Int
+  isActive: Boolean
+}

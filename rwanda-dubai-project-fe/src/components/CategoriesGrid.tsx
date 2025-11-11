@@ -14,20 +14,20 @@ export function CategoriesGrid({ categories, onCategoryClick }: CategoriesGridPr
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 bg-gradient-to-b from-white to-slate-50/50">
+    <section className="py-8 md:py-20 bg-gradient-to-b from-white to-slate-50/50">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+        {/* Header - Compact on mobile */}
+        <div className="text-center mb-6 md:mb-16 animate-fade-in">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
             {t("categories.shopByCategory")}
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
             {t("categories.description")}
           </p>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Categories Grid - 2 cols on mobile, more compact */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
           {categories.map((category, index) => (
             <Card 
               key={category.id} 
@@ -45,12 +45,13 @@ export function CategoriesGrid({ categories, onCategoryClick }: CategoriesGridPr
                   />
                 </div>
                 
-                <div className="p-8">
-                  <h3 className="font-bold text-xl mb-3 group-hover:text-gray-600 transition-colors duration-300">
+                <div className="p-3 md:p-8">
+                  <h3 className="font-bold text-sm md:text-xl mb-1 md:mb-3 group-hover:text-gray-600 transition-colors duration-300">
                     {category.name}
                   </h3>
                   
-                  <div className="space-y-2 mb-6">
+                  {/* Hide subcategories on mobile */}
+                  <div className="hidden md:block space-y-2 mb-6">
                     {category.subcategories.slice(0, 3).map((sub, index) => (
                       <p key={index} className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors">
                         • {sub}
@@ -66,10 +67,11 @@ export function CategoriesGrid({ categories, onCategoryClick }: CategoriesGridPr
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="p-0 h-auto text-gray-600 hover:text-gray-700 font-semibold group-hover:translate-x-1 transition-all duration-300"
+                    className="p-0 h-auto text-xs md:text-sm text-gray-600 hover:text-gray-700 font-semibold group-hover:translate-x-1 transition-all duration-300"
                   >
-                    {t("categories.exploreCollection")}
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    <span className="hidden md:inline">{t("categories.exploreCollection")}</span>
+                    <span className="md:hidden">{t("categories.explore") || "Explore"}</span>
+                    <ArrowRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 </div>
               </CardContent>

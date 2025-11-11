@@ -103,7 +103,7 @@ extend type Mutation {
   # ===== Tax Configuration =====
   createTaxRate(input: CreateTaxRateInput!): AdminTaxRate!  updateTaxRate(id: ID!, input: UpdateTaxRateInput!): AdminTaxRate!  deleteTaxRate(id: ID!): Boolean!
   # ===== Shipping Configuration =====
-  updateShippingMethod(id: ID!, input: UpdateShippingMethodInput!): AdminShippingMethod!
+  # Note: updateShippingMethod is defined in shipment-schema.graphql to avoid duplicate definition
   # ===== Coupon Management =====
   createCoupon(input: CreateCouponInput!): AdminCoupon!  updateCoupon(id: ID!, input: UpdateCouponInput!): AdminCoupon!  deleteCoupon(id: ID!): Boolean!
   # ===== Attribute Management =====

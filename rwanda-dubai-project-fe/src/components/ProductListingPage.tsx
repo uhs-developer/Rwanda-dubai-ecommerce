@@ -40,6 +40,12 @@ export function ProductListingPage({
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [currentPage, setCurrentPage] = useState(1);
+  const [animationKey, setAnimationKey] = useState(0);
+
+  // Reset animation when view mode changes
+  useEffect(() => {
+    setAnimationKey(prev => prev + 1);
+  }, [viewMode]);
   const itemsPerPage = 12;
 
   // Filter products based on criteria
@@ -356,15 +362,23 @@ export function ProductListingPage({
                 ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                 : "space-y-4"
               }>
-                {paginatedProducts.map(product => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onAddToCart={onAddToCart}
-                    onAddToWishlist={onAddToWishlist}
-                    onProductClick={onProductClick}
-                    className={viewMode === 'list' ? "flex flex-row" : ""}
-                  />
+                {paginatedProducts.map((product, index) => (
+                  <div
+                    key={`${product.id}-${animationKey}`}
+                    className="animate-fade-in-up"
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                      opacity: 0
+                    }}
+                  >
+                    <ProductCard
+                      product={product}
+                      onAddToCart={onAddToCart}
+                      onAddToWishlist={onAddToWishlist}
+                      onProductClick={onProductClick}
+                      className={viewMode === 'list' ? "flex flex-row" : ""}
+                    />
+                  </div>
                 ))}
               </div>
 

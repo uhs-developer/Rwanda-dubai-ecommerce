@@ -27,6 +27,8 @@ export default function AdminProductsPageGraphQL() {
   const [brandId, setBrandId] = useState('');
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState<'name'|'sku'|'price'|'stockQuantity'|'createdAt'>('createdAt');
+  const [sortDir, setSortDir] = useState<'asc'|'desc'>('desc');
 
   // Load filter options
   const [categoriesResult] = useQuery({ query: GET_ADMIN_CATEGORIES_SIMPLE });
@@ -42,6 +44,8 @@ export default function AdminProductsPageGraphQL() {
       status: status || undefined,
       page,
       perPage: 20,
+      sortBy,
+      sortDir,
     },
   });
 
@@ -82,6 +86,16 @@ export default function AdminProductsPageGraphQL() {
         : `http://localhost:8000${product.primaryImage}`;
     }
     return 'https://via.placeholder.com/100';
+  };
+
+  const toggleSort = (field: 'name'|'sku'|'price'|'stockQuantity'|'createdAt') => {
+    if (sortBy === field) {
+      setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortDir('asc');
+    }
+    reexecuteQuery({ requestPolicy: 'network-only' });
   };
 
   return (
@@ -140,12 +154,28 @@ export default function AdminProductsPageGraphQL() {
             <thead className="bg-muted/50">
               <tr>
                 <th className="text-left px-4 py-2">Image</th>
-                <th className="text-left px-4 py-2">SKU</th>
-                <th className="text-left px-4 py-2">Name</th>
+                <th className="text-left px-4 py-2">
+                  <button className="flex items-center gap-1" onClick={() => toggleSort('sku')}>
+                    SKU {sortBy === 'sku' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
+                  </button>
+                </th>
+                <th className="text-left px-4 py-2">
+                  <button className="flex items-center gap-1" onClick={() => toggleSort('name')}>
+                    Name {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
+                  </button>
+                </th>
                 <th className="text-left px-4 py-2">Brand</th>
                 <th className="text-left px-4 py-2">Category</th>
-                <th className="text-right px-4 py-2">Price</th>
-                <th className="text-right px-4 py-2">Qty</th>
+                <th className="text-right px-4 py-2">
+                  <button className="flex items-center gap-1 ml-auto" onClick={() => toggleSort('price')}>
+                    Price {sortBy === 'price' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
+                  </button>
+                </th>
+                <th className="text-right px-4 py-2">
+                  <button className="flex items-center gap-1 ml-auto" onClick={() => toggleSort('stockQuantity')}>
+                    Qty {sortBy === 'stockQuantity' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
+                  </button>
+                </th>
                 <th className="text-right px-4 py-2">Status</th>
                 <th className="text-right px-4 py-2">Actions</th>
               </tr>

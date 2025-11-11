@@ -731,3 +731,216 @@ export const FLUSH_CACHE = gql`
   }
 `;
 
+// ========== SHIPPING METHODS ==========
+export const GET_SHIPPING_METHODS = gql`
+  query GetShippingMethods($isActive: Boolean) {
+    shippingMethods(isActive: $isActive) {
+      id
+      name
+      code
+      description
+      carrier
+      type
+      basePrice
+      estimatedDaysMin
+      estimatedDaysMax
+      isActive
+      sortOrder
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_SHIPPING_METHOD = gql`
+  query GetShippingMethod($id: ID!) {
+    shippingMethod(id: $id) {
+      id
+      name
+      code
+      description
+      carrier
+      type
+      basePrice
+      estimatedDaysMin
+      estimatedDaysMax
+      isActive
+      sortOrder
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_SHIPPING_METHOD = gql`
+  mutation CreateShippingMethod($input: CreateShippingMethodInput!) {
+    createShippingMethod(input: $input) {
+      id
+      name
+      code
+      type
+      basePrice
+    }
+  }
+`;
+
+export const UPDATE_SHIPPING_METHOD = gql`
+  mutation UpdateShippingMethod($id: ID!, $input: UpdateShippingMethodInput!) {
+    updateShippingMethod(id: $id, input: $input) {
+      id
+      name
+      code
+      type
+      basePrice
+    }
+  }
+`;
+
+export const DELETE_SHIPPING_METHOD = gql`
+  mutation DeleteShippingMethod($id: ID!) {
+    deleteShippingMethod(id: $id)
+  }
+`;
+
+// ========== SHIPPING ROUTES ==========
+export const GET_SHIPPING_ROUTES = gql`
+  query GetShippingRoutes($originCountry: String, $destinationCountry: String, $isActive: Boolean) {
+    shippingRoutes(originCountry: $originCountry, destinationCountry: $destinationCountry, isActive: $isActive) {
+      id
+      name
+      code
+      originCountry
+      originCity
+      destinationCountry
+      destinationCity
+      transitPoints
+      description
+      isActive
+      sortOrder
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_SHIPPING_ROUTE = gql`
+  query GetShippingRoute($id: ID!) {
+    shippingRoute(id: $id) {
+      id
+      name
+      code
+      originCountry
+      originCity
+      destinationCountry
+      destinationCity
+      transitPoints
+      description
+      isActive
+      sortOrder
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_SHIPPING_ROUTE = gql`
+  mutation CreateShippingRoute($input: CreateShippingRouteInput!) {
+    createShippingRoute(input: $input) {
+      id
+      name
+      code
+      originCountry
+      destinationCountry
+    }
+  }
+`;
+
+export const UPDATE_SHIPPING_ROUTE = gql`
+  mutation UpdateShippingRoute($id: ID!, $input: UpdateShippingRouteInput!) {
+    updateShippingRoute(id: $id, input: $input) {
+      id
+      name
+      code
+    }
+  }
+`;
+
+export const DELETE_SHIPPING_ROUTE = gql`
+  mutation DeleteShippingRoute($id: ID!) {
+    deleteShippingRoute(id: $id)
+  }
+`;
+
+// ========== SHIPPING METHOD ROUTE PRICING ==========
+export const SET_METHOD_ROUTE_PRICE = gql`
+  mutation SetMethodRoutePrice($input: SetMethodRoutePriceInput!) {
+    setMethodRoutePrice(input: $input) {
+      id
+      pricePerKg
+      pricePerCbm
+      flatRate
+      handlingFee
+      fuelSurchargePercentage
+      insurancePercentage
+      customsClearanceFee
+      customsDutyPercentage
+      customsVatPercentage
+    }
+  }
+`;
+
+export const UPDATE_METHOD_ROUTE_PRICE = gql`
+  mutation UpdateMethodRoutePrice($id: ID!, $input: UpdateMethodRoutePriceInput!) {
+    updateMethodRoutePrice(id: $id, input: $input) {
+      id
+      pricePerKg
+      pricePerCbm
+    }
+  }
+`;
+
+export const DELETE_METHOD_ROUTE_PRICE = gql`
+  mutation DeleteMethodRoutePrice($id: ID!) {
+    deleteMethodRoutePrice(id: $id)
+  }
+`;
+
+// ========== SHIPPING CALCULATIONS ==========
+export const CALCULATE_SHIPPING_COST = gql`
+  query CalculateShippingCost($input: CalculateShippingInput!) {
+    calculateShippingCost(input: $input) {
+      baseCost
+      handlingFee
+      fuelSurcharge
+      insurance
+      customsClearance
+      customsDuty
+      customsVat
+      totalCost
+      estimatedDaysMin
+      estimatedDaysMax
+    }
+  }
+`;
+
+export const GET_AVAILABLE_SHIPPING_OPTIONS = gql`
+  query GetAvailableShippingOptions(
+    $destinationCountry: String!
+    $weightKg: Float!
+    $volumeCbm: Float
+    $orderValue: Float!
+  ) {
+    availableShippingOptions(
+      destinationCountry: $destinationCountry
+      weightKg: $weightKg
+      volumeCbm: $volumeCbm
+      orderValue: $orderValue
+    ) {
+      id
+      cost
+      estimatedDays
+      description
+    }
+  }
+`;
+

@@ -73,26 +73,26 @@ export function CategoryFeaturedSlider({
 
   return (
     <section 
-      className="py-12 bg-gradient-to-br from-muted/30 to-muted/10"
+      className="py-6 md:py-12 bg-gradient-to-br from-muted/30 to-muted/10"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        {/* Header - compact on mobile */}
+        <div className="flex items-center justify-between mb-4 md:mb-8">
           <div>
-            <h2 className="text-3xl font-bold mb-2">{title}</h2>
+            <h2 className="text-xl md:text-3xl font-bold mb-1 md:mb-2">{title}</h2>
             {subtitle && (
-              <p className="text-muted-foreground">{subtitle}</p>
+              <p className="text-xs md:text-base text-muted-foreground">{subtitle}</p>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             {onViewAll && (
-              <Button variant="outline" onClick={onViewAll}>
+              <Button variant="outline" size="sm" onClick={onViewAll} className="text-xs md:text-sm">
                 View All
               </Button>
             )}
-            <div className="flex gap-1">
+            <div className="hidden sm:flex gap-1">
               <Button
                 variant="outline"
                 size="sm"
@@ -134,8 +134,8 @@ export function CategoryFeaturedSlider({
                   key={product.id}
                   className={`flex-shrink-0 px-2 ${
                     showOneOnMobile 
-                      ? 'w-full sm:w-1/2 lg:w-1/4' 
-                      : 'w-full sm:w-1/2 lg:w-1/3'
+                      ? 'w-1/2 sm:w-1/2 lg:w-1/4' 
+                      : 'w-1/2 sm:w-1/2 lg:w-1/3'
                   }`}
                 >
                   <Card className="group h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1">

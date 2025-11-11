@@ -61,6 +61,10 @@ import AdminInvoicesPage from "../admin/pages/AdminInvoicesPage";
 import AdminShipmentsPage from "../admin/pages/AdminShipmentsPage";
 import AdminUsersManagementPage from "../admin/pages/AdminUsersManagementPage";
 import AdminConfigurationPage from "../admin/pages/AdminConfigurationPage";
+import AdminCurrencyPage from "../admin/pages/AdminCurrencyPage";
+import AdminShippingMethodsPage from "../admin/pages/AdminShippingMethodsPage";
+import AdminShippingRoutesPage from "../admin/pages/AdminShippingRoutesPage";
+import AdminShippingPricingPage from "../admin/pages/AdminShippingPricingPage";
 
 export function AppRouter() {
   return (
@@ -255,6 +259,13 @@ function AppRouterContent() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
 
+  // Scroll to top on route change (except for hash links)
+  useEffect(() => {
+    if (!location.hash) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [location.pathname]);
+
   return (
       <div className="min-h-screen flex flex-col">
         {/* Header (hide on admin routes) */}
@@ -403,11 +414,51 @@ function AppRouterContent() {
               }
             />
             <Route
+              path="/admin/shipping-methods"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Shipping Methods">
+                    <AdminShippingMethodsPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/shipping-routes"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Shipping Routes">
+                    <AdminShippingRoutesPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/shipping-pricing"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Shipping Pricing">
+                    <AdminShippingPricingPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
               path="/admin/configuration"
               element={
                 <AdminRoute>
                   <AdminLayout title="Configuration">
                     <AdminConfigurationPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/currency"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Currency">
+                    <AdminCurrencyPage />
                   </AdminLayout>
                 </AdminRoute>
               }

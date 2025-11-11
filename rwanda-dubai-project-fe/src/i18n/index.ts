@@ -70,6 +70,15 @@ const resources = {
       "product.specifications": "Specifications",
       "product.reviews": "Reviews",
       "product.relatedProducts": "Related Products",
+      "product.freeShipping": "Free Shipping",
+      "product.freeShippingDesc": "Free delivery on orders over $500",
+      "product.freeReturns": "Free Returns",
+      "product.freeReturnsDesc": "30-day return policy, no questions asked",
+      "product.warranty": "Warranty",
+      "product.warrantyDesc": "Manufacturer warranty included",
+      "product.shippingReturns": "Shipping & Returns",
+      "product.share": "Share",
+      "product.quantity": "Quantity",
 
       // Cart
       "cart.empty": "Your cart is empty",
@@ -148,6 +157,7 @@ const resources = {
       "categories.description": "Find exactly what you need from our comprehensive selection of electronics, auto parts, tools, and home appliances.",
       "categories.moreCategories": "more categories",
       "categories.exploreCollection": "Explore Collection",
+      "categories.explore": "Explore",
 
       // Footer
       "footer.stayUpdated": "Stay Updated",
@@ -367,6 +377,15 @@ const resources = {
       "product.specifications": "Ibisobanuro Byimbitse",
       "product.reviews": "Ubusobanuro",
       "product.relatedProducts": "Ibintu Bifitanye Ishingiro",
+      "product.freeShipping": "Kohereza ku Buntu",
+      "product.freeShippingDesc": "Kohereza ku buntu ku bicumbi birenze $500",
+      "product.freeReturns": "Gusubiza ku Buntu",
+      "product.freeReturnsDesc": "Politiki yo gusubiza iminsi 30, nta kibazo",
+      "product.warranty": "Garanti",
+      "product.warrantyDesc": "Garanti y'umukoresha iharimo",
+      "product.shippingReturns": "Kohereza na Gusubiza",
+      "product.share": "Gusangira",
+      "product.quantity": "Umubare",
 
       // Cart
       "cart.empty": "Igare ryawe ririmo ubusa",
@@ -438,6 +457,7 @@ const resources = {
       "categories.description": "Shaka icyo ukeneye mu byiciro byacu byuzuye by'ikoranabuhanga, ibice bya modoka, ibikoresho n'ibikoresho byo murugo.",
       "categories.moreCategories": "ibyiciro byinshi",
       "categories.exploreCollection": "Sura Urutonde",
+      "categories.explore": "Sura",
 
       // Footer - Kinyarwanda
       "footer.stayUpdated": "Endelea Kusasishwa",
@@ -527,6 +547,15 @@ const resources = {
       "product.specifications": "Vipengele",
       "product.reviews": "Maoni",
       "product.relatedProducts": "Bidhaa Zinazohusiana",
+      "product.freeShipping": "Usafiri wa Bure",
+      "product.freeShippingDesc": "Uwasilishaji wa bure kwa maagizo zaidi ya $500",
+      "product.freeReturns": "Rudisha Bure",
+      "product.freeReturnsDesc": "Sera ya kurudisha siku 30, hakuna maswali",
+      "product.warranty": "Dhamana",
+      "product.warrantyDesc": "Dhamana ya mtengenezaji imejumuishwa",
+      "product.shippingReturns": "Usafiri na Kurudisha",
+      "product.share": "Shiriki",
+      "product.quantity": "Idadi",
 
       // Cart
       "cart.empty": "Mkokoteni wako ni tupu",
@@ -598,6 +627,7 @@ const resources = {
       "categories.description": "Tafuta unachohitaji katika uteuzi wetu kamili wa kielektroniki, sehemu za magari, zana na vifaa vya nyumbani.",
       "categories.moreCategories": "kategoria zaidi",
       "categories.exploreCollection": "Gundua Mkusanyiko",
+      "categories.explore": "Gundua",
 
       // Homepage - Kiswahili
       "home.testimonialsTitle": "Nini Wateja Wetu Wanavyosema",
@@ -696,6 +726,13 @@ const resources = {
       "product.specifications": "Mikemikemo",
       "product.reviews": "Mituna",
       "product.relatedProducts": "Bilembo ya ndenge moko",
+      "product.freeShipping": "Kotinda na ntalo te",
+      "product.freeShippingDesc": "Kotinda na ntalo te na ma-commande oyo eza koleka $500",
+      "product.freeReturns": "Kozongisa na ntalo te",
+      "product.freeReturnsDesc": "Politiki ya kozongisa na mikolo 30, mituna te",
+      "product.warranty": "Garanti",
+      "product.warrantyDesc": "Garanti ya motongi ezali na kati",
+      "product.shippingReturns": "Kotinda na Kozongisa",
 
       // Cart
       "cart.empty": "Kabo na yo ezali mpamba",
@@ -767,6 +804,7 @@ const resources = {
       "categories.description": "Tala oyo ozali koluka na makategori na biso ya elektroni, bilembo ya motuka, bilembo na bilembo ya ndako.",
       "categories.moreCategories": "makategori mosusu",
       "categories.exploreCollection": "Tala mokano",
+      "categories.explore": "Tala",
 
       // Homepage - Lingala
       "home.testimonialsTitle": "Nini Bakisi na Biso Bazali Koloba",
@@ -865,6 +903,13 @@ const resources = {
       "product.specifications": "Ebipimo",
       "product.reviews": "Ebirowoozo",
       "product.relatedProducts": "Ebintu Ebirala",
+      "product.freeShipping": "Okutuma mu Buzibu",
+      "product.freeShippingDesc": "Okutuma mu buzibu ku maagizo agasukka mu $500",
+      "product.freeReturns": "Okuddamu mu Buzibu",
+      "product.freeReturnsDesc": "Enkola y'okuddamu mu nnaku 30, tewali buuzi",
+      "product.warranty": "Obukuumi",
+      "product.warrantyDesc": "Obukuumi bwa mutongole bukwatiddwa",
+      "product.shippingReturns": "Okutuma n'Okuddamu",
 
       // Cart
       "cart.empty": "Akagenda ko kaliiwo",
@@ -936,6 +981,7 @@ const resources = {
       "categories.description": "Noonya ky'oyagala mu ebyika byaffe bya elektroni, obutundu bwa magalimoto, ebikozesebwa n'ebintu by'omu nju.",
       "categories.moreCategories": "ebyika ebirala",
       "categories.exploreCollection": "Laba Ekusanyo",
+      "categories.explore": "Laba",
 
       // Homepage - Luganda
       "home.testimonialsTitle": "Kiki Abaguzi Baffe Bayogera",

@@ -24,18 +24,21 @@ export function ProductCard({
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
+  // Check if list mode (flex-row class is applied)
+  const isListMode = className?.includes('flex-row') || className?.includes('flex flex-row');
+
   return (
     <Card className={`group cursor-pointer hover:shadow-md transition-shadow ${className || ''}`}>
-      <CardContent className="p-0">
-        <div className="relative">
+      <CardContent className={isListMode ? "p-0 flex" : "p-0"}>
+        <div className={`relative ${isListMode ? "w-48 h-48 flex-shrink-0" : ""}`}>
           <div 
-            className="aspect-square overflow-hidden rounded-t-lg"
+            className={`${isListMode ? "w-full h-full rounded-l-lg" : "aspect-square overflow-hidden rounded-t-lg"}`}
             onClick={() => onProductClick?.(product)}
           >
             <ImageWithFallback
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className={`${isListMode ? "w-full h-full object-cover" : "w-full h-full object-cover"} group-hover:scale-105 transition-transform duration-300`}
             />
           </div>
           
@@ -67,7 +70,7 @@ export function ProductCard({
           </Button>
         </div>
 
-        <div className="p-4">
+        <div className={`p-4 ${isListMode ? "flex-1 flex flex-col justify-between" : ""}`}>
           {/* Brand */}
           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
             {product.brand}

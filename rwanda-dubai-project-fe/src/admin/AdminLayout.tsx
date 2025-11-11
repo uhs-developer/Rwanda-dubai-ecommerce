@@ -17,14 +17,18 @@ export default function AdminLayout({ children, title = "Dashboard" }: AdminLayo
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, user } = useAuth();
+  const [collapsed, setCollapsed] = useState<boolean>(() => localStorage.getItem('admin_sidebar_collapsed') === '1');
+  useEffect(() => {
+    localStorage.setItem('admin_sidebar_collapsed', collapsed ? '1' : '0');
+  }, [collapsed]);
 
   const NavItem = ({ icon: Icon, label, path }: { icon: any; label: string; path: string }) => (
     <button
       onClick={() => navigate(path)}
-      className="w-full flex items-center gap-3 rounded-md px-3 py-2 hover:bg-muted text-left"
+      className={`w-full flex ${collapsed ? 'justify-center px-2' : 'items-center gap-3 px-3'} rounded-md py-2 text-left hover:bg-transparent hover:border hover:border-slate-700`}
     >
       <Icon className="h-4 w-4" />
-      <span className="text-sm">{label}</span>
+      <span className={`text-sm ${collapsed ? 'hidden' : ''}`}>{label}</span>
     </button>
   );
 
@@ -41,11 +45,13 @@ export default function AdminLayout({ children, title = "Dashboard" }: AdminLayo
 
   const Group = ({
     label,
+    icon: Icon,
     children,
     defaultOpen = false,
     activeMatch,
   }: {
     label: string;
+    icon?: any;
     children: ReactNode;
     defaultOpen?: boolean;
     activeMatch?: RegExp;
@@ -63,66 +69,86 @@ export default function AdminLayout({ children, title = "Dashboard" }: AdminLayo
       <div className="rounded-md">
         <button
           onClick={() => setOpen(!open)}
-          className={`w-full flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted text-left ${isActive ? "bg-muted" : ""}`}
+          className={`w-full flex items-center justify-between rounded-md px-3 py-2 text-left hover:bg-transparent hover:border hover:border-slate-700 ${isActive ? "bg-slate-800 border border-slate-700" : ""}`}
         >
-          <span className="text-sm font-medium">{label}</span>
-          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+          <span className="flex items-center gap-2">
+            {Icon && <Icon className="h-4 w-4" />}
+            <span className={`text-sm font-medium ${collapsed ? "hidden" : ""}`}>{label}</span>
+          </span>
+          {!collapsed && <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />}
         </button>
-        {open && <div className="pl-2 mt-1 space-y-1">{children}</div>}
+        {open && <div className={`${collapsed ? 'pl-0' : 'pl-2'} mt-1 space-y-1`}>{children}</div>}
       </div>
     );
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="grid grid-cols-[260px_1fr]">
+      <div className={`grid ${collapsed ? 'grid-cols-[72px_1fr]' : 'grid-cols-[260px_1fr]'}`}>
         {/* Sidebar */}
-        <aside className="border-r min-h-screen p-4">
-          <div className="mb-6">
-            <div className="text-lg font-semibold">Admin Console</div>
-            <div className="text-xs text-muted-foreground">{user?.name}</div>
+        <aside className="border-r min-h-screen p-4 bg-slate-900 text-slate-100">
+          <div className="mb-6 flex items-center justify-between">
+            <div className={`${collapsed ? 'hidden' : ''}`}>
+              <div className="text-lg font-semibold">Admin Console</div>
+              <div className="text-xs opacity-70">{user?.name}</div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCollapsed(!collapsed)}
+              className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700"
+              title={collapsed ? 'Expand' : 'Collapse'}
+            >
+              {collapsed ? '»' : '«'}
+            </Button>
           </div>
 
-          <nav className="space-y-2">
+          <nav className={`space-y-2 ${collapsed ? 'overflow-hidden' : ''}`}>
             <NavItem icon={LayoutDashboard} label="Dashboard" path="/admin" />
 
-            <Group label="Sales" activeMatch={/^\/admin\/(orders|invoices|shipments|credit-memos)/}>
+            <Group icon={ShoppingCart} label="Sales" activeMatch={/^\/admin\/(orders|invoices|credit-memos)/}>
               <NavItem icon={ShoppingCart} label="Orders" path="/admin/orders" />
               <NavItem icon={FileCheck} label="Invoices" path="/admin/invoices" />
-              <NavItem icon={Truck} label="Shipments" path="/admin/shipments" />
               <NavItem icon={Receipt} label="Credit Memos" path="/admin/credit-memos" />
             </Group>
 
-            <Group label="Catalog" activeMatch={/^\/admin\/(products|categories|attributes)/}>
+            <Group icon={Package} label="Catalog" activeMatch={/^\/admin\/(products|categories|attributes)/}>
               <NavItem icon={Package} label="Products" path="/admin/products" />
               <NavItem icon={Tags} label="Categories" path="/admin/categories" />
               <NavItem icon={Tag} label="Attributes" path="/admin/attributes" />
             </Group>
 
-            <Group label="Customers" activeMatch={/^\/admin\/(customers|customer-groups)/}>
+            <Group icon={Users} label="Customers" activeMatch={/^\/admin\/(customers|customer-groups)/}>
               <NavItem icon={Users} label="All Customers" path="/admin/customers" />
               <NavItem icon={UserCircle} label="Customer Groups" path="/admin/customer-groups" />
             </Group>
 
-            <Group label="Marketing" activeMatch={/^\/admin\/promotions/}>
+            <Group icon={Truck} label="Shipping" activeMatch={/^\/admin\/(shipping-methods|shipping-routes|shipping-pricing)/}>
+              <NavItem icon={Truck} label="Shipping Methods" path="/admin/shipping-methods" />
+              <NavItem icon={Truck} label="Shipping Routes" path="/admin/shipping-routes" />
+              <NavItem icon={Tag} label="Pricing Config" path="/admin/shipping-pricing" />
+            </Group>
+
+            <Group icon={Megaphone} label="Marketing" activeMatch={/^\/admin\/promotions/}>
               <NavItem icon={Megaphone} label="Promotions" path="/admin/promotions" />
             </Group>
 
-            <Group label="Content" activeMatch={/^\/admin\/(pages|blocks)/}>
+            <Group icon={FileText} label="Content" activeMatch={/^\/admin\/(pages|blocks)/}>
               <NavItem icon={FileText} label="Pages" path="/admin/pages" />
               <NavItem icon={FileText} label="Blocks" path="/admin/blocks" />
             </Group>
 
-            <Group label="Stores" activeMatch={/^\/admin\/configuration/}>
+            <Group icon={Store} label="Stores" activeMatch={/^\/admin\/(configuration|currency)/}>
               <NavItem icon={Store} label="Configuration" path="/admin/configuration" />
+              <NavItem icon={Store} label="Currency" path="/admin/currency" />
             </Group>
 
-            <Group label="System" activeMatch={/^\/admin\/(cache|admin-users)/}>
+            <Group icon={Settings} label="System" activeMatch={/^\/admin\/(cache|admin-users)/}>
               <NavItem icon={RefreshCw} label="Cache Management" path="/admin/cache" />
               <NavItem icon={Shield} label="Admin Users" path="/admin/admin-users" />
             </Group>
 
-            <Group label="Account" activeMatch={/^\/admin\/profile/}>
+            <Group icon={Settings} label="Account" activeMatch={/^\/admin\/profile/}>
               <NavItem icon={Settings} label="Profile" path="/admin/profile" />
             </Group>
           </nav>
@@ -130,11 +156,11 @@ export default function AdminLayout({ children, title = "Dashboard" }: AdminLayo
           <div className="mt-6">
             <Button 
               variant="outline" 
-              className="w-full flex items-center gap-2"
+              className={`w-full flex items-center gap-2 border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700 ${collapsed ? 'justify-center px-2' : ''}`}
               onClick={() => logout().then(() => navigate('/'))}
             >
               <LogOut className="h-4 w-4" />
-              Sign out
+              {!collapsed && <span>Sign out</span>}
             </Button>
           </div>
         </aside>

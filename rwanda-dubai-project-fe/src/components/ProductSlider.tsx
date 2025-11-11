@@ -46,18 +46,19 @@ export function ProductSlider({
     : false;
 
   return (
-    <section className="py-8">
+    <section className="py-4 md:py-8">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">{title}</h2>
+        {/* Header - more compact on mobile */}
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <h2 className="text-xl md:text-2xl font-semibold">{title}</h2>
           <div className="flex items-center gap-2">
             {onViewAll && (
-              <Button variant="ghost" onClick={onViewAll}>
+              <Button variant="ghost" size="sm" onClick={onViewAll} className="text-xs md:text-sm">
                 View All
               </Button>
             )}
-            <div className="flex gap-1">
+            {/* Hide navigation arrows on mobile */}
+            <div className="hidden sm:flex gap-1">
               <Button
                 variant="outline"
                 size="sm"
@@ -80,15 +81,15 @@ export function ProductSlider({
           </div>
         </div>
 
-        {/* Slider */}
+        {/* Slider - 50% width cards on mobile */}
         <div className="relative">
           <div
             ref={sliderRef}
-            className="flex gap-4 overflow-x-auto scrollbar-hide"
+            className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {products.map((product) => (
-              <div key={product.id} className="flex-none w-80">
+              <div key={product.id} className="flex-none w-[calc(50%-6px)] sm:w-64 md:w-80">
                 <ProductCard
                   product={product}
                   onAddToCart={onAddToCart}

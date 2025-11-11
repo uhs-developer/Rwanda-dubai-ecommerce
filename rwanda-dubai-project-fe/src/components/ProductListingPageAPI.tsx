@@ -64,6 +64,17 @@ export function ProductListingPageAPI({
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [animationKey, setAnimationKey] = useState(0);
+
+  // Reset animation when view mode changes
+  useEffect(() => {
+    setAnimationKey(prev => prev + 1);
+  }, [viewMode]);
+
+  // Scroll to top when component mounts or category/subcategory changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [category, subcategory]);
 
   // Initialize data on component mount
   useEffect(() => {
@@ -508,15 +519,23 @@ export function ProductListingPageAPI({
                 ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                 : "space-y-4"
               }>
-                {displayProducts.map(product => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onAddToCart={onAddToCart}
-                    onAddToWishlist={onAddToWishlist}
-                    onProductClick={onProductClick}
-                    className={viewMode === 'list' ? "flex flex-row" : ""}
-                  />
+                {displayProducts.map((product, index) => (
+                  <div
+                    key={`${product.id}-${animationKey}`}
+                    className="animate-fade-in-up"
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                      opacity: 0
+                    }}
+                  >
+                    <ProductCard
+                      product={product}
+                      onAddToCart={onAddToCart}
+                      onAddToWishlist={onAddToWishlist}
+                      onProductClick={onProductClick}
+                      className={viewMode === 'list' ? "flex flex-row" : ""}
+                    />
+                  </div>
                 ))}
               </div>
 

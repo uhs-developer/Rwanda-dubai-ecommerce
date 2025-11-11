@@ -71,6 +71,7 @@ interface ProductFormData {
   shortDescription?: string;
   description?: string;
   categoryId?: string;
+  categoryIds?: string[];
   brandId?: string;
   stockQuantity: number | string;
   weight?: number | string;
@@ -89,6 +90,8 @@ export default function AdminProductFormPage() {
   const [loading, setLoading] = useState(false);
   const [skuEdited, setSkuEdited] = useState(false);
   const [slugEdited, setSlugEdited] = useState(false);
+  const [categoryInput, setCategoryInput] = useState('');
+  const [brandInput, setBrandInput] = useState('');
 
   // Form state
   const [formData, setFormData] = useState<ProductFormData>({
@@ -101,6 +104,7 @@ export default function AdminProductFormPage() {
     shortDescription: '',
     description: '',
     categoryId: '',
+    categoryIds: [],
     brandId: '',
     stockQuantity: 0,
     weight: '',
@@ -126,6 +130,16 @@ export default function AdminProductFormPage() {
   // Mutations
   const [, createProduct] = useMutation(CREATE_PRODUCT_MUTATION);
   const [, updateProduct] = useMutation(UPDATE_PRODUCT_MUTATION);
+  const [, createCategoryMutation] = useMutation(gql`
+    mutation CreateCategoryQuick($input: CreateCategoryInput!) {
+      createCategory(input: $input) { id name slug }
+    }
+  `);
+  const [, createBrandMutation] = useMutation(gql`
+    mutation CreateBrandQuick($input: CreateBrandInput!) {
+      createBrand(input: $input) { id name slug }
+    }
+  `);
 
   const categories = filterOptionsResult.data?.adminCategories?.data || [];
   const brands = filterOptionsResult.data?.adminBrands || [];
@@ -149,6 +163,7 @@ export default function AdminProductFormPage() {
         shortDescription: p.shortDescription || '',
         description: p.description || '',
         categoryId: p.category?.id != null ? String(p.category.id) : '',
+        categoryIds: Array.isArray((p as any).categories) ? (p as any).categories.map((c: any) => String(c.id)) : [],
         brandId: p.brand?.id != null ? String(p.brand.id) : '',
         stockQuantity: p.stockQuantity != null ? String(p.stockQuantity) : '',
         weight: p.weight != null ? String(p.weight) : '',
@@ -426,7 +441,7 @@ export default function AdminProductFormPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="price">Price (USD) <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="price">Price (RWF) <span className="text-red-500">*</span></Label>
                   <Input
                     id="price"
                     type="number"
@@ -435,9 +450,22 @@ export default function AdminProductFormPage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
                     required
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {(() => {
+                      const rwf = Number(formData.price || 0);
+                      const rates = ratesResult.data?.adminExchangeRates || [];
+                      const findRate = (from: string, to: string) => rates.find((r: any) => r.codeFrom === from && r.codeTo === to)?.rate
+                        || (1 / (rates.find((r: any) => r.codeFrom === to && r.codeTo === from)?.rate || 0));
+                      const usd = rwf / (findRate('USD', 'RWF') || 1);
+                      const aed = rwf / (findRate('AED', 'RWF') || 1);
+                      const jpy = rwf / (findRate('JPY', 'RWF') || 1);
+                      if (!isFinite(usd) || !isFinite(aed) || !isFinite(jpy)) return null;
+                      return `≈ $${usd.toFixed(2)} • د.إ ${aed.toFixed(2)} • ¥${jpy.toFixed(2)}`;
+                    })()}
+                  </p>
                 </div>
                 <div>
-                  <Label htmlFor="originalPrice">Original Price (USD)</Label>
+                  <Label htmlFor="originalPrice">Original Price (RWF)</Label>
                   <Input
                     id="originalPrice"
                     type="number"
@@ -448,7 +476,7 @@ export default function AdminProductFormPage() {
                   <p className="text-xs text-muted-foreground mt-1">Regular price before discount</p>
                 </div>
                 <div>
-                  <Label htmlFor="costPrice">Cost Price (USD)</Label>
+                  <Label htmlFor="costPrice">Cost Price (RWF)</Label>
                   <Input
                     id="costPrice"
                     type="number"
@@ -560,7 +588,7 @@ export default function AdminProductFormPage() {
               <CardTitle>Organization</CardTitle>
             </CardHeader>
             <CardContent>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="brandId">Brand</Label>
                 <Select value={formData.brandId || "none"} onValueChange={(val) => setFormData(prev => ({ ...prev, brandId: val === "none" ? "" : val }))}>
                   <SelectTrigger>
@@ -573,6 +601,35 @@ export default function AdminProductFormPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                <Input
+                  placeholder="Type new brand name and press Enter"
+                  value={brandInput}
+                  onChange={(e) => setBrandInput(e.target.value)}
+                  onKeyDown={async (e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const name = brandInput.trim();
+                      if (!name) return;
+                      const existing = brands.find((b: any) => b.name.toLowerCase() === name.toLowerCase());
+                      if (existing) {
+                        setFormData(prev => ({ ...prev, brandId: String(existing.id) }));
+                        setBrandInput('');
+                        return;
+                      }
+                      const result = await createBrandMutation({ input: { name } });
+                      if (result.error) {
+                        toast.error(result.error.message || 'Failed to create brand');
+                        return;
+                      }
+                      const br = (result.data as any)?.createBrand;
+                      if (br?.id) {
+                        setFormData(prev => ({ ...prev, brandId: String(br.id) }));
+                        setBrandInput('');
+                        reexecFilter({ requestPolicy: 'network-only' });
+                      }
+                    }
+                  }}
+                />
               </div>
             </CardContent>
           </Card>
