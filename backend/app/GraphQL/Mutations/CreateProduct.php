@@ -4,6 +4,7 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Product;
 use Illuminate\Support\Str;
+use GraphQL\Error\Error;
 
 class CreateProduct
 {
@@ -11,6 +12,11 @@ class CreateProduct
     {
         $input = $args['input'];
         
+        // Basic validation
+        if (empty($input['categoryId']) && (empty($input['categoryIds']) || !is_array($input['categoryIds']) || count($input['categoryIds']) === 0)) {
+            throw new Error('Category is required. Please select at least one category.');
+        }
+
         // Generate slug if not provided
         if (empty($input['slug'])) {
             $input['slug'] = Str::slug($input['name']);
@@ -24,7 +30,7 @@ class CreateProduct
             'original_price' => $input['originalPrice'] ?? null,
             'stock_quantity' => $input['stockQuantity'] ?? 0,
             'weight' => $input['weight'] ?? null,
-            'category_id' => $input['categoryId'] ?? null,
+            'category_id' => $input['categoryId'] ?? ($input['categoryIds'][0] ?? null),
             'brand_id' => $input['brandId'] ?? null,
             'description' => $input['description'] ?? null,
             'short_description' => $input['shortDescription'] ?? null,

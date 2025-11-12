@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { ArrowLeft, Users, TrendingUp, Award, CheckCircle, Truck, Clock, Shield } from "lucide-react";
+import { ArrowLeft, Users, TrendingUp, Award, CheckCircle, Truck, Clock, Shield, Info } from "lucide-react";
 
 interface AboutPageProps {
   onBack: () => void;
@@ -42,6 +42,34 @@ export function AboutPage({ onBack }: AboutPageProps) {
             from Dubai accessible to customers in Rwanda. We've grown from a small startup to a trusted 
             bridge between two dynamic markets.
           </p>
+        </div>
+      </div>
+
+      {/* Exchange Rate Transparency */}
+      <div className="bg-gray-50 py-12">
+        <div className="container mx-auto px-4">
+          <Card className="max-w-4xl mx-auto">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-3 mb-3">
+                <Info className="h-5 w-5 text-primary mt-0.5" />
+                <h3 className="text-xl font-semibold text-gray-900">Exchange Rate Transparency</h3>
+              </div>
+              <p className="text-gray-700 text-sm leading-relaxed mb-3">
+                You may notice our dollar exchange rate differs from what you see elsewhere. Exchange
+                rates can fluctuate quickly across markets and sources, and it’s not always possible to
+                update every price instantly. To keep service reliable, we include a small margin to cover
+                these variations while still offering competitive final pricing.
+              </p>
+              <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                Need a tailored quote or a large order? Contact us for a custom enquiry — we’ll provide
+                you with the most up-to-date rate and an all-in price for your specific request.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" onClick={() => (window.location.href = 'mailto:support@techbridge.com')}>Email Us</Button>
+                <Button size="sm" variant="outline" onClick={() => (window.location.href = '/contact')}>Contact Page</Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 

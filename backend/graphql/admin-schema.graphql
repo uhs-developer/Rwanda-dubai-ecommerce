@@ -2,6 +2,9 @@
 # ADMIN GRAPHQL SCHEMA - Magento-parity Admin API
 # ===========================================
 
+# Scalar for JSON data
+scalar JSON
+
 extend type Query {
   # ===== Admin Products =====
   adminProducts(
@@ -52,6 +55,15 @@ extend type Query {
     perPage: Int = 20
     status: String
     paymentStatus: String
+    paymentMethod: String
+    shippingMethod: String
+    currency: String
+    minTotal: Float
+    maxTotal: Float
+    dateFrom: DateTime
+    dateTo: DateTime
+    customerEmail: String
+    customerName: String
   ): AdminOrderConnection!
 
   adminOrder(id: ID!): AdminOrder
@@ -65,9 +77,16 @@ extend type Query {
   
   # ===== Admin Invoices =====
   adminInvoices(
+    q: String
     orderId: ID
     page: Int = 1
     perPage: Int = 20
+    status: String
+    currency: String
+    minTotal: Float
+    maxTotal: Float
+    dateFrom: DateTime
+    dateTo: DateTime
   ): AdminInvoiceConnection!
   
   # adminShipment(id: ID!): AdminShipment  # TODO: Implement resolver
@@ -140,6 +159,9 @@ extend type Mutation {
   createExchangeRate(input: UpsertExchangeRateInput!): ExchangeRate! @field(resolver: "App\\GraphQL\\Mutations\\CreateExchangeRate")
   updateExchangeRate(id: ID!, input: UpsertExchangeRateInput!): ExchangeRate! @field(resolver: "App\\GraphQL\\Mutations\\UpdateExchangeRate")
   deleteExchangeRate(id: ID!): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\DeleteExchangeRate")
+
+  # ===== AI-Powered SEO Generation =====
+  generateProductSEO(productId: ID, productData: ProductSEOInput): ProductSEOResponse! @field(resolver: "App\\GraphQL\\Mutations\\GenerateProductSEO")
 }
 
 # =========================================
@@ -167,6 +189,16 @@ type AdminProduct {
   priceUsd: Float @field(resolver: "App\\GraphQL\\Resolvers\\ProductPrice@usd")
   priceAed: Float @field(resolver: "App\\GraphQL\\Resolvers\\ProductPrice@aed")
   priceJpy: Float @field(resolver: "App\\GraphQL\\Resolvers\\ProductPrice@jpy")
+  # SEO Fields
+  metaTitle: String
+  metaDescription: String
+  metaKeywords: [String!]
+  seoTranslations: JSON
+  searchKeywords: String
+  structuredData: JSON
+  aiSuggestions: [String!]
+  seoScore: Int
+  lastSeoOptimization: DateTime
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -270,7 +302,9 @@ type AdminInvoice {
   invoiceNumber: String! @rename(attribute: "invoice_number")
   status: String!
   grandTotal: Float! @rename(attribute: "grand_total")
+  currency: String
   createdAt: DateTime! @rename(attribute: "created_at")
+  order: AdminOrder @belongsTo(relation: "order")
 }
 
 type AdminInvoiceConnection {
@@ -465,6 +499,13 @@ input CreateProductInput {
   primaryImage: String
   isActive: Boolean
   isFeatured: Boolean
+  # SEO Fields
+  metaTitle: String
+  metaDescription: String
+  metaKeywords: [String!]
+  seoTranslations: JSON
+  searchKeywords: String
+  structuredData: JSON
 }
 
 input UpdateProductInput {
@@ -484,6 +525,13 @@ input UpdateProductInput {
   primaryImage: String
   isActive: Boolean
   isFeatured: Boolean
+  # SEO Fields
+  metaTitle: String
+  metaDescription: String
+  metaKeywords: [String!]
+  seoTranslations: JSON
+  searchKeywords: String
+  structuredData: JSON
 }
 
 input CreateCategoryInput {
@@ -657,3 +705,35 @@ input UpdateBlockInput {
   isActive: Boolean
 }
 
+
+# =========================================
+# SEO TYPES AND INPUTS
+# =========================================
+
+input ProductSEOInput {
+  name: String!
+  description: String
+  category: String
+  brand: String
+  price: Float
+  slug: String
+}
+
+type ProductSEOResponse {
+  success: Boolean!
+  message: String
+  product: AdminProduct
+  seoData: SEOData
+}
+
+type SEOData {
+  metaTitle: String
+  metaDescription: String
+  metaKeywords: [String!]
+  seoTranslations: JSON
+  searchKeywords: String
+  structuredData: JSON
+  aiSuggestions: [String!]
+  seoScore: Int
+  lastSeoOptimization: DateTime
+}

@@ -212,28 +212,45 @@ export class ProductService {
 }
 
 // Helper functions for data transformation
-export const transformProductForDisplay = (product: Product) => {
+export const transformProductForDisplay = (rawProduct: any) => {
+  const imagesArray = Array.isArray(rawProduct?.images) ? rawProduct.images : [];
+  const firstImage = imagesArray[0];
+  const imageUrl = rawProduct?.primary_image
+    || rawProduct?.image
+    || (firstImage && (firstImage.image_url || firstImage.url))
+    || 'https://via.placeholder.com/400x400?text=No+Image';
+
+  const categoriesArray = Array.isArray(rawProduct?.categories) ? rawProduct.categories : [];
+  const categoryName = rawProduct?.category?.name || categoriesArray[0]?.name || '';
+  const subcategoryName = rawProduct?.subcategory?.name || '';
+
+  const brandName = rawProduct?.brand?.name || '';
+
+  const images = imagesArray
+    .map((img: any) => img?.image_url || img?.url)
+    .filter((x: any) => !!x);
+
   return {
-    id: product.id.toString(),
-    name: product.name,
-    price: product.price,
-    originalPrice: product.original_price,
-    image: product.primary_image || 'https://via.placeholder.com/400x400?text=No+Image',
-    images: product.images?.map(img => img.image_url) || [],
-    category: product.category.name,
-    subcategory: product.subcategory.name,
-    rating: product.average_rating,
-    reviews: product.total_reviews,
-    description: product.description || product.short_description || '',
-    specifications: product.specifications || {},
-    inStock: product.in_stock,
-    brand: product.brand.name,
-    tags: product.tags || [],
-    features: product.features || [],
-    slug: product.slug,
-    discount_percentage: product.discount_percentage,
-    is_on_sale: product.is_on_sale,
-    is_featured: product.is_featured
+    id: String(rawProduct?.id ?? rawProduct?.slug ?? ''),
+    name: rawProduct?.name || '',
+    price: Number(rawProduct?.price ?? 0),
+    originalPrice: rawProduct?.original_price ?? rawProduct?.specialPrice ?? undefined,
+    image: imageUrl,
+    images,
+    category: categoryName,
+    subcategory: subcategoryName,
+    rating: Number(rawProduct?.average_rating ?? rawProduct?.rating ?? 0),
+    reviews: Number(rawProduct?.total_reviews ?? rawProduct?.reviews ?? 0),
+    description: rawProduct?.description || rawProduct?.short_description || '',
+    specifications: rawProduct?.specifications || {},
+    inStock: Boolean(rawProduct?.in_stock ?? rawProduct?.inStock ?? (rawProduct?.qty ? rawProduct.qty > 0 : true)),
+    brand: brandName,
+    tags: rawProduct?.tags || [],
+    features: rawProduct?.features || [],
+    slug: rawProduct?.slug || '',
+    discount_percentage: rawProduct?.discount_percentage,
+    is_on_sale: Boolean(rawProduct?.is_on_sale),
+    is_featured: Boolean(rawProduct?.is_featured),
   };
 };
 

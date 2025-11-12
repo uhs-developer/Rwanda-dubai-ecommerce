@@ -7,11 +7,27 @@ import { GET_ADMIN_INVOICES } from '../../graphql/admin';
 
 export default function AdminInvoicesPage() {
   const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
+  const [currency, setCurrency] = useState('');
+  const [minTotal, setMinTotal] = useState('');
+  const [maxTotal, setMaxTotal] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [page, setPage] = useState(1);
 
   const [invoicesResult] = useQuery({
     query: GET_ADMIN_INVOICES,
-    variables: { q: search, page, perPage: 20 },
+    variables: {
+      q: search || undefined,
+      status: status || undefined,
+      currency: currency || undefined,
+      minTotal: minTotal ? parseFloat(minTotal) : undefined,
+      maxTotal: maxTotal ? parseFloat(maxTotal) : undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+      page,
+      perPage: 20,
+    },
   });
 
   const invoices = invoicesResult.data?.adminInvoices?.data || [];
@@ -24,16 +40,36 @@ export default function AdminInvoicesPage() {
     setPage(target);
   };
 
+  const clearFilters = () => {
+    setSearch('');
+    setStatus('');
+    setCurrency('');
+    setMinTotal('');
+    setMaxTotal('');
+    setDateFrom('');
+    setDateTo('');
+    setPage(1);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <h2 className="text-xl font-semibold">Invoices</h2>
-        <Input
-          placeholder="Search invoices..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-64"
-        />
+        <div className="flex gap-2 flex-wrap">
+          <Input placeholder="Search invoices..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-48" />
+          <select className="h-9 border rounded px-2 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="void">Void</option>
+          </select>
+          <Input placeholder="Currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-24" />
+          <Input placeholder="Min total" type="number" value={minTotal} onChange={(e) => setMinTotal(e.target.value)} className="w-28" />
+          <Input placeholder="Max total" type="number" value={maxTotal} onChange={(e) => setMaxTotal(e.target.value)} className="w-28" />
+          <Input placeholder="From" type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-36" />
+          <Input placeholder="To" type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-36" />
+          <Button variant="outline" size="sm" onClick={clearFilters}>Clear</Button>
+        </div>
       </div>
 
       {loading && <p>Loading invoices...</p>}

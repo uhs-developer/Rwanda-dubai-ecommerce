@@ -12,14 +12,32 @@ export default function AdminOrdersPageGraphQL() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [shippingMethod, setShippingMethod] = useState('');
+  const [currency, setCurrency] = useState('');
+  const [minTotal, setMinTotal] = useState('');
+  const [maxTotal, setMaxTotal] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [page, setPage] = useState(1);
 
   const [ordersResult] = useQuery({
     query: GET_ADMIN_ORDERS,
     variables: {
-      q: search,
+      q: search || undefined,
       status: status || undefined,
       paymentStatus: paymentStatus || undefined,
+      paymentMethod: paymentMethod || undefined,
+      shippingMethod: shippingMethod || undefined,
+      currency: currency || undefined,
+      minTotal: minTotal ? parseFloat(minTotal) : undefined,
+      maxTotal: maxTotal ? parseFloat(maxTotal) : undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+      customerEmail: customerEmail || undefined,
+      customerName: customerName || undefined,
       page,
       perPage: 20,
     },
@@ -35,39 +53,52 @@ export default function AdminOrdersPageGraphQL() {
     setPage(target);
   };
 
+  const clearFilters = () => {
+    setSearch('');
+    setStatus('');
+    setPaymentStatus('');
+    setPaymentMethod('');
+    setShippingMethod('');
+    setCurrency('');
+    setMinTotal('');
+    setMaxTotal('');
+    setDateFrom('');
+    setDateTo('');
+    setCustomerEmail('');
+    setCustomerName('');
+    setPage(1);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h2 className="text-xl font-semibold">Orders</h2>
-        <div className="flex gap-2">
-          <Input
-            placeholder="Search orders..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-48"
-          />
-          <select
-            className="h-9 border rounded px-2 text-sm"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
+        <div className="flex gap-2 flex-wrap">
+          <Input placeholder="Search orders..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-40" />
+          <Input placeholder="Customer email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className="w-40" />
+          <Input placeholder="Customer name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="w-36" />
+          <select className="h-9 border rounded px-2 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="">All Status</option>
             <option value="pending">Pending</option>
             <option value="processing">Processing</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
-          <select
-            className="h-9 border rounded px-2 text-sm"
-            value={paymentStatus}
-            onChange={(e) => setPaymentStatus(e.target.value)}
-          >
+          <select className="h-9 border rounded px-2 text-sm" value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value)}>
             <option value="">All Payment Status</option>
             <option value="pending">Pending</option>
             <option value="paid">Paid</option>
             <option value="failed">Failed</option>
             <option value="refunded">Refunded</option>
           </select>
+          <Input placeholder="Payment method" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-36" />
+          <Input placeholder="Shipping method" value={shippingMethod} onChange={(e) => setShippingMethod(e.target.value)} className="w-36" />
+          <Input placeholder="Currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-24" />
+          <Input placeholder="Min total" type="number" value={minTotal} onChange={(e) => setMinTotal(e.target.value)} className="w-28" />
+          <Input placeholder="Max total" type="number" value={maxTotal} onChange={(e) => setMaxTotal(e.target.value)} className="w-28" />
+          <Input placeholder="From" type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-36" />
+          <Input placeholder="To" type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-36" />
+          <Button variant="outline" size="sm" onClick={clearFilters}>Clear</Button>
         </div>
       </div>
 

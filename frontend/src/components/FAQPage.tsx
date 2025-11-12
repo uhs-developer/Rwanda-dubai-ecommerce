@@ -3,7 +3,7 @@ import { Input } from "./ui/input";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import { ArrowLeft, Search, Plus, Minus, Mail, Phone, MessageCircle, HelpCircle } from "lucide-react";
+import { ArrowLeft, Search, Plus, Minus, Mail, Phone, MessageCircle, HelpCircle, Info } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -21,6 +21,13 @@ interface FAQItem {
 }
 
 const faqData: FAQItem[] = [
+  {
+    id: "exrate",
+    category: "payment",
+    categoryLabel: "Payment",
+    question: "Why is the USD exchange rate different on your platform?",
+    answer: "Exchange rates fluctuate across markets and change frequently. While we update our prices regularly, real-time changes can occur. To ensure reliable service, we include a small margin to cover these variations while keeping our final prices competitive. For large or custom orders, contact us and we'll provide a tailored quote with the latest available rate.",
+  },
   {
     id: "1",
     category: "shipping",
@@ -296,29 +303,16 @@ export function FAQPage({ onBack }: FAQPageProps) {
               <p className="text-gray-300 mb-8">
                 {t("faq.supportDescription")}
               </p>
-              
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  variant="secondary" 
-                  onClick={handleEmailSupport}
-                  className="flex items-center gap-2"
-                >
+                <Button variant="secondary" onClick={() => (window.location.href = 'mailto:support@techbridge.com')} className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
                   {t("faq.emailSupport")}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleCallUs}
-                  className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-gray-900"
-                >
+                <Button variant="outline" onClick={() => toast.info('Calling +971 4 XXX XXXX...')} className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-gray-900">
                   <Phone className="h-4 w-4" />
                   {t("faq.callUs")}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleLiveChat}
-                  className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-gray-900"
-                >
+                <Button variant="outline" onClick={() => toast.info('Live chat feature coming soon!')} className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-gray-900">
                   <MessageCircle className="h-4 w-4" />
                   {t("faq.liveChat")}
                 </Button>
@@ -331,10 +325,7 @@ export function FAQPage({ onBack }: FAQPageProps) {
         <div className="mt-8 grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">{t("faq.customerSupportHours")}</h3>
-            <p className="text-gray-600 text-sm mb-4">
-              {t("faq.supportHoursDescription")}
-            </p>
-            
+            <p className="text-gray-600 text-sm mb-4">{t("faq.supportHoursDescription")}</p>
             <div className="space-y-2 text-sm">
               <div>
                 <span className="font-medium text-gray-900">{t("faq.emailSupport")}</span>
@@ -343,19 +334,12 @@ export function FAQPage({ onBack }: FAQPageProps) {
               </div>
             </div>
           </div>
-
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">{t("faq.phoneAndChat")}</h3>
             <div className="space-y-2 text-sm">
-              <p className="text-gray-600">
-                <span className="font-medium text-gray-900">{t("faq.mondayFriday")}:</span> 9:00 AM - 6:00 PM
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium text-gray-900">{t("faq.saturday")}:</span> 10:00 AM - 4:00 PM
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium text-gray-900">{t("faq.sunday")}:</span> {t("faq.closed")}
-              </p>
+              <p className="text-gray-600"><span className="font-medium text-gray-900">{t("faq.mondayFriday")}:</span> 9:00 AM - 6:00 PM</p>
+              <p className="text-gray-600"><span className="font-medium text-gray-900">{t("faq.saturday")}:</span> 10:00 AM - 4:00 PM</p>
+              <p className="text-gray-600"><span className="font-medium text-gray-900">{t("faq.sunday")}:</span> {t("faq.closed")}</p>
             </div>
           </div>
         </div>

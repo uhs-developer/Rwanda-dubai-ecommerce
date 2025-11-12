@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Checkbox } from "../../components/ui/checkbox";
 import { toast } from "sonner";
 import { useQuery, useMutation, gql } from 'urql';
+import { AISEOGenerator } from '../components/AISEOGenerator';
+import { AIFieldSuggestion } from '../components/AIFieldSuggestion';
 
 // GraphQL queries and mutations
 const GET_PRODUCT_FOR_EDIT = gql`
@@ -83,6 +85,9 @@ interface ProductFormData {
   metaTitle?: string;
   metaDescription?: string;
   metaKeywords?: string;
+  searchKeywords?: string;
+  seoTranslations?: any;
+  structuredData?: any;
 }
 
 export default function AdminProductFormPage() {
@@ -146,11 +151,44 @@ export default function AdminProductFormPage() {
   const categories = filterOptionsResult.data?.adminCategories?.data || [];
   const brands = filterOptionsResult.data?.adminBrands?.data || [];
 
+  // Helper to extract clear error from GraphQL
+  const extractGraphQLError = (err: any): string => {
+    const gqlErr = err?.graphQLErrors?.[0];
+    const dbg = gqlErr?.extensions?.debugMessage as string | undefined;
+    const msg = gqlErr?.message as string | undefined;
+    const text = dbg || msg || err?.message;
+    if (!text) return 'Operation failed';
+    // Friendly mappings
+    if (/category_id\s+cannot\s+be\s+null/i.test(text) || /Category is required/i.test(text)) {
+      return 'Please select a category.';
+    }
+    if (/duplicate entry/i.test(text) && /sku/i.test(text)) {
+      return 'This SKU already exists. Please choose a different SKU.';
+    }
+    if (/slug/i.test(text) && /duplicate/i.test(text)) {
+      return 'This slug already exists. Please edit the slug.';
+    }
+    return text.replace(/^SQLSTATE.*?:\s*/i, '');
+  };
+
+  // Handle SEO generation callback
+  const handleSEOGenerated = (seoData: any) => {
+    setFormData(prev => ({
+      ...prev,
+      metaTitle: seoData.metaTitle || prev.metaTitle,
+      metaDescription: seoData.metaDescription || prev.metaDescription,
+      metaKeywords: seoData.metaKeywords?.join(', ') || prev.metaKeywords,
+      searchKeywords: seoData.searchKeywords || prev.searchKeywords,
+      seoTranslations: seoData.seoTranslations || prev.seoTranslations,
+      structuredData: seoData.structuredData || prev.structuredData,
+    }));
+  };
+
   // Populate form when editing
   useEffect(() => {
     if (productResult.error) {
       console.error('[AdminProductForm] Failed to load product:', productResult.error);
-      toast.error('Failed to load product: ' + productResult.error.message);
+      toast.error('Failed to load product: ' + extractGraphQLError(productResult.error));
     }
     
     if (isEdit && productResult.data?.adminProduct) {
@@ -217,6 +255,11 @@ export default function AdminProductFormPage() {
   }, [formData.name, formData.categoryId, isEdit, skuEdited, categories]);
 
   const handleSubmit = async () => {
+    // Client-side required validations
+    if (!formData.categoryId && (!formData.categoryIds || formData.categoryIds.length === 0)) {
+      toast.error('Please select a category.');
+      return;
+    }
     if (!formData.name || !formData.sku || !formData.slug || !formData.price) {
       // If SKU is missing in create mode, generate it on the fly
       if (!isEdit && !formData.sku && formData.name) {
@@ -249,13 +292,19 @@ export default function AdminProductFormPage() {
         isActive: formData.isActive,
         isFeatured: formData.isFeatured,
         primaryImage: formData.primaryImage || undefined,
+        metaTitle: formData.metaTitle || undefined,
+        metaDescription: formData.metaDescription || undefined,
+        metaKeywords: formData.metaKeywords ? formData.metaKeywords.split(',').map(k => k.trim()) : undefined,
+        searchKeywords: formData.searchKeywords || undefined,
+        seoTranslations: formData.seoTranslations || undefined,
+        structuredData: formData.structuredData || undefined,
       };
 
       if (isEdit) {
         const result = await updateProduct({ id: id, input });
         if (result.error) {
           console.error('[AdminProductForm] Update failed:', result.error);
-          toast.error(result.error.message || 'Failed to update product');
+          toast.error(extractGraphQLError(result.error));
         } else {
           toast.success('Product updated successfully');
           navigate('/admin/products');
@@ -264,7 +313,7 @@ export default function AdminProductFormPage() {
         const result = await createProduct({ input });
         if (result.error) {
           console.error('[AdminProductForm] Create failed:', result.error);
-          toast.error(result.error.message || 'Failed to create product');
+          toast.error(extractGraphQLError(result.error));
         } else {
           toast.success('Product created successfully');
           navigate('/admin/products');
@@ -282,7 +331,7 @@ export default function AdminProductFormPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{isEdit ? `Edit Product: ${formData.name || 'Loading...'}` : 'Create Product'}</h2>
+        <h2 className="text-2xl font-bold">{isEdit ? `${formData.name || 'Loading...'}` : 'Create Product'}</h2>
         <Button variant="outline" onClick={() => navigate('/admin/products')}>
           Back to Products
         </Button>
@@ -297,7 +346,7 @@ export default function AdminProductFormPage() {
       {productResult.error && isEdit && (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
           <p className="font-semibold">Error loading product</p>
-          <p className="text-sm mt-1">{productResult.error.message}</p>
+          <p className="text-sm mt-1">{extractGraphQLError(productResult.error)}</p>
         </div>
       )}
 
@@ -318,6 +367,14 @@ export default function AdminProductFormPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   required
                 />
+                {formData.name && (
+                  <AIFieldSuggestion
+                    fieldName="Product Name"
+                    currentValue={formData.name}
+                    productName={formData.name}
+                    onApplySuggestion={(suggestion) => setFormData(prev => ({ ...prev, name: suggestion }))}
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -431,6 +488,14 @@ export default function AdminProductFormPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   rows={6}
                 />
+                {formData.name && (
+                  <AIFieldSuggestion
+                    fieldName="Description"
+                    currentValue={formData.description || ''}
+                    productName={formData.name}
+                    onApplySuggestion={(suggestion) => setFormData(prev => ({ ...prev, description: suggestion }))}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>
@@ -519,17 +584,39 @@ export default function AdminProductFormPage() {
           {/* SEO */}
           <Card>
             <CardHeader>
-              <CardTitle>SEO</CardTitle>
+              <CardTitle>SEO & Search Optimization</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* AI SEO Generator */}
+              {formData.name && (
+                <AISEOGenerator
+                  productId={id}
+                  productData={{
+                    name: formData.name,
+                    description: formData.description || '',
+                    category: categories.find((c: any) => String(c.id) === formData.categoryId)?.name || '',
+                    brand: brands.find((b: any) => String(b.id) === formData.brandId)?.name || '',
+                    price: parseFloat(formData.price as string) || 0
+                  }}
+                  onSEOGenerated={handleSEOGenerated}
+                />
+              )}
+
+              {/* Meta Title */}
               <div>
                 <Label htmlFor="metaTitle">Meta Title</Label>
                 <Input
                   id="metaTitle"
                   value={formData.metaTitle}
                   onChange={(e) => setFormData(prev => ({ ...prev, metaTitle: e.target.value }))}
+                  placeholder="SEO-optimized title for search engines"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formData.metaTitle?.length || 0}/60 characters (recommended: 50-60)
+                </p>
               </div>
+
+              {/* Meta Description */}
               <div>
                 <Label htmlFor="metaDescription">Meta Description</Label>
                 <Textarea
@@ -537,16 +624,38 @@ export default function AdminProductFormPage() {
                   value={formData.metaDescription}
                   onChange={(e) => setFormData(prev => ({ ...prev, metaDescription: e.target.value }))}
                   rows={2}
+                  placeholder="SEO-optimized description for search results"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formData.metaDescription?.length || 0}/160 characters (recommended: 150-160)
+                </p>
               </div>
+
+              {/* Meta Keywords */}
               <div>
                 <Label htmlFor="metaKeywords">Meta Keywords</Label>
                 <Input
                   id="metaKeywords"
                   value={formData.metaKeywords}
                   onChange={(e) => setFormData(prev => ({ ...prev, metaKeywords: e.target.value }))}
+                  placeholder="keyword1, keyword2, keyword3"
                 />
                 <p className="text-xs text-muted-foreground mt-1">Separate keywords with commas</p>
+              </div>
+
+              {/* Search Keywords */}
+              <div>
+                <Label htmlFor="searchKeywords">Search Keywords (Multilingual)</Label>
+                <Textarea
+                  id="searchKeywords"
+                  value={formData.searchKeywords}
+                  onChange={(e) => setFormData(prev => ({ ...prev, searchKeywords: e.target.value }))}
+                  rows={3}
+                  placeholder="buy iPhone, acheter iPhone, gura iPhone, شراء iPhone"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Keywords in multiple languages for better search coverage (EN, FR, RW, AR)
+                </p>
               </div>
             </CardContent>
           </Card>

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Edit Product: {{ $product->name }}</h1>
+    <h1 class="h3 mb-0">{{ $product->name }}</h1>
     <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
         <i class="bi bi-arrow-left"></i> Back to Products
     </a>

@@ -11,6 +11,19 @@ class ExchangeRate extends Model
         'code_to',
         'rate',
     ];
-}
 
+    protected $appends = ['codeFrom', 'codeTo'];
+
+    // Accessor for GraphQL camelCase
+    public function getCodeFromAttribute($value)
+    {
+        return $this->attributes['code_from'] ?? null;
+    }
+
+    // Accessor for GraphQL camelCase
+    public function getCodeToAttribute($value)
+    {
+        return $this->attributes['code_to'] ?? null;
+    }
+}
 

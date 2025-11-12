@@ -421,6 +421,27 @@ export function HeaderDynamic({
           >
             {t("header.newArrivals")}
           </Button>
+          <Button
+            variant="ghost"
+            className="text-foreground hover:text-primary"
+            onClick={() => onNavigate?.('about')}
+          >
+            About
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-foreground hover:text-primary"
+            onClick={() => onNavigate?.('faq')}
+          >
+            FAQ
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-foreground hover:text-primary"
+            onClick={() => onNavigate?.('contact')}
+          >
+            Contact
+          </Button>
         </nav>
       </div>
     </header>

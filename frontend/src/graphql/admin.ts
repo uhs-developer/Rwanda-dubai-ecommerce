@@ -227,6 +227,15 @@ export const GET_ADMIN_ORDERS = gql`
     $perPage: Int
     $status: String
     $paymentStatus: String
+    $paymentMethod: String
+    $shippingMethod: String
+    $currency: String
+    $minTotal: Float
+    $maxTotal: Float
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $customerEmail: String
+    $customerName: String
   ) {
     adminOrders(
       q: $q
@@ -234,15 +243,20 @@ export const GET_ADMIN_ORDERS = gql`
       perPage: $perPage
       status: $status
       paymentStatus: $paymentStatus
+      paymentMethod: $paymentMethod
+      shippingMethod: $shippingMethod
+      currency: $currency
+      minTotal: $minTotal
+      maxTotal: $maxTotal
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      customerEmail: $customerEmail
+      customerName: $customerName
     ) {
       data {
         id
         orderNumber
-        customer {
-          id
-          name
-          email
-        }
+        customer { id name email }
         status
         paymentStatus
         paymentMethod
@@ -344,15 +358,39 @@ export const CREATE_SHIPMENT = gql`
 
 // ========== ADMIN INVOICES ==========
 export const GET_ADMIN_INVOICES = gql`
-  query GetAdminInvoices($orderId: ID, $page: Int, $perPage: Int) {
-    adminInvoices(orderId: $orderId, page: $page, perPage: $perPage) {
+  query GetAdminInvoices(
+    $q: String
+    $orderId: ID
+    $page: Int
+    $perPage: Int
+    $status: String
+    $currency: String
+    $minTotal: Float
+    $maxTotal: Float
+    $dateFrom: DateTime
+    $dateTo: DateTime
+  ) {
+    adminInvoices(
+      q: $q
+      orderId: $orderId
+      page: $page
+      perPage: $perPage
+      status: $status
+      currency: $currency
+      minTotal: $minTotal
+      maxTotal: $maxTotal
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+    ) {
       data {
         id
         orderId
         invoiceNumber
         status
         grandTotal
+        currency
         createdAt
+        order { id orderNumber }
       }
       paginatorInfo {
         currentPage
@@ -906,71 +944,6 @@ export const SET_METHOD_ROUTE_PRICE = gql`
   mutation SetMethodRoutePrice($input: SetMethodRoutePriceInput!) {
     setMethodRoutePrice(input: $input) {
       id
-      pricePerKg
-      pricePerCbm
-      flatRate
-      handlingFee
-      fuelSurchargePercentage
-      insurancePercentage
-      customsClearanceFee
-      customsDutyPercentage
-      customsVatPercentage
     }
   }
 `;
-
-export const UPDATE_METHOD_ROUTE_PRICE = gql`
-  mutation UpdateMethodRoutePrice($id: ID!, $input: UpdateMethodRoutePriceInput!) {
-    updateMethodRoutePrice(id: $id, input: $input) {
-      id
-      pricePerKg
-      pricePerCbm
-    }
-  }
-`;
-
-export const DELETE_METHOD_ROUTE_PRICE = gql`
-  mutation DeleteMethodRoutePrice($id: ID!) {
-    deleteMethodRoutePrice(id: $id)
-  }
-`;
-
-// ========== SHIPPING CALCULATIONS ==========
-export const CALCULATE_SHIPPING_COST = gql`
-  query CalculateShippingCost($input: CalculateShippingInput!) {
-    calculateShippingCost(input: $input) {
-      baseCost
-      handlingFee
-      fuelSurcharge
-      insurance
-      customsClearance
-      customsDuty
-      customsVat
-      totalCost
-      estimatedDaysMin
-      estimatedDaysMax
-    }
-  }
-`;
-
-export const GET_AVAILABLE_SHIPPING_OPTIONS = gql`
-  query GetAvailableShippingOptions(
-    $destinationCountry: String!
-    $weightKg: Float!
-    $volumeCbm: Float
-    $orderValue: Float!
-  ) {
-    availableShippingOptions(
-      destinationCountry: $destinationCountry
-      weightKg: $weightKg
-      volumeCbm: $volumeCbm
-      orderValue: $orderValue
-    ) {
-      id
-      cost
-      estimatedDays
-      description
-    }
-  }
-`;
-

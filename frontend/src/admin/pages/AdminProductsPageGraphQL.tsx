@@ -61,22 +61,23 @@ export default function AdminProductsPageGraphQL() {
     return () => clearTimeout(timer);
   }, [search, categoryId, brandId, status]);
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this product?')) {
-      const result = await deleteProductMutation({ id });
-      if (result.error) {
-        toast.error(result.error.message || 'Failed to delete product');
-      } else {
-        toast.success('Product deleted successfully');
-        reexecuteQuery({ requestPolicy: 'network-only' });
+  const handleDelete = async (id: string) =>
+    {
+      if (confirm('Are you sure you want to delete this product?')) {
+        const result = await deleteProductMutation({ id });
+        if (result.error) {
+          toast.error(result.error.message || 'Failed to delete product');
+        } else {
+          toast.success('Product deleted successfully');
+          reexecuteQuery({ requestPolicy: 'network-only' });
+        }
       }
-    }
-  };
+    };
 
   const products = productsResult.data?.adminProducts?.data || [];
   const paginatorInfo = productsResult.data?.adminProducts?.paginatorInfo;
   const categories = categoriesResult.data?.adminCategories?.data || [];
-  const brands = brandsResult.data?.adminBrands || [];
+  const brands = brandsResult.data?.adminBrands?.data || [];
   const loading = productsResult.fetching;
 
   const getProductImageUrl = (product: any) => {
@@ -176,6 +177,11 @@ export default function AdminProductsPageGraphQL() {
                     Qty {sortBy === 'stockQuantity' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
                   </button>
                 </th>
+                <th className="text-right px-4 py-2">
+                  <button className="flex items-center gap-1 ml-auto" onClick={() => toggleSort('createdAt')}>
+                    Created {sortBy === 'createdAt' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
+                  </button>
+                </th>
                 <th className="text-right px-4 py-2">Status</th>
                 <th className="text-right px-4 py-2">Actions</th>
               </tr>
@@ -183,13 +189,13 @@ export default function AdminProductsPageGraphQL() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td className="px-4 py-6 text-center text-muted-foreground" colSpan={9}>
+                  <td className="px-4 py-6 text-center text-muted-foreground" colSpan={10}>
                     Loading…
                   </td>
                 </tr>
               ) : products.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-center text-muted-foreground" colSpan={9}>
+                  <td className="px-4 py-6 text-center text-muted-foreground" colSpan={10}>
                     No products
                   </td>
                 </tr>
@@ -230,6 +236,7 @@ export default function AdminProductsPageGraphQL() {
                         {p.stockQuantity ?? 0}
                       </span>
                     </td>
+                    <td className="px-4 py-2 text-right">{new Date(p.createdAt).toLocaleDateString()}</td>
                     <td className="px-4 py-2 text-right">
                       <span
                         className={`inline-flex items-center rounded px-2 py-0.5 text-xs ${
