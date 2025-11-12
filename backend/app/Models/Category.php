@@ -76,7 +76,16 @@ class Category extends Model
     // Accessors
     public function getProductCountAttribute()
     {
-        return $this->products()->active()->count();
+        // Count direct products
+        $directCount = $this->products()->active()->count();
+        
+        // Count products from all subcategories recursively
+        $subcategoryCount = 0;
+        foreach ($this->children as $child) {
+            $subcategoryCount += $child->productCount; // This will recursively count
+        }
+        
+        return $directCount + $subcategoryCount;
     }
 
     public function getParentIdAttribute()

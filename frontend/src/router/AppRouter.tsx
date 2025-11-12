@@ -62,11 +62,13 @@ import AdminInvoicesPage from "../admin/pages/AdminInvoicesPage";
 import AdminShipmentsPage from "../admin/pages/AdminShipmentsPage";
 import AdminUsersManagementPage from "../admin/pages/AdminUsersManagementPage";
 import AdminConfigurationPage from "../admin/pages/AdminConfigurationPage";
+import AdminContentPage from "../admin/pages/AdminContentPage";
 import AdminCurrencyPage from "../admin/pages/AdminCurrencyPage";
 import AdminShippingMethodsPage from "../admin/pages/AdminShippingMethodsPage";
 import AdminShippingRoutesPage from "../admin/pages/AdminShippingRoutesPage";
 import AdminShippingPricingPage from "../admin/pages/AdminShippingPricingPage";
 import AdminBrandsPage from "../admin/pages/AdminBrandsPage";
+import { ComingSoonPage } from "../components/ComingSoonPage";
 
 export function AppRouter() {
   return (
@@ -201,6 +203,10 @@ function AppRouterContent() {
       toast.error('Your cart is empty');
       return;
     }
+    // Close cart sidebar if open
+    setIsCartOpen(false);
+    // Navigate to checkout page
+    navigate('/checkout');
   };
 
   const handlePlaceOrder = (orderData: any) => {
@@ -466,6 +472,16 @@ function AppRouterContent() {
               }
             />
             <Route
+              path="/admin/content"
+              element={
+                <AdminRoute>
+                  <AdminLayout title="Content Management">
+                    <AdminContentPage />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
               path="/admin/currency"
               element={
                 <AdminRoute>
@@ -512,20 +528,11 @@ function AppRouterContent() {
             } />
 
             <Route path="/deals" element={
-              <ProductListingPage
-                searchQuery=""
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
-                onProductClick={handleProductClick}
-              />
+              <DealsPageWrapper />
             } />
 
             <Route path="/new-arrivals" element={
-              <ProductListingPage
-                onAddToCart={addToCart}
-                onAddToWishlist={addToWishlist}
-                onProductClick={handleProductClick}
-              />
+              <NewArrivalsPageWrapper />
             } />
 
             <Route path="/category/:categoryId" element={
@@ -567,7 +574,7 @@ function AppRouterContent() {
                 onUpdateQuantity={updateCartQuantity}
                 onRemoveItem={removeFromCart}
                 onCheckout={handleCheckout}
-                onContinueShopping={() => { }}
+                onContinueShopping={() => navigate('/')}
               />
             } />
 
@@ -1054,6 +1061,28 @@ function AccountSecurityPageWrapper() {
   return (
     <AccountSecurityPage
       onBack={() => navigate('/account')}
+    />
+  );
+}
+
+function DealsPageWrapper() {
+  const navigate = useNavigate();
+  return (
+    <ComingSoonPage
+      title="Deals"
+      subtitle="Our best offers and limited-time promotions are on the way."
+      onBack={() => navigate('/')}
+    />
+  );
+}
+
+function NewArrivalsPageWrapper() {
+  const navigate = useNavigate();
+  return (
+    <ComingSoonPage
+      title="New Arrivals"
+      subtitle="Fresh products are coming soon. Check back for the latest drops."
+      onBack={() => navigate('/')}
     />
   );
 }

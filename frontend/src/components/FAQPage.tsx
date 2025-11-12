@@ -7,6 +7,8 @@ import { ArrowLeft, Search, Plus, Minus, Mail, Phone, MessageCircle, HelpCircle,
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useQuery } from 'urql';
+import { GET_PAGE_CONTENT } from '../graphql/storefront';
 
 interface FAQPageProps {
   onBack: () => void;
@@ -154,6 +156,19 @@ export function FAQPage({ onBack }: FAQPageProps) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [openItems, setOpenItems] = useState<string[]>([]);
 
+  const [pageContentResult] = useQuery({ 
+    query: GET_PAGE_CONTENT, 
+    variables: { pageKey: 'faq' } 
+  });
+
+  const pageContent = pageContentResult.data?.adminPageContent;
+  
+  // Helper to get section content
+  const getContent = (key: string, fallback: string) => {
+    const section = pageContent?.sections?.find((s: any) => s.key === key);
+    return section?.content || fallback;
+  };
+
   const toggleItem = (itemId: string) => {
     setOpenItems(prev => 
       prev.includes(itemId) 
@@ -197,8 +212,12 @@ export function FAQPage({ onBack }: FAQPageProps) {
               {t("common.back")}
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t("faq.title")}</h1>
-              <p className="text-gray-600">{t("faq.subtitle")}</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {getContent('hero_title', t("faq.title"))}
+              </h1>
+              <p className="text-gray-600">
+                {getContent('hero_subtitle', t("faq.subtitle"))}
+              </p>
             </div>
           </div>
         </div>
@@ -308,11 +327,11 @@ export function FAQPage({ onBack }: FAQPageProps) {
                   <Mail className="h-4 w-4" />
                   {t("faq.emailSupport")}
                 </Button>
-                <Button variant="outline" onClick={() => toast.info('Calling +971 4 XXX XXXX...')} className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-gray-900">
+                <Button variant="outline" onClick={() => toast.info('Calling +971 4 XXX XXXX...')} className="flex items-center gap-2 border-white bg-transparent hover:bg-white text-white hover:text-gray-900">
                   <Phone className="h-4 w-4" />
                   {t("faq.callUs")}
                 </Button>
-                <Button variant="outline" onClick={() => toast.info('Live chat feature coming soon!')} className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-gray-900">
+                <Button variant="outline" onClick={() => toast.info('Live chat feature coming soon!')} className="flex items-center gap-2 border-white bg-transparent hover:bg-white text-white hover:text-gray-900">
                   <MessageCircle className="h-4 w-4" />
                   {t("faq.liveChat")}
                 </Button>

@@ -6,6 +6,9 @@ import { ArrowLeft, MapPin, Phone, Mail, Clock, MessageCircle, Headphones, Info 
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useQuery } from 'urql';
+import { GET_ADMIN_SITE_CONFIG } from '../graphql/admin';
+import { GET_PAGE_CONTENT } from '../graphql/storefront';
 
 interface ContactPageProps {
   onBack: () => void;
@@ -19,6 +22,21 @@ export function ContactPage({ onBack }: ContactPageProps) {
     subject: '',
     message: ''
   });
+
+  const [configResult] = useQuery({ query: GET_ADMIN_SITE_CONFIG });
+  const [pageContentResult] = useQuery({ 
+    query: GET_PAGE_CONTENT, 
+    variables: { pageKey: 'contact' } 
+  });
+
+  const contact = configResult.data?.adminSiteConfig?.contact || {};
+  const pageContent = pageContentResult.data?.adminPageContent;
+  
+  // Helper to get section content
+  const getContent = (key: string, fallback: string) => {
+    const section = pageContent?.sections?.find((s: any) => s.key === key);
+    return section?.content || fallback;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -43,7 +61,8 @@ export function ContactPage({ onBack }: ContactPageProps) {
   };
 
   const handleWhatsApp = () => {
-    window.open('https://wa.me/971XXXXXXX', '_blank');
+    const number = contact.whatsappNumber || '971XXXXXXX';
+    window.open(`https://wa.me/${number}`, '_blank');
   };
 
   return (
@@ -74,8 +93,12 @@ export function ContactPage({ onBack }: ContactPageProps) {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Information */}
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">{t("contact.getInTouch")}</h2>
-            <p className="text-gray-600 mb-8">{t("contact.description")}</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              {getContent('hero_title', t("contact.getInTouch"))}
+            </h2>
+            <p className="text-gray-600 mb-8">
+              {getContent('description', t("contact.description"))}
+            </p>
 
             {/* Exchange-rate note */}
             <Card className="mb-8">
@@ -99,8 +122,8 @@ export function ContactPage({ onBack }: ContactPageProps) {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2">{t("contact.address")}</h3>
-                      <p className="text-gray-600 text-sm">{t("contact.dubaiOffice")}</p>
-                      <p className="text-gray-600 text-sm">{t("contact.kigaliOffice")}</p>
+                      <p className="text-gray-600 text-sm">{contact.addressDubai || t("contact.dubaiOffice")}</p>
+                      <p className="text-gray-600 text-sm">{contact.addressKigali || t("contact.kigaliOffice")}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -115,8 +138,8 @@ export function ContactPage({ onBack }: ContactPageProps) {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2">{t("contact.phone")}</h3>
-                      <p className="text-gray-600 text-sm">{t("contact.dubaiPhone")}</p>
-                      <p className="text-gray-600 text-sm">{t("contact.kigaliPhone")}</p>
+                      <p className="text-gray-600 text-sm">{contact.phoneDubai || t("contact.dubaiPhone")}</p>
+                      <p className="text-gray-600 text-sm">{contact.phoneKigali || t("contact.kigaliPhone")}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -131,8 +154,8 @@ export function ContactPage({ onBack }: ContactPageProps) {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2">{t("contact.email")}</h3>
-                      <p className="text-gray-600 text-sm">{t("contact.supportEmail")}</p>
-                      <p className="text-gray-600 text-sm">{t("contact.ordersEmail")}</p>
+                      <p className="text-gray-600 text-sm">{contact.supportEmail || t("contact.supportEmail")}</p>
+                      <p className="text-gray-600 text-sm">{contact.ordersEmail || t("contact.ordersEmail")}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -147,9 +170,9 @@ export function ContactPage({ onBack }: ContactPageProps) {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2">{t("contact.businessHours")}</h3>
-                      <p className="text-gray-600 text-sm">{t("contact.mondayFriday")}</p>
-                      <p className="text-gray-600 text-sm">{t("contact.saturday")}</p>
-                      <p className="text-gray-600 text-sm">{t("contact.sunday")}</p>
+                      <p className="text-gray-600 text-sm">{contact.businessHours?.weekday || t("contact.mondayFriday")}</p>
+                      <p className="text-gray-600 text-sm">{contact.businessHours?.saturday || t("contact.saturday")}</p>
+                      <p className="text-gray-600 text-sm">{contact.businessHours?.sunday || t("contact.sunday")}</p>
                     </div>
                   </div>
                 </CardContent>

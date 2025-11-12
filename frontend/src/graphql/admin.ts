@@ -947,3 +947,87 @@ export const SET_METHOD_ROUTE_PRICE = gql`
     }
   }
 `;
+
+// ========== SITE CONFIG ==========
+export const GET_ADMIN_SITE_CONFIG = gql`
+  query GetAdminSiteConfig {
+    adminSiteConfig {
+      contact {
+        addressDubai
+        addressKigali
+        phoneDubai
+        phoneKigali
+        supportEmail
+        ordersEmail
+        whatsappNumber
+        businessHours
+      }
+    }
+  }
+`;
+
+export const UPDATE_SITE_CONFIG = gql`
+  mutation UpdateSiteConfig($input: UpdateSiteConfigInput!) {
+    updateSiteConfig(input: $input) {
+      contact {
+        addressDubai
+        addressKigali
+        phoneDubai
+        phoneKigali
+        supportEmail
+        ordersEmail
+        whatsappNumber
+        businessHours
+      }
+    }
+  }
+`;
+
+// ========== PAGE CONTENT MANAGEMENT ==========
+export const GET_ADMIN_PAGE_CONTENTS = gql`
+  query GetAdminPageContents {
+    adminPageContents {
+      id
+      pageKey
+      pageName
+      sections {
+        key
+        label
+        content
+      }
+      updatedAt
+    }
+  }
+`;
+
+export const GET_ADMIN_PAGE_CONTENT = gql`
+  query GetAdminPageContent($pageKey: String!) {
+    adminPageContent(pageKey: $pageKey) {
+      id
+      pageKey
+      pageName
+      sections {
+        key
+        label
+        content
+      }
+      updatedAt
+    }
+  }
+`;
+
+export const UPDATE_PAGE_CONTENT = gql`
+  mutation UpdatePageContent($pageKey: String!, $input: UpdatePageContentInput!) {
+    updatePageContent(pageKey: $pageKey, input: $input) {
+      id
+      pageKey
+      pageName
+      sections {
+        key
+        label
+        content
+      }
+      updatedAt
+    }
+  }
+`;

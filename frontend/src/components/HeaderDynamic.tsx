@@ -82,7 +82,8 @@ export function HeaderDynamic({
       .filter(cat => cat.productCount > 0)
       .map(cat => ({
         ...cat,
-        children: cat.children.filter(sub => sub.productCount > 0)
+        // Show all subcategories, even if they have 0 products
+        children: cat.children
       }));
   }, [categories]);
 

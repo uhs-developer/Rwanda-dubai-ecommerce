@@ -1,5 +1,22 @@
 import { gql } from 'urql';
 
+// ========== PAGE CONTENT (STOREFRONT) ==========
+export const GET_PAGE_CONTENT = gql`
+  query GetPageContent($pageKey: String!) {
+    adminPageContent(pageKey: $pageKey) {
+      id
+      pageKey
+      pageName
+      sections {
+        key
+        label
+        content
+      }
+      updatedAt
+    }
+  }
+`;
+
 // ========== STOREFRONT CATEGORIES ==========
 export const GET_STOREFRONT_CATEGORIES = gql`
   query GetStorefrontCategories {

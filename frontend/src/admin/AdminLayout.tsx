@@ -133,7 +133,8 @@ export default function AdminLayout({ children, title = "Dashboard" }: AdminLayo
               <NavItem icon={Megaphone} label="Promotions" path="/admin/promotions" />
             </Group>
 
-            <Group icon={FileText} label="Content" activeMatch={/^\/admin\/(pages|blocks)/}>
+            <Group icon={FileText} label="Content" activeMatch={/^\/admin\/(pages|blocks|content)/}>
+              <NavItem icon={FileText} label="Page Content" path="/admin/content" />
               <NavItem icon={FileText} label="Pages" path="/admin/pages" />
               <NavItem icon={FileText} label="Blocks" path="/admin/blocks" />
             </Group>

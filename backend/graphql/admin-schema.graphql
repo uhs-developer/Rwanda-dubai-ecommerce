@@ -89,10 +89,6 @@ extend type Query {
     dateTo: DateTime
   ): AdminInvoiceConnection!
   
-  # adminShipment(id: ID!): AdminShipment  # TODO: Implement resolver
-  # adminInvoice(id: ID!): AdminInvoice  # TODO: Implement resolver
-  # adminCreditMemo(id: ID!): AdminCreditMemo  # TODO: Implement resolver
-  
   # ===== Admin Users & Roles =====
   adminUsers(
     q: String
@@ -115,6 +111,13 @@ extend type Query {
 
   # ===== Exchange Rates =====
   adminExchangeRates: [ExchangeRate!]! @field(resolver: "App\\GraphQL\\Queries\\AdminExchangeRates")
+
+  # ===== Site Config =====
+  adminSiteConfig: SiteConfig! @field(resolver: "App\\GraphQL\\Queries\\AdminSiteConfig")
+  
+  # ===== Page Content Management =====
+  adminPageContents: [PageContent!]! @field(resolver: "App\\GraphQL\\Queries\\AdminPageContents")
+  adminPageContent(pageKey: String!): PageContent @field(resolver: "App\\GraphQL\\Queries\\AdminPageContent")
 }
 
 extend type Mutation {
@@ -122,7 +125,6 @@ extend type Mutation {
   createProduct(input: CreateProductInput!): AdminProduct!
   updateProduct(id: ID!, input: UpdateProductInput!): AdminProduct!
   deleteProduct(id: ID!): Boolean!
-
   # ===== Category CRUD =====
   createCategory(input: CreateCategoryInput!): AdminCategory!  updateCategory(id: ID!, input: UpdateCategoryInput!): AdminCategory!  deleteCategory(id: ID!): Boolean!
   # ===== Customer CRUD =====
@@ -145,23 +147,12 @@ extend type Mutation {
   createCoupon(input: CreateCouponInput!): AdminCoupon!  updateCoupon(id: ID!, input: UpdateCouponInput!): AdminCoupon!  deleteCoupon(id: ID!): Boolean!
   # ===== Attribute Management =====
   createAttribute(input: CreateAttributeInput!): AdminAttribute!  updateAttribute(id: ID!, input: UpdateAttributeInput!): AdminAttribute!  deleteAttribute(id: ID!): Boolean!
-  # ===== Customer Group Management =====
-  createCustomerGroup(input: CreateCustomerGroupInput!): AdminCustomerGroup!  updateCustomerGroup(id: ID!, input: UpdateCustomerGroupInput!): AdminCustomerGroup!  deleteCustomerGroup(id: ID!): Boolean!
-  # ===== Promotion Management =====
-  createPromotion(input: CreatePromotionInput!): AdminPromotion!  updatePromotion(id: ID!, input: UpdatePromotionInput!): AdminPromotion!  deletePromotion(id: ID!): Boolean!
-  # ===== CMS Management =====
-  createPage(input: CreatePageInput!): AdminPage!  updatePage(id: ID!, input: UpdatePageInput!): AdminPage!  deletePage(id: ID!): Boolean!
-  createBlock(input: CreateBlockInput!): AdminBlock!  updateBlock(id: ID!, input: UpdateBlockInput!): AdminBlock!  deleteBlock(id: ID!): Boolean!
-  # ===== Cache Management =====
-  flushCache(types: [String!]): Boolean!
 
-  # ===== Exchange Rates =====
-  createExchangeRate(input: UpsertExchangeRateInput!): ExchangeRate! @field(resolver: "App\\GraphQL\\Mutations\\CreateExchangeRate")
-  updateExchangeRate(id: ID!, input: UpsertExchangeRateInput!): ExchangeRate! @field(resolver: "App\\GraphQL\\Mutations\\UpdateExchangeRate")
-  deleteExchangeRate(id: ID!): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\DeleteExchangeRate")
-
-  # ===== AI-Powered SEO Generation =====
-  generateProductSEO(productId: ID, productData: ProductSEOInput): ProductSEOResponse! @field(resolver: "App\\GraphQL\\Mutations\\GenerateProductSEO")
+  # ===== Site Config =====
+  updateSiteConfig(input: UpdateSiteConfigInput!): SiteConfig! @field(resolver: "App\\GraphQL\\Mutations\\UpdateSiteConfig")
+  
+  # ===== Page Content Management =====
+  updatePageContent(pageKey: String!, input: UpdatePageContentInput!): PageContent! @field(resolver: "App\\GraphQL\\Mutations\\UpdatePageContent")
 }
 
 # =========================================
@@ -737,3 +728,61 @@ type SEOData {
   seoScore: Int
   lastSeoOptimization: DateTime
 }
+
+# ========== TYPES ==========
+
+type SiteConfigContact {
+  addressDubai: String
+  addressKigali: String
+  phoneDubai: String
+  phoneKigali: String
+  supportEmail: String
+  ordersEmail: String
+  whatsappNumber: String
+  businessHours: JSON
+}
+
+type SiteConfig {
+  contact: SiteConfigContact
+}
+
+input UpdateSiteConfigInput {
+  contact: UpdateSiteConfigContactInput
+}
+
+input UpdateSiteConfigContactInput {
+  addressDubai: String
+  addressKigali: String
+  phoneDubai: String
+  phoneKigali: String
+  supportEmail: String
+  ordersEmail: String
+  whatsappNumber: String
+  businessHours: JSON
+}
+
+# ========== PAGE CONTENT MANAGEMENT ==========
+
+type PageContent {
+  id: ID!
+  pageKey: String!
+  pageName: String!
+  sections: [PageSection!]!
+  updatedAt: DateTime
+}
+
+type PageSection {
+  key: String!
+  label: String!
+  content: String
+}
+
+input UpdatePageContentInput {
+  sections: [PageSectionInput!]!
+}
+
+input PageSectionInput {
+  key: String!
+  content: String
+}
+
