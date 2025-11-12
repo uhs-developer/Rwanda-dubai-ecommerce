@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from 'urql';
 import { GET_ADMIN_SITE_CONFIG } from '../graphql/admin';
 import { GET_PAGE_CONTENT } from '../graphql/storefront';
+import { PageWrapper } from './PageWrapper';
 
 interface ContactPageProps {
   onBack: () => void;
@@ -69,7 +70,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
+        <PageWrapper className="py-6">
           <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
@@ -85,11 +86,11 @@ export function ContactPage({ onBack }: ContactPageProps) {
               <p className="text-gray-600">{t("contact.subtitle")}</p>
             </div>
           </div>
-        </div>
+        </PageWrapper>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
+      <PageWrapper>
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Information */}
           <div>
@@ -241,7 +242,7 @@ export function ContactPage({ onBack }: ContactPageProps) {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </PageWrapper>
     </div>
   );
 }

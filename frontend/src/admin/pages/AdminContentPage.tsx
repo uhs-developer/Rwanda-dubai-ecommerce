@@ -117,7 +117,7 @@ export default function AdminContentPage() {
                   <div key={section.key} className="space-y-2">
                     <Label htmlFor={section.key}>{section.label}</Label>
                     
-                    {section.key.includes('content') || section.key === 'mission' || section.key === 'vision' ? (
+                    {section.key.includes('content') || section.key === 'body' || section.key === 'mission' || section.key === 'vision' ? (
                       <div className="border rounded-md">
                         <ReactQuill
                           theme="snow"

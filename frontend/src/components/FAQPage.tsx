@@ -3,12 +3,13 @@ import { Input } from "./ui/input";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import { ArrowLeft, Search, Plus, Minus, Mail, Phone, MessageCircle, HelpCircle, Info } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Search, Plus, Minus, Mail, Phone, MessageCircle, HelpCircle } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useQuery } from 'urql';
-import { GET_PAGE_CONTENT } from '../graphql/storefront';
+import { GET_PAGE_CONTENT, GET_FAQS } from '../graphql/storefront';
+import { PageWrapper } from './PageWrapper';
 
 interface FAQPageProps {
   onBack: () => void;
@@ -19,136 +20,8 @@ interface FAQItem {
   category: string;
   question: string;
   answer: string;
-  categoryLabel: string;
+  categoryLabel?: string;
 }
-
-const faqData: FAQItem[] = [
-  {
-    id: "exrate",
-    category: "payment",
-    categoryLabel: "Payment",
-    question: "Why is the USD exchange rate different on your platform?",
-    answer: "Exchange rates fluctuate across markets and change frequently. While we update our prices regularly, real-time changes can occur. To ensure reliable service, we include a small margin to cover these variations while keeping our final prices competitive. For large or custom orders, contact us and we'll provide a tailored quote with the latest available rate.",
-  },
-  {
-    id: "1",
-    category: "shipping",
-    categoryLabel: "Shipping",
-    question: "How long does shipping to Rwanda take?",
-    answer: "Standard shipping from our global hubs (Dubai, China, South Korea) to Rwanda typically takes 5-7 business days. Express options are available for faster delivery. All shipments include tracking information so you can monitor your order's progress."
-  },
-  {
-    id: "2",
-    category: "shipping",
-    categoryLabel: "Shipping",
-    question: "Do I need to pay customs duties on my order?",
-    answer: "Customs duties may apply depending on the value and type of products ordered. Orders under $100 are typically exempt from duties. For orders above this amount, you may be required to pay customs fees upon delivery. We provide all necessary documentation to facilitate customs clearance."
-  },
-  {
-    id: "3",
-    category: "orders",
-    categoryLabel: "Orders",
-    question: "Can I modify or cancel my order after placing it?",
-    answer: "Orders can be modified or cancelled within 2 hours of placement. After this time, orders enter our fulfillment process and cannot be changed. Please contact our customer service team immediately if you need to make changes to your order."
-  },
-  {
-    id: "4",
-    category: "payment",
-    categoryLabel: "Payment",
-    question: "What payment methods do you accept?",
-    answer: "We accept major credit cards (Visa, MasterCard, American Express), PayPal, bank transfers, and mobile money payments. All transactions are secured with SSL encryption to protect your payment information."
-  },
-  {
-    id: "5",
-    category: "products",
-    categoryLabel: "Products",
-    question: "Are all products genuine and authentic?",
-    answer: "Yes, we guarantee that all our products are 100% genuine and authentic. We work directly with authorized distributors and manufacturers in Dubai to ensure product authenticity. All items come with original packaging and documentation."
-  },
-  {
-    id: "6",
-    category: "shipping",
-    categoryLabel: "Shipping",
-    question: "Can I track my shipment?",
-    answer: "Yes, all orders include tracking information. Once your order ships, you'll receive a tracking number via email and SMS. You can track your shipment on our website or directly with the shipping carrier."
-  },
-  {
-    id: "7",
-    category: "orders",
-    categoryLabel: "Orders",
-    question: "Do you offer bulk or wholesale pricing?",
-    answer: "Yes, we offer competitive bulk and wholesale pricing for orders of 10 or more units. Please contact our sales team with your requirements for a custom quote. Volume discounts are available for businesses and resellers."
-  },
-  {
-    id: "8",
-    category: "payment",
-    categoryLabel: "Payment",
-    question: "Is it safe to enter my payment information?",
-    answer: "Absolutely. We use industry-standard SSL encryption and PCI DSS compliant payment processing to protect your information. Your payment details are never stored on our servers and are processed securely by trusted payment providers."
-  },
-  {
-    id: "9",
-    category: "products",
-    categoryLabel: "Products",
-    question: "Can you help me find a specific product not listed on your website?",
-    answer: "Yes! Our team can help source specific products from Dubai's markets. Contact us with the product details, and we'll check availability and provide you with pricing and delivery information within 24 hours."
-  },
-  {
-    id: "10",
-    category: "account",
-    categoryLabel: "Account",
-    question: "Do I need to create an account to place an order?",
-    answer: "While you can place orders as a guest, creating an account offers benefits like order history, faster checkout, wishlist functionality, and exclusive member discounts. Account creation is free and takes less than a minute."
-  },
-  {
-    id: "11",
-    category: "returns",
-    categoryLabel: "Returns",
-    question: "What is your return policy?",
-    answer: "We offer a 30-day return policy for most items. Products must be in original condition with all packaging and accessories. Return shipping costs are covered by us for defective items, while customer-initiated returns may incur return shipping fees."
-  },
-  {
-    id: "12",
-    category: "warranty",
-    categoryLabel: "Warranty",
-    question: "What warranty coverage do you provide?",
-    answer: "Warranty coverage varies by product category: Electronics (12-24 months), Auto Parts (6-12 months), and Appliances (12-36 months). All warranties cover manufacturing defects and component failures under normal use conditions."
-  },
-  {
-    id: "13",
-    category: "products",
-    categoryLabel: "Products",
-    question: "Do you sell refurbished or used items?",
-    answer: "No, we only sell brand new, unused products. All items are sourced directly from manufacturers or authorized distributors and come with full warranty coverage. We clearly label any open-box or display items if available."
-  },
-  {
-    id: "14",
-    category: "support",
-    categoryLabel: "Support",
-    question: "How can I contact customer support?",
-    answer: "Our customer support team is available via email (support@techbridge.com), phone (+971 4 XXX XXXX), live chat on our website, and WhatsApp. Email support is available 24/7, while phone and chat support operate during business hours."
-  },
-  {
-    id: "15",
-    category: "installation",
-    categoryLabel: "Installation",
-    question: "Do you provide installation services for auto parts?",
-    answer: "While we don't provide direct installation services, we can recommend certified mechanics and auto service centers in Rwanda. We also provide detailed installation guides and technical support for compatible products."
-  }
-];
-
-const categories = [
-  { id: "all", label: "All" },
-  { id: "shipping", label: "Shipping" },
-  { id: "orders", label: "Orders" },
-  { id: "payment", label: "Payment" },
-  { id: "products", label: "Products" },
-  { id: "returns", label: "Returns" },
-  { id: "warranty", label: "Warranty" },
-  { id: "account", label: "Account" },
-  { id: "support", label: "Support" },
-  { id: "installation", label: "Installation" }
-];
 
 export function FAQPage({ onBack }: FAQPageProps) {
   const { t } = useTranslation();
@@ -160,14 +33,29 @@ export function FAQPage({ onBack }: FAQPageProps) {
     query: GET_PAGE_CONTENT, 
     variables: { pageKey: 'faq' } 
   });
+  const [faqsResult] = useQuery({ query: GET_FAQS });
 
   const pageContent = pageContentResult.data?.adminPageContent;
-  
+  const faqs: FAQItem[] = faqsResult.data?.faqs || [];
+  const loading = faqsResult.fetching;
+
   // Helper to get section content
   const getContent = (key: string, fallback: string) => {
     const section = pageContent?.sections?.find((s: any) => s.key === key);
     return section?.content || fallback;
   };
+
+  const categories = useMemo(() => {
+    const unique: { id: string; label: string }[] = [{ id: 'all', label: t('faq.all') } as any];
+    const map = new Map<string, string>();
+    for (const f of faqs) {
+      if (!map.has(f.category)) {
+        map.set(f.category, f.categoryLabel || f.category);
+        unique.push({ id: f.category, label: f.categoryLabel || f.category });
+      }
+    }
+    return unique;
+  }, [faqs, t]);
 
   const toggleItem = (itemId: string) => {
     setOpenItems(prev => 
@@ -177,30 +65,18 @@ export function FAQPage({ onBack }: FAQPageProps) {
     );
   };
 
-  const filteredFAQs = faqData.filter(faq => {
+  const filteredFAQs = (faqs as FAQItem[]).filter(faq => {
     const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "all" || faq.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const handleEmailSupport = () => {
-    window.location.href = "mailto:support@techbridge.com";
-  };
-
-  const handleCallUs = () => {
-    toast.info("Calling +971 4 XXX XXXX...");
-  };
-
-  const handleLiveChat = () => {
-    toast.info("Live chat feature coming soon!");
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
+        <PageWrapper className="py-6">
           <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
@@ -220,10 +96,10 @@ export function FAQPage({ onBack }: FAQPageProps) {
               </p>
             </div>
           </div>
-        </div>
+        </PageWrapper>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <PageWrapper>
         {/* Search Bar */}
         <div className="mb-8">
           <div className="relative max-w-md mx-auto">
@@ -255,66 +131,45 @@ export function FAQPage({ onBack }: FAQPageProps) {
           </div>
         </div>
 
-        {/* Popular Questions Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-6">
-            <HelpCircle className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold text-gray-900">{t("faq.popularQuestions")}</h2>
-          </div>
-
-          <div className="space-y-4">
-            {filteredFAQs.map((faq) => (
-              <Card key={faq.id} className="overflow-hidden">
-                <Collapsible 
-                  open={openItems.includes(faq.id)} 
-                  onOpenChange={() => toggleItem(faq.id)}
-                >
-                  <CollapsibleTrigger asChild>
-                    <CardContent className="p-6 cursor-pointer hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Badge variant="secondary" className="text-xs">
-                            {faq.categoryLabel}
-                          </Badge>
-                          <h3 className="font-medium text-gray-900 text-left">
-                            {faq.question}
-                          </h3>
-                        </div>
-                        {openItems.includes(faq.id) ? (
-                          <Minus className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                        ) : (
-                          <Plus className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                        )}
-                      </div>
-                    </CardContent>
+        {/* FAQs List */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="p-6">
+                <CardContent className="p-0">
+                  <div className="h-5 bg-gray-200 rounded w-2/3 mb-3" />
+                  <div className="h-4 bg-gray-100 rounded w-full mb-2" />
+                  <div className="h-4 bg-gray-100 rounded w-5/6" />
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            filteredFAQs.map((faq) => (
+              <Card key={faq.id} className="p-6">
+                <Collapsible open={openItems.includes(faq.id)}>
+                  <CollapsibleTrigger onClick={() => toggleItem(faq.id)} className="w-full text-left">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-gray-900">{faq.question}</span>
+                      {openItems.includes(faq.id) ? (
+                        <Minus className="h-4 w-4" />
+                      ) : (
+                        <Plus className="h-4 w-4" />
+                      )}
+                    </div>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <CardContent className="px-6 pb-6 pt-0">
-                      <div className="pl-20">
-                        <p className="text-gray-600 text-sm leading-relaxed">
-                          {faq.answer}
-                        </p>
-                      </div>
+                    <CardContent className="pt-4 text-sm text-gray-700">
+                      {faq.answer}
                     </CardContent>
                   </CollapsibleContent>
                 </Collapsible>
               </Card>
-            ))}
-          </div>
-
-          {filteredFAQs.length === 0 && (
-            <div className="text-center py-12">
-              <HelpCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{t("faq.noQuestionsFound")}</h3>
-              <p className="text-gray-600">
-                {t("faq.tryAdjustingSearch")}
-              </p>
-            </div>
+            ))
           )}
         </div>
 
         {/* Still Need Help Section */}
-        <Card className="bg-gray-900 text-white">
+        <Card className="bg-gray-900 text-white mt-10">
           <CardContent className="p-8 text-center">
             <div className="max-w-2xl mx-auto">
               <HelpCircle className="h-12 w-12 mx-auto mb-4 text-white" />
@@ -347,22 +202,18 @@ export function FAQPage({ onBack }: FAQPageProps) {
             <p className="text-gray-600 text-sm mb-4">{t("faq.supportHoursDescription")}</p>
             <div className="space-y-2 text-sm">
               <div>
-                <span className="font-medium text-gray-900">{t("faq.emailSupport")}</span>
-                <p className="text-gray-600">{t("faq.available247")}</p>
-                <p className="text-gray-600">{t("faq.responseWithin24h")}</p>
+                <span className="font-medium text-gray-900">{t("faq.mondayFriday")}:</span> 9:00 AM - 6:00 PM
+              </div>
+              <div>
+                <span className="font-medium text-gray-900">{t("faq.saturday")}:</span> 10:00 AM - 4:00 PM
+              </div>
+              <div>
+                <span className="font-medium text-gray-900">{t("faq.sunday")}:</span> {t("faq.closed")}
               </div>
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">{t("faq.phoneAndChat")}</h3>
-            <div className="space-y-2 text-sm">
-              <p className="text-gray-600"><span className="font-medium text-gray-900">{t("faq.mondayFriday")}:</span> 9:00 AM - 6:00 PM</p>
-              <p className="text-gray-600"><span className="font-medium text-gray-900">{t("faq.saturday")}:</span> 10:00 AM - 4:00 PM</p>
-              <p className="text-gray-600"><span className="font-medium text-gray-900">{t("faq.sunday")}:</span> {t("faq.closed")}</p>
-            </div>
-          </div>
         </div>
-      </div>
+      </PageWrapper>
     </div>
   );
 }

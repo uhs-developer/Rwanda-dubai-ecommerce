@@ -9,7 +9,7 @@ import { Separator } from "./ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { Skeleton } from "./ui/skeleton";
-import { SlidersHorizontal, Grid3X3, List, Star, Filter, AlertCircle } from "lucide-react";
+import { SlidersHorizontal, Grid3X3, List, Filter, AlertCircle } from "lucide-react";
 import { ProductCard } from "./ProductCard";
 import { GET_STOREFRONT_PRODUCTS, GET_PRODUCT_FILTERS } from "../graphql/storefront";
 import { toast } from "sonner";
@@ -29,7 +29,7 @@ type ViewMode = 'grid' | 'list';
 
 export function ProductListingPageDynamic({
   category,
-  subcategory,
+  subcategory: _subcategory, // Unused - subcategories now handled via filters
   searchQuery,
   onAddToCart,
   onAddToWishlist,
@@ -39,6 +39,7 @@ export function ProductListingPageDynamic({
   // Filter state
   const [selectedBrandIds, setSelectedBrandIds] = useState<string[]>([]);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | undefined>(category);
+  const [selectedSubcategorySlugs, setSelectedSubcategorySlugs] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [minRating, setMinRating] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -55,7 +56,9 @@ export function ProductListingPageDynamic({
   // Build filter variables
   const filterVariables = {
     q: searchQuery,
-    categorySlug: selectedCategorySlug || category,
+    categorySlug: selectedSubcategorySlugs.length > 0 
+      ? selectedSubcategorySlugs[0] // Use first selected subcategory
+      : (selectedCategorySlug || category),
     brandIds: selectedBrandIds.length > 0 ? selectedBrandIds : undefined,
     minPrice: priceRange[0] > 0 ? priceRange[0] : undefined,
     maxPrice: priceRange[1] < 10000 ? priceRange[1] : undefined,
@@ -92,6 +95,11 @@ export function ProductListingPageDynamic({
   const dynamicMinPrice = filterData?.minPrice || 0;
   const dynamicMaxPrice = filterData?.maxPrice || 10000;
 
+  // Get all subcategories from available categories
+  const allSubcategories = availableCategories.flatMap((cat: any) => 
+    (cat.children || []).map((child: any) => ({ ...child, parentName: cat.name }))
+  );
+
   // Initialize price range from dynamic data
   useEffect(() => {
     if (filterData && !selectedBrandIds.length && !selectedCategorySlug) {
@@ -109,6 +117,16 @@ export function ProductListingPageDynamic({
   const handleCategoryChange = (categorySlug: string, checked: boolean) => {
     // If checking, set this category. If unchecking, clear the category
     setSelectedCategorySlug(checked ? categorySlug : undefined);
+    setSelectedSubcategorySlugs([]); // Clear subcategories when category changes
+    setPage(1);
+  };
+
+  const handleSubcategoryChange = (subcategorySlug: string, checked: boolean) => {
+    setSelectedSubcategorySlugs(prev =>
+      checked 
+        ? [...prev, subcategorySlug]
+        : prev.filter(slug => slug !== subcategorySlug)
+    );
     setPage(1);
   };
 
@@ -120,6 +138,7 @@ export function ProductListingPageDynamic({
   const clearFilters = () => {
     setSelectedBrandIds([]);
     setSelectedCategorySlug(category);
+    setSelectedSubcategorySlugs([]);
     setPriceRange([dynamicMinPrice, dynamicMaxPrice]);
     setMinRating(0);
     setInStockOnly(false);
@@ -183,6 +202,34 @@ export function ProductListingPageDynamic({
                     ))}
                   </div>
                 )}
+              </div>
+            ))}
+          </div>
+          <Separator className="mt-4" />
+        </div>
+      )}
+
+      {/* Subcategories - Separate Section */}
+      {allSubcategories.length > 0 && (
+        <div>
+          <h3 className="font-semibold mb-3">Subcategories</h3>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {allSubcategories.map((subcat: any) => (
+              <div key={subcat.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`subcategory-${subcat.id}`}
+                  checked={selectedSubcategorySlugs.includes(subcat.slug)}
+                  onCheckedChange={(checked: boolean) => handleSubcategoryChange(subcat.slug, checked)}
+                />
+                <label htmlFor={`subcategory-${subcat.id}`} className="text-sm cursor-pointer flex-1">
+                  {subcat.name}
+                  {subcat.productCount > 0 && (
+                    <span className="text-muted-foreground ml-1">({subcat.productCount})</span>
+                  )}
+                  {subcat.parentName && (
+                    <span className="text-xs text-muted-foreground ml-1">({subcat.parentName})</span>
+                  )}
+                </label>
               </div>
             ))}
           </div>
@@ -266,7 +313,7 @@ export function ProductListingPageDynamic({
   );
 
   const LoadingSkeleton = () => (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {Array.from({ length: 8 }).map((_, i) => (
         <Card key={i} className="overflow-hidden">
           <Skeleton className="h-48 w-full" />
@@ -369,7 +416,7 @@ export function ProductListingPageDynamic({
         </div>
 
         {/* Active Filters */}
-        {(selectedBrandIds.length > 0 || minRating > 0 || inStockOnly || selectedCategorySlug) && (
+        {(selectedBrandIds.length > 0 || selectedSubcategorySlugs.length > 0 || minRating > 0 || inStockOnly || selectedCategorySlug) && (
           <div className="flex flex-wrap gap-2 mt-4">
             {selectedBrandIds.map(brandId => (
               <Badge key={brandId} variant="secondary" className="cursor-pointer"
@@ -377,6 +424,15 @@ export function ProductListingPageDynamic({
                 {getBrandName(brandId)} ×
               </Badge>
             ))}
+            {selectedSubcategorySlugs.map(subcatSlug => {
+              const subcat = allSubcategories.find((s: any) => s.slug === subcatSlug);
+              return (
+                <Badge key={subcatSlug} variant="secondary" className="cursor-pointer"
+                  onClick={() => handleSubcategoryChange(subcatSlug, false)}>
+                  {subcat?.name || subcatSlug} ×
+                </Badge>
+              );
+            })}
             {selectedCategorySlug && selectedCategorySlug !== category && (
               <Badge variant="secondary" className="cursor-pointer"
                 onClick={() => {
@@ -429,17 +485,18 @@ export function ProductListingPageDynamic({
           ) : (
             <>
               <div className={viewMode === 'grid'
-                ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                ? "grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
                 : "space-y-4"
               }>
                 {products.map((product: any, index: number) => {
                   // Transform product to match expected format
-                  const displayProduct = {
+                  const displayProduct: any = {
                     id: product.id,
                     name: product.name,
                     slug: product.slug,
                     price: product.price,
                     specialPrice: product.specialPrice,
+                    originalPrice: product.specialPrice ? product.price : undefined,
                     image: product.images?.[0]?.url || '/placeholder-product.jpg',
                     rating: 4.5, // Default rating since it's not in the API
                     reviews: 0,
@@ -448,6 +505,9 @@ export function ProductListingPageDynamic({
                     inStock: true,
                     description: product.shortDescription || product.description || '',
                     images: product.images?.map((img: any) => img.url) || [],
+                    subcategory: product.categories?.[1]?.name || '',
+                    specifications: {},
+                    tags: [],
                   };
 
                   return (

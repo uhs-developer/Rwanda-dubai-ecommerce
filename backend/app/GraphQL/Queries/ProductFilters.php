@@ -19,7 +19,6 @@ class ProductFilters
         $priceQuery = Product::query()->active();
 
         // Only apply search query to price range, not other filters
-        // This way price range updates based on search, but categories/brands always show
         if (isset($args['q']) && !empty($args['q'])) {
             $priceQuery->search($args['q']);
         }
@@ -41,7 +40,7 @@ class ProductFilters
             ->toArray();
 
         $categories = Category::whereIn('id', $categoryIds)
-            ->with('children')
+            ->with(['children', 'children.children'])
             ->orderBy('name')
             ->get();
 
@@ -58,7 +57,6 @@ class ProductFilters
             ->get();
 
         return [
-            'minPrice' => $minPrice,
             'maxPrice' => $maxPrice,
             'categories' => $categories,
             'brands' => $brands,

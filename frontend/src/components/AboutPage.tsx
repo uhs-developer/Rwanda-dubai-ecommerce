@@ -3,6 +3,7 @@ import { Card, CardContent } from "./ui/card";
 import { ArrowLeft, CheckCircle, Truck, Clock, Shield } from "lucide-react";
 import { useQuery } from 'urql';
 import { GET_PAGE_CONTENT } from '../graphql/storefront';
+import { PageWrapper } from './PageWrapper';
 
 interface AboutPageProps {
   onBack: () => void;
@@ -24,14 +25,17 @@ export function AboutPage({ onBack }: AboutPageProps) {
 
   // Helper to render HTML content safely
   const renderHTML = (html: string) => {
-    return <div dangerouslySetInnerHTML={{ __html: html }} className="prose max-w-none" />;
+    return <div dangerouslySetInnerHTML={{ __html: html }} className="prose max-w-none prose-lg" />;
   };
+
+  const bodyContent = getContent('body', '');
+  const hasBodyContent = bodyContent && bodyContent.trim() !== '';
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
+        <PageWrapper>
           <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
@@ -51,12 +55,25 @@ export function AboutPage({ onBack }: AboutPageProps) {
               </p>
             </div>
           </div>
-        </div>
+        </PageWrapper>
       </div>
 
+      {/* Company History / Body Section */}
+      {hasBodyContent && (
+        <div className="bg-white py-12 sm:py-16">
+          <PageWrapper>
+            <div className="max-w-4xl mx-auto">
+              <div className="text-gray-700 leading-relaxed">
+                {renderHTML(bodyContent)}
+              </div>
+            </div>
+          </PageWrapper>
+        </div>
+      )}
+
       {/* Mission & Vision Section */}
-      <div className="bg-white py-16">
-        <div className="container mx-auto px-4">
+      <div className="bg-white py-12 sm:py-16">
+        <PageWrapper>
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             <Card className="p-8">
               <CardContent className="pt-0">
@@ -76,12 +93,12 @@ export function AboutPage({ onBack }: AboutPageProps) {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </PageWrapper>
       </div>
 
       {/* Our Values Section */}
-      <div className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
+      <div className="bg-gray-50 py-12 sm:py-16">
+        <PageWrapper>
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">Our Values</h3>
             <p className="text-gray-600">These core values guide everything we do</p>
@@ -136,25 +153,27 @@ export function AboutPage({ onBack }: AboutPageProps) {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </PageWrapper>
       </div>
 
       {/* CTA Section */}
-      <div className="bg-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold text-gray-900 mb-4">Ready to Get Started?</h3>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Explore our wide selection of products sourced from global markets
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button size="lg" onClick={() => window.location.href = '/products'}>
-              Browse Products
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => window.location.href = '/contact'}>
-              Contact Us
-            </Button>
+      <div className="bg-white py-12 sm:py-16">
+        <PageWrapper>
+          <div className="text-center">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">Ready to Get Started?</h3>
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+              Explore our wide selection of products sourced from global markets
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button size="lg" onClick={() => window.location.href = '/products'}>
+                Browse Products
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => window.location.href = '/contact'}>
+                Contact Us
+              </Button>
+            </div>
           </div>
-        </div>
+        </PageWrapper>
       </div>
     </div>
   );

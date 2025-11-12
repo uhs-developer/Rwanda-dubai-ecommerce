@@ -32,7 +32,7 @@ export function ProductCard({
       <CardContent className={isListMode ? "p-0 flex" : "p-0"}>
         <div className={`relative ${isListMode ? "w-48 h-48 flex-shrink-0" : ""}`}>
           <div 
-            className={`${isListMode ? "w-full h-full rounded-l-lg" : "aspect-square overflow-hidden rounded-t-lg"}`}
+            className={`${isListMode ? "w-full h-full rounded-l-lg" : "aspect-[4/3] overflow-hidden rounded-t-lg"}`}
             onClick={() => onProductClick?.(product)}
           >
             <ImageWithFallback
@@ -70,7 +70,7 @@ export function ProductCard({
           </Button>
         </div>
 
-        <div className={`p-4 ${isListMode ? "flex-1 flex flex-col justify-between" : ""}`}>
+        <div className={`p-3 ${isListMode ? "flex-1 flex flex-col justify-between" : ""}`}>
           {/* Brand */}
           <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
             {product.brand}
@@ -95,10 +95,10 @@ export function ProductCard({
           </div>
 
           {/* Price */}
-          <div className="flex items-center gap-2 mb-3">
-            <span className="font-semibold text-lg">${product.price}</span>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-semibold text-base">${product.price}</span>
             {product.originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-xs text-muted-foreground line-through">
                 ${product.originalPrice}
               </span>
             )}
@@ -107,7 +107,7 @@ export function ProductCard({
           {/* Add to cart button */}
           <Button
             size="sm"
-            className="w-full"
+            className="w-full text-xs"
             disabled={!product.inStock}
             onClick={(e: { stopPropagation: () => void; }) => {
               e.stopPropagation();

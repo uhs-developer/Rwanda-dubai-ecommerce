@@ -786,3 +786,18 @@ input PageSectionInput {
   content: String
 }
 
+# ========== FAQ TYPES ==========
+
+type FAQItem {
+  id: ID!
+  category: String!
+  categoryLabel: String
+  question: String!
+  answer: String!
+}
+
+extend type Query {
+  # Storefront FAQs
+  faqs: [FAQItem!]! @field(resolver: "App\\GraphQL\\Queries\\Faqs")
+}
+

@@ -46,6 +46,7 @@ class AdminPageContent
                 return [
                     ['key' => 'hero_title', 'label' => 'Hero Title', 'content' => 'About Us'],
                     ['key' => 'hero_subtitle', 'label' => 'Hero Subtitle', 'content' => 'Your trusted partner in global e-commerce'],
+                    ['key' => 'body', 'label' => 'Company History / Body Content', 'content' => 'Tell your company\'s story here. This section appears before Mission & Vision.'],
                     ['key' => 'mission', 'label' => 'Our Mission', 'content' => 'We connect global markets with Rwanda through seamless e-commerce.'],
                     ['key' => 'vision', 'label' => 'Our Vision', 'content' => 'To become the leading cross-border e-commerce platform.'],
                 ];

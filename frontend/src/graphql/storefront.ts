@@ -17,6 +17,19 @@ export const GET_PAGE_CONTENT = gql`
   }
 `;
 
+// ========== FAQs (STOREFRONT) ==========
+export const GET_FAQS = gql`
+  query GetFaqs {
+    faqs {
+      id
+      category
+      categoryLabel
+      question
+      answer
+    }
+  }
+`;
+
 // ========== STOREFRONT CATEGORIES ==========
 export const GET_STOREFRONT_CATEGORIES = gql`
   query GetStorefrontCategories {
