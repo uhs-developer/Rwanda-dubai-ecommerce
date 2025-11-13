@@ -7,7 +7,7 @@ const resources = {
   en: {
     translation: {
       // Header
-      "header.logo": "TechBridge",
+      "header.logo": "Kora",
       "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Search for electronics, auto parts, tools...",
       "header.account": "Account",
@@ -135,7 +135,7 @@ const resources = {
       "home.samsungSubtitle": "Discover the latest Galaxy smartphones and devices",
       "home.premiumAudio": "Premium Audio",
       "home.audioSubtitle": "Immerse yourself in superior sound quality",
-      "home.whyChooseTitle": "Why Choose TechBridge?",
+      "home.whyChooseTitle": "Why Choose Kora?",
       "home.whyChooseDesc": "We're committed to delivering the best shopping experience from Dubai, China, and South Korea to Rwanda with unmatched service quality.",
       "home.freeShippingTitle": "Free Shipping",
       "home.freeShippingDesc": "Free delivery on orders over $500 to any location in Rwanda",
@@ -175,7 +175,7 @@ const resources = {
       "footer.newsletterDesc": "Get the latest deals and product updates delivered to your inbox.",
       "footer.newsletterPlaceholder": "Enter your email address",
       "footer.subscribe": "Subscribe",
-      "footer.companyDesc": "Connecting Dubai's premium electronics and auto parts market with Rwanda through reliable shipping and authentic products.",
+      "footer.companyDesc": "Kora is Rwanda’s Digital Procurement Corridor. We connect you to producers in China, Dubai and South Korea with transparent TLC, rigorous QC and reliable logistics.",
       "footer.quickLinks": "Quick Links",
       "footer.aboutUs": "About Us",
       "footer.contact": "Contact",
@@ -237,8 +237,8 @@ const resources = {
       "contact.dubaiPhone": "+971 4 XXX XXXX (Dubai)",
       "contact.kigaliPhone": "+250 788 XXX XXX (Kigali)",
       "contact.email": "Email",
-      "contact.supportEmail": "support@techbridge.com",
-      "contact.ordersEmail": "orders@techbridge.com",
+      "contact.supportEmail": "support@kora.rw",
+      "contact.ordersEmail": "orders@kora.rw",
       "contact.businessHours": "Business Hours",
       "contact.mondayFriday": "Monday - Friday: 9:00 AM - 6:00 PM",
       "contact.saturday": "Saturday: 10:00 AM - 4:00 PM",
@@ -293,7 +293,7 @@ const resources = {
       "home.noFeaturedProducts": "No featured products available",
       "home.exploreCollection": "Explore our {{category}} collection",
       "home.noProductsInCategory": "No products available in this category",
-      "home.whyChoosePlatform": "Why Choose Rwanda-Dubai Platform",
+      "home.whyChoosePlatform": "Why Choose Kora",
       "home.fastShippingTitle": "Fast Shipping",
       "home.fastShippingDesc": "Express delivery from our global hubs to Rwanda in 5-7 business days",
       "home.qualityGuaranteedTitle": "Quality Guaranteed",
@@ -325,7 +325,7 @@ const resources = {
   rw: {
     translation: {
       // Header - Kinyarwanda
-      "header.logo": "TechBridge",
+      "header.logo": "Kora",
       "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Shakisha ibikoresho by'ikoranabuhanga, ibice by'imodoka, ibikoresho...",
       "header.account": "Konti",
@@ -453,7 +453,7 @@ const resources = {
       "home.samsungSubtitle": "Menya telefone n'ibikoresho bisha bya Galaxy",
       "home.premiumAudio": "Ijwi rya rwego rwo hejuru",
       "home.audioSubtitle": "Iyinjiza mu ijwi riza neza",
-      "home.whyChooseTitle": "Kuki Guhitamo TechBridge?",
+      "home.whyChooseTitle": "Kuki Guhitamo Kora?",
       "home.whyChooseDesc": "Twiyemeje gutanga uburambe bwiza bwo kugura kuva Dubai kugera i Rwanda hamwe n'umurimo utagereranywa.",
       "home.freeShippingTitle": "Kohereza ku buntu",
       "home.freeShippingDesc": "Kohereza ku buntu ku bicumbi birenze $500 ahantu hose mu Rwanda",
@@ -476,7 +476,7 @@ const resources = {
       "footer.newsletterDesc": "Pata ofa mpya na sasisho za bidhaa zilizotumwa kwenye kisanduku chako cha barua pepe.",
       "footer.newsletterPlaceholder": "Ingiza anwani ya barua pepe yako",
       "footer.subscribe": "Jisajili",
-      "footer.companyDesc": "Kuunganisha soko la kielektroniki la hali ya juu la Dubai na Rwanda kupitia usafirishaji thabiti na bidhaa halisi.",
+      "footer.companyDesc": "Kora ni inzira y’ikoranabuhanga yo gutumiza ibicuruzwa mu Rwanda. Duhuza n’abakora mu Bushinwa, Dubai na Koreya y’Amajyepfo, ku giciro gitomoye (TLC), na QC inoze hamwe na lojiestike yizewe.",
       "footer.quickLinks": "Viungo vya Haraka",
       "footer.aboutUs": "Kuhusu Sisi",
       "footer.contact": "Wasiliana",
@@ -496,7 +496,7 @@ const resources = {
   sw: {
     translation: {
       // Header - Kiswahili
-      "header.logo": "TechBridge",
+      "header.logo": "Kora",
       "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Tafuta vifaa vya kielektroniki, sehemu za magari, zana...",
       "header.account": "Akaunti",
@@ -624,7 +624,7 @@ const resources = {
       "home.samsungSubtitle": "Gundua simu na vifaa vipya vya Galaxy",
       "home.premiumAudio": "Sauti ya Juu",
       "home.audioSubtitle": "Jizike katika ubora wa sauti bora",
-      "home.whyChooseTitle": "Kwa Nini Uchague TechBridge?",
+      "home.whyChooseTitle": "Kwa Nini Uchague Kora?",
       "home.whyChooseDesc": "Tumejitolea kutoa uzoefu bora wa ununuzi kutoka Dubai hadi Rwanda pamoja na huduma isiyolinganishwa.",
       "home.freeShippingTitle": "Usafirishaji Bila Malipo",
       "home.freeShippingDesc": "Usafirishaji bila malipo kwa oda zaidi ya $500 popote Rwanda",
@@ -656,7 +656,7 @@ const resources = {
       "footer.newsletterDesc": "Pata ofa mpya na sasisho za bidhaa zilizotumwa kwenye kisanduku chako cha barua pepe.",
       "footer.newsletterPlaceholder": "Ingiza anwani ya barua pepe yako",
       "footer.subscribe": "Jisajili",
-      "footer.companyDesc": "Kuunganisha soko la kielektroniki la hali ya juu la Dubai na Rwanda kupitia usafirishaji thabiti na bidhaa halisi.",
+      "footer.companyDesc": "Kora ni Kituo cha Ununuzi wa Kidigitali kwa Rwanda. Tunaunganisha na wazalishaji China, Dubai na Korea Kusini, kwa TLC iliyo wazi, QC madhubuti na usafirishaji wa kuaminika.",
       "footer.quickLinks": "Viungo vya Haraka",
       "footer.aboutUs": "Kuhusu Sisi",
       "footer.contact": "Wasiliana",
@@ -676,7 +676,7 @@ const resources = {
   ln: {
     translation: {
       // Header - Lingala
-      "header.logo": "TechBridge",
+      "header.logo": "Kora",
       "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Boluka bilembo ya elektroni, bilembo ya motuka, bilembo...",
       "header.account": "Konti",
@@ -804,7 +804,7 @@ const resources = {
       "home.samsungSubtitle": "Laba telefone n'ebintu ebipya bya Galaxy",
       "home.premiumAudio": "Audio ya waggulu",
       "home.audioSubtitle": "Inyigiza mu ddoboozi ennungi",
-      "home.whyChooseTitle": "Lwaki olonze TechBridge?",
+      "home.whyChooseTitle": "Lwaki olonze Kora?",
       "home.whyChooseDesc": "Tufubye okukuwa ekirabo ekisinga obulungi eky'okugula okuva Dubai okudda Uganda ne ssanduku erya bulijjo.",
       "home.freeShippingTitle": "Kotinda ya mbongo te",
       "home.freeShippingDesc": "Kotinda ya mbongo te na commande oyo ezali likolo ya $500 wala wona mu Uganda",

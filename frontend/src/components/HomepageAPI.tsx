@@ -11,7 +11,7 @@ import { Skeleton } from "./ui/skeleton";
 import { Truck, Shield, Headphones, CreditCard, Star, ArrowRight, AlertCircle } from "lucide-react";
 import { transformProductForDisplay } from "../services/product";
 import { useTranslation } from "react-i18next";
-import { GET_STOREFRONT_CATEGORIES, GET_FEATURED_PRODUCTS, GET_BRANDS } from "../graphql/storefront";
+import { GET_STOREFRONT_CATEGORIES, GET_FEATURED_PRODUCTS, GET_BRANDS, GET_PAGE_CONTENT } from "../graphql/storefront";
 
 interface HomepageAPIProps {
   onAddToCart?: (product: any) => void;
@@ -46,6 +46,17 @@ export function HomepageAPI({
   const brands = brandsResult.data?.brands || [];
   const loading = categoriesResult.fetching || featuredProductsResult.fetching || brandsResult.fetching;
   const error = categoriesResult.error || featuredProductsResult.error || brandsResult.error;
+
+  // Homepage CMS content
+  const [homeContentResult] = useQuery({
+    query: GET_PAGE_CONTENT,
+    variables: { pageKey: 'home' }
+  });
+  const homeSections = homeContentResult.data?.adminPageContent?.sections || [];
+  const getHome = (key: string, fallback = '') => {
+    const s = homeSections.find((x: any) => x.key === key);
+    return s?.content || fallback;
+  };
 
   const handleCategoryClick = (categorySlug: string) => {
     navigate(`/category/${categorySlug}`);
@@ -209,47 +220,66 @@ export function HomepageAPI({
           </section>
         ))}
 
-        {/* Why Choose Us */}
+        {/* Benefits from CMS */}
         <section>
-          <h2 className="text-2xl font-bold text-center mb-8">{t("home.whyChoosePlatform")}</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">{getHome('benefit_title', t("home.whyChoosePlatform"))}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardContent className="p-6 text-center">
                 <Truck className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">{t("home.fastShippingTitle")}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {t("home.fastShippingDesc")}
-                </p>
+                <h3 className="font-semibold mb-2">{getHome('benefit_1_title', t("home.fastShippingTitle"))}</h3>
+                <p className="text-sm text-muted-foreground">{getHome('benefit_1_desc', t("home.fastShippingDesc"))}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <Shield className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">{t("home.qualityGuaranteedTitle")}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {t("home.qualityGuaranteedDesc")}
-                </p>
+                <h3 className="font-semibold mb-2">{getHome('benefit_2_title', t("home.qualityGuaranteedTitle"))}</h3>
+                <p className="text-sm text-muted-foreground">{getHome('benefit_2_desc', t("home.qualityGuaranteedDesc"))}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <Headphones className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">{t("home.supportTitle")}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {t("home.supportDesc")}
-                </p>
+                <h3 className="font-semibold mb-2">{getHome('benefit_3_title', t("home.supportTitle"))}</h3>
+                <p className="text-sm text-muted-foreground">{getHome('benefit_3_desc', t("home.supportDesc"))}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <CreditCard className="h-8 w-8 mx-auto mb-4 text-primary" />
-                <h3 className="font-semibold mb-2">{t("home.securePaymentsTitle")}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {t("home.securePaymentsDesc")}
-                </p>
+                <h3 className="font-semibold mb-2">{getHome('benefit_4_title', t("home.securePaymentsTitle"))}</h3>
+                <p className="text-sm text-muted-foreground">{getHome('benefit_4_desc', t("home.securePaymentsDesc"))}</p>
               </CardContent>
             </Card>
           </div>
+        </section>
+
+        {/* How It Works (CMS) */}
+        <section>
+          <h2 className="text-2xl font-bold text-center mb-6">{getHome('how_title', 'How Kora Works')}</h2>
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[getHome('how_step1'), getHome('how_step2'), getHome('how_step3')].filter(Boolean).map((step, i) => (
+              <Card key={i}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-4xl font-black text-primary mb-2">{i + 1}</div>
+                  <p className="text-sm text-muted-foreground">{step}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Sourcing Hubs (CMS) */}
+        <section>
+          <h2 className="text-2xl font-bold text-center mb-4">{getHome('sourcing_title', 'Our Sourcing Hubs')}</h2>
+          <p className="text-center text-muted-foreground max-w-3xl mx-auto mb-6">{getHome('sourcing_body')}</p>
+        </section>
+
+        {/* TLC Transparency (CMS) */}
+        <section>
+          <h2 className="text-2xl font-bold text-center mb-4">{getHome('tlc_title', 'Transparent Total Landed Cost (TLC)')}</h2>
+          <p className="text-center text-muted-foreground max-w-3xl mx-auto">{getHome('tlc_body')}</p>
         </section>
 
         {/* Our Values - pre-footer trust section */}

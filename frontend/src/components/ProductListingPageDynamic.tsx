@@ -214,7 +214,9 @@ export function ProductListingPageDynamic({
         <div>
           <h3 className="font-semibold mb-3">Subcategories</h3>
           <div className="space-y-2 max-h-64 overflow-y-auto">
-            {allSubcategories.map((subcat: any) => (
+            {allSubcategories
+              .filter((subcat: any) => (subcat.productCount ?? 0) > 0)
+              .map((subcat: any) => (
               <div key={subcat.id} className="flex items-center space-x-2">
                 <Checkbox
                   id={`subcategory-${subcat.id}`}

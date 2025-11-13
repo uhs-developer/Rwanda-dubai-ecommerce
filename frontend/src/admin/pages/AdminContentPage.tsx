@@ -94,11 +94,13 @@ export default function AdminContentPage() {
                   <SelectValue placeholder="Select a page" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="home">Homepage</SelectItem>
                   <SelectItem value="contact">Contact Us</SelectItem>
                   <SelectItem value="about">About Us</SelectItem>
                   <SelectItem value="faq">FAQ</SelectItem>
                   <SelectItem value="privacy">Privacy Policy</SelectItem>
                   <SelectItem value="terms">Terms & Conditions</SelectItem>
+                  <SelectItem value="returns">Returns & Warranty</SelectItem>
                 </SelectContent>
               </Select>
             </div>
