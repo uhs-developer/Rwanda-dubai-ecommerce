@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { Badge } from "./ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
@@ -22,6 +20,9 @@ import {
 import { CartItem } from "./ShoppingCart";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "sonner";
+import { isSandboxPayment } from "../config/paymentConfig";
 
 interface CheckoutPageProps {
   items: CartItem[];
@@ -31,7 +32,9 @@ interface CheckoutPageProps {
 
 export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps) {
   const { t } = useTranslation();
+  const { user, isAuthenticated } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     // Shipping Information
     firstName: "",
@@ -57,6 +60,27 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
     agreeTerms: false,
   });
 
+  // Autofill from authenticated user profile on initial load / when user changes
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    setFormData(prev => ({
+      ...prev,
+      firstName: prev.firstName || (user as any).first_name || (user as any).name?.split(" ")[0] || "",
+      lastName:
+        prev.lastName ||
+        (user as any).last_name ||
+        ((user as any).name && (user as any).name.split(" ").slice(1).join(" ")) ||
+        "",
+      email: prev.email || (user as any).email || "",
+      phone: prev.phone || (user as any).phone || "",
+      address: prev.address || (user as any).default_address?.street || "",
+      city: prev.city || (user as any).default_address?.city || "",
+      district: prev.district || (user as any).default_address?.district || "",
+      postalCode: prev.postalCode || (user as any).default_address?.postcode || "",
+    }));
+  }, [isAuthenticated, user]);
+
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.05;
@@ -67,29 +91,39 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
   };
 
   const handleSubmit = () => {
+    if (isSubmitting) return;
+
     if (!formData.agreeTerms) {
-      alert("Please agree to the terms and conditions");
+      toast.error("Please agree to the terms and conditions");
       return;
     }
 
-    const orderData = {
-      items,
-      shipping: formData,
-      payment: {
-        method: formData.paymentMethod,
-        ...(formData.paymentMethod === 'card' ? {
-          cardNumber: formData.cardNumber,
-          cardName: formData.cardName,
-        } : {
-          mobileNumber: formData.mobileNumber,
-          provider: formData.mobileProvider,
-        })
-      },
-      totals: { subtotal, shipping, tax, total },
-      timestamp: new Date(),
-    };
+    try {
+      setIsSubmitting(true);
 
-    onPlaceOrder(orderData);
+      const orderData = {
+        items,
+        shipping: formData,
+        payment: {
+          method: formData.paymentMethod,
+          ...(formData.paymentMethod === 'card'
+            ? {
+                cardNumber: formData.cardNumber,
+                cardName: formData.cardName,
+              }
+            : {
+                mobileNumber: formData.mobileNumber,
+                provider: formData.mobileProvider,
+              }),
+        },
+        totals: { subtotal, shipping, tax, total },
+        timestamp: new Date(),
+      };
+
+      onPlaceOrder(orderData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const steps = [
@@ -266,9 +300,17 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
                   size="lg" 
                   className="w-full"
                   onClick={() => setCurrentStep(2)}
-                  disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.address || !formData.city || !formData.district}
+                  disabled={
+                    !formData.firstName ||
+                    !formData.lastName ||
+                    !formData.email ||
+                    !formData.phone ||
+                    !formData.address ||
+                    !formData.city ||
+                    !formData.district
+                  }
                 >
-                  Continue to Payment
+                  {t("checkout.continueToPayment")}
                 </Button>
               </CardContent>
             </Card>
@@ -393,7 +435,7 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
                   </div>
                 )}
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
                   <Button 
                     variant="outline" 
                     size="lg" 
@@ -409,6 +451,12 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
                     Review Order
                   </Button>
                 </div>
+
+                {isSandboxPayment && (
+                  <p className="text-xs text-muted-foreground">
+                    Sandbox checkout: payments are simulated using test data; you won&apos;t be charged.
+                  </p>
+                )}
               </CardContent>
             </Card>
           )}
@@ -510,10 +558,12 @@ export function CheckoutPage({ items, onBack, onPlaceOrder }: CheckoutPageProps)
                     size="lg" 
                     className="flex-1"
                     onClick={handleSubmit}
-                    disabled={!formData.agreeTerms}
+                    disabled={!formData.agreeTerms || isSubmitting}
                   >
                     <Lock className="h-4 w-4 mr-2" />
-                    Place Order - ${total.toFixed(2)}
+                    {isSubmitting
+                      ? t("checkout.placingOrder") ?? "Placing Order..."
+                      : `${t("checkout.placeOrder") ?? "Place Order"} - $${total.toFixed(2)}`}
                   </Button>
                 </div>
               </CardContent>

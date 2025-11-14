@@ -50,7 +50,7 @@ export function AddressBookPage({ onBack }: AddressBookPageProps) {
       type: "work",
       isDefault: false,
       name: "John Doe",
-      company: "TechBridge Ltd",
+      company: "Kora Ltd",
       street: "KG 456 St",
       city: "Kigali",
       state: "Kigali City", 

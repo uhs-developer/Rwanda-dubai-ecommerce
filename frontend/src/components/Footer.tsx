@@ -45,7 +45,7 @@ export function Footer() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">TechBridge</h3>
+            <h3 className="text-xl font-bold text-white">Kora</h3>
             <p className="text-sm">
               {t("footer.companyDesc")}
             </p>
@@ -73,6 +73,11 @@ export function Footer() {
                 { label: t("footer.aboutUs"), action: () => navigate('/about') },
                 { label: t("footer.contact"), action: () => navigate('/contact') },
                 { label: t("footer.returnsWarranty"), action: () => navigate('/returns') },
+                { label: 'Shipping & Delivery', action: () => navigate('/shipping') },
+                { label: 'Terms & Conditions', action: () => navigate('/terms') },
+                { label: 'Privacy Policy', action: () => navigate('/privacy') },
+                { label: 'Cookie Policy', action: () => navigate('/cookies') },
+                { label: 'Dispute Resolution', action: () => navigate('/dispute') },
                 { label: t("footer.faq"), action: () => navigate('/faq') },
                 { label: t("footer.blog"), action: () => navigate('/blog') }
               ].map((link) => (
@@ -141,20 +146,21 @@ export function Footer() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm">
-            © {currentYear} TechBridge. {t("footer.allRightsReserved")}
+            © {currentYear} Kora. {t("footer.allRightsReserved")}
           </p>
           <div className="flex gap-6">
             {[
-              t("footer.privacyPolicy"),
-              t("footer.termsOfService"),
-              t("footer.cookiePolicy")
+              { label: t("footer.privacyPolicy"), action: () => navigate('/privacy') },
+              { label: t("footer.termsOfService"), action: () => navigate('/terms') },
+              { label: t("footer.cookiePolicy"), action: () => navigate('/cookies') }
             ].map((link) => (
               <Button
-                key={link}
+                key={link.label}
                 variant="link"
                 className="p-0 h-auto text-gray-400 hover:text-white text-sm"
+                onClick={link.action}
               >
-                {link}
+                {link.label}
               </Button>
             ))}
           </div>

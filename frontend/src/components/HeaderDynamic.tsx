@@ -124,9 +124,9 @@ export function HeaderDynamic({
             onClick={() => onNavigate?.('home')}
           >
             <div className="h-10 w-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
-              TB
+              K
             </div>
-            <h1 className="text-2xl font-bold text-primary hidden lg:block">TechBridge</h1>
+            <h1 className="text-2xl font-bold text-primary hidden lg:block">Kora</h1>
           </div>
 
           {/* Search bar */}

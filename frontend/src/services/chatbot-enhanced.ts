@@ -154,7 +154,7 @@ class EnhancedChatbotService {
       `${msg.type === 'user' ? 'Customer' : 'Assistant'}: ${msg.content}`
     ).join('\n');
 
-    return `You are a friendly, helpful shopping assistant for TechBridge - an e-commerce platform connecting Dubai with Rwanda. You help customers find products, answer questions, and provide excellent customer service.
+    return `You are a friendly, helpful shopping assistant for Kora - an e-commerce platform connecting Dubai with Rwanda. You help customers find products, answer questions, and provide excellent customer service.
 
 CONVERSATION CONTEXT:
 ${recentConversation ? recentConversation : 'This is the start of the conversation.'}
@@ -184,7 +184,7 @@ Provide a natural, conversational response. If recommending products, mention th
       `- ${p.name} by ${p.brand} - $${p.price} (${p.category})`
     ).join('\n');
 
-    return `You are a friendly shopping assistant for TechBridge, connecting Dubai with Rwanda.
+    return `You are a friendly shopping assistant for Kora, connecting Dubai with Rwanda.
 
 Available products:
 ${productList}

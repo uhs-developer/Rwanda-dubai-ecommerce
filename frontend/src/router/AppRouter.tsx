@@ -23,6 +23,7 @@ import { ReturnsWarrantyPage } from "../components/ReturnsWarrantyPage";
 import { FAQPage } from "../components/FAQPage";
 import { BlogPage } from "../components/BlogPage";
 import { BlogDetailPage } from "../components/BlogDetailPage";
+import { StaticPage } from "../components/StaticPage";
 import { AccountDashboard } from "../components/AccountDashboard";
 import { OrderHistoryPage } from "../components/OrderHistoryPage";
 import { ProfileSettingsPage } from "../components/ProfileSettingsPage";
@@ -83,7 +84,8 @@ export function AppRouter() {
 }
 
 function AppRouterContent() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -205,6 +207,11 @@ function AppRouterContent() {
     }
     // Close cart sidebar if open
     setIsCartOpen(false);
+    // If not logged in, send to auth with intended checkout redirect
+    if (!isAuthenticated) {
+      navigate('/auth', { state: { from: { pathname: '/checkout' } } });
+      return;
+    }
     // Navigate to checkout page
     navigate('/checkout');
   };
@@ -656,6 +663,13 @@ function AppRouterContent() {
             <Route path="/faq" element={
               <FAQPageWrapper />
             } />
+
+            {/* Static policy/info pages driven by PageContent */}
+            <Route path="/terms" element={<StaticPage pageKey="terms" titleFallback="Terms & Conditions" />} />
+            <Route path="/privacy" element={<StaticPage pageKey="privacy" titleFallback="Privacy Policy" />} />
+            <Route path="/cookies" element={<StaticPage pageKey="cookies" titleFallback="Cookie Policy" />} />
+            <Route path="/shipping" element={<StaticPage pageKey="shipping" titleFallback="Shipping & Delivery" />} />
+            <Route path="/dispute" element={<StaticPage pageKey="dispute" titleFallback="Dispute Resolution" />} />
 
             <Route path="/blog" element={
               <BlogPageWrapper />

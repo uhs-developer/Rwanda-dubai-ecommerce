@@ -141,7 +141,7 @@ return new class extends Migration
         Schema::create('shipment_carriers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->nullable()->constrained('tenants')->onDelete('cascade');
-            $table->string('name'); // e.g., "TechBridge Logistics", "DHL", "FedEx"
+            $table->string('name'); // e.g., "Kora Logistics", "DHL", "FedEx"
             $table->string('code')->unique();
             $table->string('website')->nullable();
             $table->string('tracking_url')->nullable(); // URL template for tracking

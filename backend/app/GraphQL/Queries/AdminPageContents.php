@@ -50,6 +50,26 @@ class AdminPageContents
                 'pageKey' => 'returns',
                 'pageName' => 'Returns & Warranty',
             ],
+            [
+                'id' => 'cookies',
+                'pageKey' => 'cookies',
+                'pageName' => 'Cookie Policy',
+            ],
+            [
+                'id' => 'shipping',
+                'pageKey' => 'shipping',
+                'pageName' => 'Shipping & Delivery',
+            ],
+            [
+                'id' => 'warranty',
+                'pageKey' => 'warranty',
+                'pageName' => 'Warranty',
+            ],
+            [
+                'id' => 'dispute',
+                'pageKey' => 'dispute',
+                'pageName' => 'Dispute Resolution',
+            ],
         ];
 
         // Attach sections to each page

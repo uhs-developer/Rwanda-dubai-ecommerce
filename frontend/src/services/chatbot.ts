@@ -224,7 +224,7 @@ class ChatbotService {
       : '';
 
     const siteContext = `SITE INFORMATION:
-- Platform: TechBridge E-commerce
+- Platform: Kora E-commerce
 - Business Model: Dubai/China/Korea → Rwanda cross-border trade
 - Available Categories: ${categoryNames || 'Loading categories...'}
 - Available Brands: ${brandNames || 'Loading brands...'}
@@ -250,7 +250,7 @@ ${this.context.browsingHistory.slice(0, 5).map(item =>
 ).join(', ')}`
       : 'ORDER HISTORY:\n- No previous orders';
 
-    return `You are Manzi, a friendly and expert shopping assistant for TechBridge - an e-commerce platform connecting Dubai/China/Korea with Rwanda. You help customers find products, answer questions, and provide excellent customer service.
+    return `You are Manzi, a friendly and expert shopping assistant for Kora - an e-commerce platform connecting Dubai/China/Korea with Rwanda. You help customers find products, answer questions, and provide excellent customer service.
 
 ${userContext}
 
@@ -299,7 +299,7 @@ Respond naturally as if you're a real person helping a customer in a store. Be w
       `- ${p.name} by ${typeof p.brand === 'string' ? p.brand : p.brand?.name || 'Unknown Brand'} - $${p.price} (${typeof p.category === 'string' ? p.category : p.category?.name || 'Unknown Category'})`
     ).join('\n');
 
-    return `You are Manzi, a friendly shopping assistant for TechBridge, connecting Dubai with Rwanda.
+    return `You are Manzi, a friendly shopping assistant for Kora, connecting Dubai with Rwanda.
 
 Available products:
 ${productList}
@@ -315,7 +315,7 @@ Be conversational, remember customer names from conversation history, provide pe
       return {
         id: this.generateUniqueId(),
         type: 'bot',
-        content: "Hi! I'm Manzi, your personal shopping assistant here at TechBridge! 😊 I help customers find amazing products from Dubai and get them delivered to Rwanda. I can help you with product recommendations, shipping questions, and anything else you need. What's your name?",
+        content: "Hi! I'm Manzi, your personal shopping assistant here at Kora! 😊 I help customers find amazing products from Dubai and get them delivered to Rwanda. I can help you with product recommendations, shipping questions, and anything else you need. What's your name?",
         timestamp: new Date(),
         suggestions: [
           "My name is...",
@@ -348,7 +348,7 @@ Be conversational, remember customer names from conversation history, provide pe
       return {
         id: this.generateUniqueId(),
         type: 'bot',
-        content: "Nice to meet you, Sebastien! 😊 Welcome to TechBridge! I'm Manzi, and I'm here to help you find exactly what you need. We have amazing products from Dubai with fast delivery to Rwanda. What can I help you find today?",
+        content: "Nice to meet you, Sebastien! 😊 Welcome to Kora! I'm Manzi, and I'm here to help you find exactly what you need. We have amazing products from Dubai with fast delivery to Rwanda. What can I help you find today?",
         timestamp: new Date(),
         suggestions: [
           "Show me electronics",

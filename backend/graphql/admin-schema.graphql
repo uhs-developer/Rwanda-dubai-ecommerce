@@ -153,6 +153,10 @@ extend type Mutation {
   
   # ===== Page Content Management =====
   updatePageContent(pageKey: String!, input: UpdatePageContentInput!): PageContent! @field(resolver: "App\\GraphQL\\Mutations\\UpdatePageContent")
+
+  # ===== Page SEO (AI) =====
+  generateProductSEO(productId: ID, productData: ProductSEOInput): ProductSEOResponse @field(resolver: "App\\GraphQL\\Mutations\\GenerateProductSEO")
+  generatePageSEO(pageKey: String!, title: String, content: String!): PageSEOResponse @field(resolver: "App\\GraphQL\\Mutations\\GeneratePageSEO")
 }
 
 # =========================================
@@ -714,6 +718,12 @@ type ProductSEOResponse {
   success: Boolean!
   message: String
   product: AdminProduct
+  seoData: SEOData
+}
+
+type PageSEOResponse {
+  success: Boolean!
+  message: String
   seoData: SEOData
 }
 

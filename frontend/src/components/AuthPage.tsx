@@ -214,7 +214,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                           setLoginData(prev => ({ ...prev, email: e.target.value }));
                           clearErrors();
                         }}
-                        autoComplete="username email"
+                        autoComplete="email"
                         required
                       />
                     </div>
@@ -230,7 +230,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
                       <Input
                         id="login-password"
                         type={showPassword ? "text" : "password"}
-                        name="password"
+                        name="current-password"
                         placeholder="Enter your password"
                         className={`pl-10 pr-10 ${validationErrors.password ? 'border-red-500' : ''}`}
                         value={loginData.password}

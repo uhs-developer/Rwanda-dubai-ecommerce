@@ -63,6 +63,107 @@ class GeminiSEOService
         }
     }
 
+    /**
+     * Generate comprehensive SEO content for a CMS page
+     */
+    public function generatePageSEO(array $pageData): array
+    {
+        $title = $pageData['title'] ?? '';
+        $content = $pageData['content'] ?? '';
+        $pageKey = $pageData['pageKey'] ?? '';
+
+        $prompt = $this->buildPageSEOPrompt($title, $content, $pageKey);
+
+        try {
+            $response = Http::timeout(30)
+                ->post("{$this->baseUrl}?key={$this->apiKey}", [
+                    'contents' => [['parts' => [['text' => $prompt]]]],
+                    'generationConfig' => [
+                        'temperature' => 0.7,
+                        'topK' => 40,
+                        'topP' => 0.95,
+                        'maxOutputTokens' => 8192,
+                    ]
+                ]);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+                $raw = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? '';
+                return $this->parsePageSEOResponse($raw, $pageData);
+            }
+
+            Log::error('Gemini Page SEO API Error', ['response' => $response->body()]);
+            return $this->getDefaultPageSEO($pageData);
+        } catch (\Exception $e) {
+            Log::error('Gemini Page SEO Generation Error', ['error' => $e->getMessage()]);
+            return $this->getDefaultPageSEO($pageData);
+        }
+    }
+
+    private function buildPageSEOPrompt(string $title, string $body, string $pageKey): string
+    {
+        return <<<PROMPT
+You are an expert SEO specialist for an e-commerce site operating in Rwanda.
+Generate SEO for a CMS page.
+
+Page:
+- key: {$pageKey}
+- title: {$title}
+- body (html/text): {$body}
+
+Return ONLY JSON with:
+1. meta_title (50-60 chars)
+2. meta_description (150-160 chars)
+3. meta_keywords (array of 10-15)
+4. multilingual_seo (en, fr, rw) with title+description
+5. structured_data (Schema.org WebPage JSON-LD)
+6. suggestions (5 improvements)
+7. seo_score (0-100)
+PROMPT;
+    }
+
+    private function parsePageSEOResponse(string $content, array $pageData): array
+    {
+        $content = preg_replace('/```json\s*|\s*```/', '', $content);
+        $content = trim($content);
+        try {
+            $seo = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception(json_last_error_msg());
+            }
+            return [
+                'metaTitle' => $seo['meta_title'] ?? ($pageData['title'] ?? ''),
+                'metaDescription' => $seo['meta_description'] ?? '',
+                'metaKeywords' => $seo['meta_keywords'] ?? [],
+                'searchKeywords' => implode(', ', $seo['meta_keywords'] ?? []),
+                'seoTranslations' => $seo['multilingual_seo'] ?? [],
+                'structuredData' => $seo['structured_data'] ?? ['@type' => 'WebPage', 'name' => $pageData['title'] ?? ''],
+                'aiSuggestions' => $seo['suggestions'] ?? [],
+                'seoScore' => $seo['seo_score'] ?? 60,
+                'lastSeoOptimization' => now(),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Page SEO Parse Error', ['error' => $e->getMessage(), 'content' => $content]);
+            return $this->getDefaultPageSEO($pageData);
+        }
+    }
+
+    private function getDefaultPageSEO(array $pageData): array
+    {
+        $title = $pageData['title'] ?? ucfirst($pageData['pageKey'] ?? 'Page');
+        return [
+            'metaTitle' => "{$title} | Kora Rwanda",
+            'metaDescription' => "{$title} page for Kora Rwanda.",
+            'metaKeywords' => [$title, 'kora', 'rwanda'],
+            'searchKeywords' => "{$title}, kora {$title}, {$title} rwanda",
+            'seoTranslations' => [],
+            'structuredData' => ['@context' => 'https://schema.org', '@type' => 'WebPage', 'name' => $title],
+            'aiSuggestions' => [],
+            'seoScore' => 50,
+            'lastSeoOptimization' => now(),
+        ];
+    }
+
     private function buildSEOPrompt(string $name, string $description, string $category, string $price, string $brand): string
     {
         return <<<PROMPT

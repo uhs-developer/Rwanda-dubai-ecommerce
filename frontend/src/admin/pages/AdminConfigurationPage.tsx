@@ -108,7 +108,7 @@ function GeneralTab() {
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium">Store Name</label>
-            <Input defaultValue="TechBridge E-commerce" />
+            <Input defaultValue="Kora E-commerce" />
           </div>
           <div>
             <label className="text-sm font-medium">Store Email</label>

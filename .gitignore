@@ -320,6 +320,9 @@ sessions/
 docs/secrets/
 docs/private/
 
+# Laws documents
+docs/laws/
+
 # ==========================================
 # NOTES
 # ==========================================

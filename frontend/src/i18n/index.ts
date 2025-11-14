@@ -49,8 +49,13 @@ const resources = {
       "common.viewAll": "View All",
 
       // Authentication
+      "auth.welcomeTitle": "Welcome to Kora",
+      "auth.welcomeDesc": "Sign in or create an account to save your details, track orders, and speed up checkout.",
+      "auth.signIn": "Sign in",
+      "auth.signUp": "Sign up",
       "auth.login": "Login",
       "auth.register": "Register",
+      "auth.back": "Back",
       "auth.logout": "Logout",
       "auth.email": "Email",
       "auth.password": "Password",
@@ -204,6 +209,7 @@ const resources = {
       "offline.editWishlist": "Edit your wishlist",
 
       // FAQ Page
+      "faq.all": "All",
       "faq.title": "Frequently Asked Questions",
       "faq.subtitle": "Find answers to common questions about our products and services",
       "faq.searchPlaceholder": "Search frequently asked questions...",
@@ -367,8 +373,13 @@ const resources = {
       "common.viewAll": "Reba Byose",
 
       // Authentication
+      "auth.welcomeTitle": "Ikaze kuri Kora",
+      "auth.welcomeDesc": "Injira cyangwa yandikishe kugira ngo ubike amakuru yawe, ukurikirane amabwiriza, no kwihutisha kwishyura.",
+      "auth.signIn": "Injira",
+      "auth.signUp": "Iyandikishe",
       "auth.login": "Injira",
       "auth.register": "Iyandikishe",
+      "auth.back": "Subira inyuma",
       "auth.logout": "Sohoka",
       "auth.email": "Imeli",
       "auth.password": "Ijambo ry'ibanga",
@@ -482,6 +493,10 @@ const resources = {
       "footer.contact": "Wasiliana",
       "footer.returnsWarranty": "Kurudisha na Dhamana",
       "footer.faq": "Maswali Yanayoulizwa Sana",
+      
+      // FAQ Page - Kinyarwanda
+      "faq.all": "Byose",
+      
       "footer.blog": "Blogu",
       "footer.categories": "Kategoria",
       "footer.newArrivals": "Ibintu Bishya",
@@ -538,8 +553,13 @@ const resources = {
       "common.viewAll": "Tazama Zote",
 
       // Authentication
+      "auth.welcomeTitle": "Karibu Kora",
+      "auth.welcomeDesc": "Ingia au jisajili ili kuhifadhi taarifa zako, kufuatilia maagizo na kuharakisha malipo.",
+      "auth.signIn": "Ingia",
+      "auth.signUp": "Jisajili",
       "auth.login": "Ingia",
       "auth.register": "Jisajili",
+      "auth.back": "Rudi nyuma",
       "auth.logout": "Toka",
       "auth.email": "Barua Pepe",
       "auth.password": "Neno la Siri",
@@ -662,6 +682,10 @@ const resources = {
       "footer.contact": "Wasiliana",
       "footer.returnsWarranty": "Kurudisha na Dhamana",
       "footer.faq": "Maswali Yanayoulizwa Sana",
+      
+      // FAQ Page - Kiswahili
+      "faq.all": "Zote",
+      
       "footer.blog": "Blogu",
       "footer.categories": "Kategoria",
       "footer.newArrivals": "Vifaa Vipya",
@@ -718,8 +742,13 @@ const resources = {
       "common.viewAll": "Tazama Zote",
 
       // Authentication
+      "auth.welcomeTitle": "Boyei bolamu na Kora",
+      "auth.welcomeDesc": "Kota to sala compte mpo na kobikisa ba coordonnées na yo, kotala ba commande mpe kobongisa checkout.",
+      "auth.signIn": "Kota",
+      "auth.signUp": "Kozala membre",
       "auth.login": "Kokota",
       "auth.register": "Kofanda lisani",
+      "auth.back": "Zonga nsima",
       "auth.logout": "Kobima",
       "auth.email": "Email",
       "auth.password": "Mot de passe",
@@ -842,6 +871,10 @@ const resources = {
       "footer.contact": "Tuŋŋŋanye",
       "footer.returnsWarranty": "Okuddawo n'okukakasa",
       "footer.faq": "Ebibuuzo ebikulu",
+      
+      // FAQ Page - Luganda
+      "faq.all": "Byonna",
+      
       "footer.blog": "Blog",
       "footer.categories": "Makategori",
       "footer.newArrivals": "Bilembo ya sika",
@@ -856,7 +889,7 @@ const resources = {
   lg: {
     translation: {
       // Header - Luganda
-      "header.logo": "TechBridge",
+      "header.logo": "Kora",
       "header.subtitle": "Dubai • China • Korea → Rwanda",
       "header.search": "Noonya ebyuma bya elektroni, ebitundu bya motoka, ebikozesebwa...",
       "header.account": "Akaunti",
@@ -898,8 +931,13 @@ const resources = {
       "common.viewAll": "Laba Byose",
 
       // Authentication
+      "auth.welcomeTitle": "Tukwanirizza ku Kora",
+      "auth.welcomeDesc": "Yingira oba wewandise okulaba amateeka go, okulondoola ebiragiro, n'okwanguya okusasula.",
+      "auth.signIn": "Yingira",
+      "auth.signUp": "Wewandise",
       "auth.login": "Yingira",
       "auth.register": "Wewandise",
+      "auth.back": "Dda emabega",
       "auth.logout": "Fuluma",
       "auth.email": "Emeyilo",
       "auth.password": "Akasumuluzo",
@@ -984,7 +1022,7 @@ const resources = {
       "home.samsungSubtitle": "Laba telefone n'ebintu ebipya bya Galaxy",
       "home.premiumAudio": "Audio ya waggulu",
       "home.audioSubtitle": "Inyigiza mu ddoboozi ennungi",
-      "home.whyChooseTitle": "Lwaki olonze TechBridge?",
+      "home.whyChooseTitle": "Lwaki olonze Kora?",
       "home.whyChooseDesc": "Tufubye okukuwa ekirabo ekisinga obulungi eky'okugula okuva Dubai okudda Uganda ne ssanduku erya bulijjo.",
       "home.freeShippingTitle": "Okutuma kwe bwereere",
       "home.freeShippingDesc": "Okutuma kwe bwereere ku bigula bisukka $500 wala wona mu Uganda",

@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             ShippingRouteSeeder::class,
             // ShippingMethodRoutePriceSeeder::class, // Empty seeder - skip for now
             TestOrdersSeeder::class, // Creates test orders and invoices
+            PageContentAndSiteConfigSeeder::class,
             // RwandaDubaiCommerceSeeder::class,
             // BlogPostsSeeder::class,
         ]);

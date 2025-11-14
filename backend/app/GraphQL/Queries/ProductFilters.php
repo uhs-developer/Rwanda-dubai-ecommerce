@@ -57,6 +57,8 @@ class ProductFilters
             ->get();
 
         return [
+            // Top-level min/max match GraphQL schema and are used by the frontend slider
+            'minPrice' => $minPrice,
             'maxPrice' => $maxPrice,
             'categories' => $categories,
             'brands' => $brands,

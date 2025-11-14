@@ -163,7 +163,7 @@ export function ProductListingPageDynamic({
   const FiltersContent = () => (
     <div className="space-y-6">
       {/* Categories */}
-      {!category && availableCategories.length > 0 && (
+      {availableCategories.length > 0 && (
         <div>
           <h3 className="font-semibold mb-3">Categories</h3>
           <div className="space-y-2 max-h-64 overflow-y-auto">

@@ -170,7 +170,7 @@ export function BlogPage({ onBack }: BlogPageProps) {
               Back
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">TechBridge Blog</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Kora Blog</h1>
               <p className="text-gray-600">Insights, tips, and updates from the world of electronics and automotive</p>
             </div>
           </div>
