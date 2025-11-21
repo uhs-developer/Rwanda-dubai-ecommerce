@@ -16,8 +16,14 @@ class ProductsAndCategoriesSeeder extends Seeder
      */
     public function run(): void
     {
-        // Disable foreign key checks for truncation
-        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // Disable foreign key checks for truncation (database-agnostic)
+        $driver = \DB::connection()->getDriverName();
+        
+        if ($driver === 'mysql') {
+            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        } elseif ($driver === 'sqlite') {
+            \DB::statement('PRAGMA foreign_keys = OFF;');
+        }
         
         // Clear existing data
         ProductImage::truncate();
@@ -27,7 +33,11 @@ class ProductsAndCategoriesSeeder extends Seeder
         Category::truncate();
         
         // Re-enable foreign key checks
-        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        if ($driver === 'mysql') {
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } elseif ($driver === 'sqlite') {
+            \DB::statement('PRAGMA foreign_keys = ON;');
+        }
 
         // Create Categories
         $electronics = Category::create([

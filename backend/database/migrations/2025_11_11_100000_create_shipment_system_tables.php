@@ -19,7 +19,9 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Shipping Methods (Air Cargo, Sea Cargo, Land Transport, etc.)
-        Schema::create('shipping_methods', function (Blueprint $table) {
+        // Skip if already exists (created by earlier migration)
+        if (!Schema::hasTable('shipping_methods')) {
+            Schema::create('shipping_methods', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->nullable()->constrained('tenants')->onDelete('cascade');
             $table->string('name'); // e.g., "Air Cargo", "Sea Freight", "Express Land"
@@ -37,7 +39,8 @@ return new class extends Migration
 
             $table->index(['tenant_id', 'is_active']);
             $table->index('code');
-        });
+            });
+        }
 
         // 2. Shipping Routes (e.g., Dubai->Mombasa->Kampala->Kigali)
         Schema::create('shipping_routes', function (Blueprint $table) {

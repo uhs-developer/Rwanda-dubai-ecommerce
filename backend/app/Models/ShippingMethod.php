@@ -17,25 +17,20 @@ class ShippingMethod extends Model
         'code',
         'description',
         'carrier',
-        'type',
-        'base_price',
-        'estimated_days_min',
-        'estimated_days_max',
         'is_active',
         'sort_order',
-        'metadata',
+        'config',
     ];
 
     protected $casts = [
-        'base_price' => 'decimal:2',
         'is_active' => 'boolean',
-        'metadata' => 'array',
+        'config' => 'array',
     ];
 
     protected $attributes = [
-        'base_price' => 0,
         'is_active' => true,
         'sort_order' => 0,
+        'config' => '[]',
     ];
 
     public function routePrices(): HasMany
@@ -60,10 +55,28 @@ class ShippingMethod extends Model
         return $query->orderBy('sort_order')->orderBy('name');
     }
 
-    // Accessor to ensure basePrice is never null
-    public function getBasePriceAttribute($value)
+    // Accessor to get base_price from config
+    public function getBasePriceAttribute()
     {
-        return $value !== null ? (float) $value : 0.0;
+        return $this->config['base_price'] ?? 0.0;
+    }
+
+    // Accessor to get type from config
+    public function getTypeAttribute()
+    {
+        return $this->config['type'] ?? 'land';
+    }
+
+    // Accessor to get estimated_days_min from config
+    public function getEstimatedDaysMinAttribute()
+    {
+        return $this->config['estimated_days_min'] ?? null;
+    }
+
+    // Accessor to get estimated_days_max from config
+    public function getEstimatedDaysMaxAttribute()
+    {
+        return $this->config['estimated_days_max'] ?? null;
     }
 
     // Accessor to ensure isActive is never null
